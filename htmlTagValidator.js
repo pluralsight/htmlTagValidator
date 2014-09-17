@@ -205,4 +205,8 @@ var htmlTagValidator = function() {
   return checkTags;
 }
 
-module.exports = htmlTagValidator()
+if(module && module.exports) {
+  module.exports = htmlTagValidator()
+} else {
+  window.htmlTagValidator = htmlTagValidator();
+}
