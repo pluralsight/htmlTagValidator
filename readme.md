@@ -6,7 +6,7 @@ unclosed tags are hard to find in browser based methods since the browser and th
 will automatically close any unclosed tags, which is great for avoiding errors, but not so much
 if you really want to know.
 ## Usage
-npm install htmlTagValidator
+npm install html-tag-validator
 
 node:
 ```javascript

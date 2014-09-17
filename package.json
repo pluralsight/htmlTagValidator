@@ -1,5 +1,5 @@
 {
-  "name": "htmlTagValidator",
+  "name": "html-tag-validator",
   "version": "0.0.1",
   "main": "htmlTagValidator.js",
   "author": "Code School - Adam Rensel",
