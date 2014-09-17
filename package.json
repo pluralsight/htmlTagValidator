@@ -1,18 +1,15 @@
 {
-  "name": "interview",
-  "version": "0.0.0",
-  "main": "1_reverse_test.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
+  "name": "htmlTagValidator",
+  "version": "0.0.1",
+  "main": "htmlTagValidator.js",
+  "author": "Code School - Adam Rensel",
+  "license": "MIT",
+  "description": "HTML tag validator for detecting things like unclosed tags and comments",
+  "repository": "git@github.com:codeschool/htmlTagValidator.git",
   "devDependencies": {
     "chai": "^1.9.1",
     "lodash": "^2.4.1",
-    "mocha": "^1.21.4"
-  },
-  "dependencies": {
+    "mocha": "^1.21.4",
     "node-inspector": "^0.7.4"
   }
 }
