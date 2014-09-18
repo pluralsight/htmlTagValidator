@@ -4,8 +4,10 @@ var htmlTagValidator = function() {
       closingTagSecondChar = "/",
       selfClosingTagSecondToLastChar = "/",
       commentSecondCharacter = "!",
+      doctypeSecondCharacterPattern = new RegExp("[dD]"),
       startTagPattern = new RegExp("[a-z0-9-]"),
-      commentPattern = new RegExp("^<!--.*-->");
+      commentPattern = new RegExp("^<!--.*-->"),
+      doctypePattern = new RegExp("^<!doctype\s.*", "i");
   
   var parserFunc, previousParserFunc, currentTagName, startingTags, characterIndex;
 
@@ -67,7 +69,7 @@ var htmlTagValidator = function() {
       setParserFunc(endingTagNameFinder);
     } else if(character === commentSecondCharacter) {
       currentTagName = ""
-      setParserFunc(commentFinder);
+      setParserFunc(commentOrDoctypeFinder);
   	} else if(selfClosing.indexOf(currentTagName) >= 0){
       setParserFunc(startingTagBeginningFinder);
     } else {
@@ -78,12 +80,10 @@ var htmlTagValidator = function() {
         currentTagName = "";
         goBackNumChars(1)
         setParserFunc(ignoredWithinEndingTagStartFinder);
-        // ignoredWithinEndingTagStartFinder(character, lIndex, cIndex);
       } else {
         currentTagName = "";
         goBackNumChars(1);
         setParserFunc(startingTagEndingFinder);
-        // startingTagEndingFinder(character, lIndex, cIndex);
       }
   	}
   }
@@ -159,6 +159,17 @@ var htmlTagValidator = function() {
     }
   }
   
+  var commentOrDoctypeFinder = function commentOrDoctypeFinder(character, lIndex, cIndex) {
+    console.log("")
+    if (doctypeSecondCharacterPattern.test(character)) {
+      currentTagName = ""
+      setParserFunc(startingTagBeginningFinder)
+    } else {
+      goBackNumChars(1);
+      setParserFunc(commentFinder)
+    }
+  }
+  
   var currentComment;
   var resetCurrentComment = function(lIndex, cIndex){
     currentComment = {content: "<!", line: lIndex + 1, char: cIndex - 1, name: "comment"}
@@ -185,6 +196,7 @@ var htmlTagValidator = function() {
     setParserFunc(startingTagBeginningFinder);
     currentTagName = "";
     startingTags = [];
+    currentComment = null;
   	
   	for(var lineIndex=0, l = lines.length; lineIndex < l; lineIndex++) {
   		for(characterIndex=0, ll=lines[lineIndex].length; characterIndex < ll; characterIndex++) {

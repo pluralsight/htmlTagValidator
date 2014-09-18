@@ -153,7 +153,7 @@ describe('htmlTagValidator', function() {
     it('raises an error', function() {
       expect(function(){ validateHtml('/testHtml/scriptClosing.html')}).to.throw(Error)
     });
-  
+   
     describe("with unclosed html Comments", function() {
       it("contains line data", function() {
          var errorData = validateHtmlReturnData('/testHtml/htmlCommentsUnclosed.html');
@@ -162,6 +162,12 @@ describe('htmlTagValidator', function() {
          expect(errorData).to.have.property('char', 3);
          expect(errorData).to.have.property('name', "comment");
       });
+    }); 
+  });
+  
+  describe('with doctype', function() {
+    it('does not raise an error', function() {
+      expect(function(){ validateHtml('/testHtml/doctype.html')}).to.not.throw(Error)
     }); 
   });
 });
