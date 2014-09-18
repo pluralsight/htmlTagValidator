@@ -34,7 +34,8 @@ var htmlTagValidator = function() {
   	"pre",
   	"code",
   	"textarea",
-  	"script"
+  	"script",
+    "style"
   ]
 
   var tagObject = function(lIndex, cIndex) {
