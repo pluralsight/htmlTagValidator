@@ -9,7 +9,7 @@ var htmlTagValidator = function() {
       commentPattern = new RegExp("^<!--.*-->"),
       doctypePattern = new RegExp("^<!doctype\s.*", "i");
   
-  var parserFunc, previousParserFunc, currentTagName, startingTags, characterIndex;
+  var parserFunc, previousParserFunc, currentTagName, startingTags, characterIndex, currentComment;
 
   var selfClosing = [
   	"area",
@@ -62,17 +62,32 @@ var htmlTagValidator = function() {
   var goBackNumChars = function(num) {
     characterIndex -= num;
   }
-
+  
+  // Handle starting html tags
   var startingTagNameFinder = function startingTagNameFinder(character, lIndex, cIndex) {
+    // If the character matches the matcher for approved tag name characters add it to
+    // the currentTagName
   	if(startTagPattern.test(character)) {
   		currentTagName += character
+    // If the character matches the closing tag second character set the finder function
+    // to the endingTagNameFinder
   	} else if(character === closingTagSecondChar) {
       setParserFunc(endingTagNameFinder);
+    // If the character looks like a commentSecondCharacter(!) then check to see if it's
+    // really a comment or a comment with the commentOrDoctypeFinder
     } else if(character === commentSecondCharacter) {
       currentTagName = ""
       setParserFunc(commentOrDoctypeFinder);
+      
+      // If the current tag name is a self closing tag, start looking for a new
+      // tag name with startingTagBeginningFinder
   	} else if(selfClosing.indexOf(currentTagName) >= 0){
       setParserFunc(startingTagBeginningFinder);
+      
+      // If nothing else trips a check, the record the currentTag name and either:
+      //   ignore all the contents of the tag is an ignoredWithin tag (script, style, pre, etc)
+      // or
+      //   start looking for the matching ending tag.
     } else {
   		tagObj = tagObject(lIndex, cIndex)
   		startingTags.push(tagObj)
@@ -120,7 +135,6 @@ var htmlTagValidator = function() {
   	if(character === closingTagSecondChar) {
       setParserFunc(endingTagNameFinder);
   	} else {
-  		// startingTagNameFinder(character, lIndex, cIndex);
       goBackNumChars(1)
       setParserFunc(startingTagNameFinder);
   	}
@@ -160,30 +174,27 @@ var htmlTagValidator = function() {
     }
   }
   
+  // Comments and doctypes both start with `<!` So we needed a custom finder to determine what it
+  // really is. If it's a doctype we want to ignore it and look for a new starting tag character,
+  // while if it's a comment, we want to look for a full comment.
   var commentOrDoctypeFinder = function commentOrDoctypeFinder(character, lIndex, cIndex) {
-    console.log("")
     if (doctypeSecondCharacterPattern.test(character)) {
       currentTagName = ""
       setParserFunc(startingTagBeginningFinder)
     } else {
-      goBackNumChars(1);
+      goBackNumChars(3);
       setParserFunc(commentFinder)
     }
   }
-  
-  var currentComment;
-  var resetCurrentComment = function(lIndex, cIndex){
-    currentComment = {content: "<!", line: lIndex + 1, char: cIndex - 1, name: "comment"}
-  }
 
   // comment finding
-  // (<!) - These have already been found on the way to this function
-  // the remaining comment should look something like: -- some commment -->
+  // Look through the incoming characters until a full matching comment has been built,
+  // then reset the finder back to the startingTagBeginningFinder and clear the currentComment 
   var commentFinder = function commentFinder(character, lIndex, cIndex) {
     if(!currentComment) {
-      resetCurrentComment(lIndex, cIndex);
+      currentComment = {content: "", line: lIndex + 1, char: cIndex + 1, name: "comment"}
     }
-    
+
     currentComment.content += character;  
 
     if(commentPattern.test(currentComment.content)) {
@@ -191,7 +202,8 @@ var htmlTagValidator = function() {
       setParserFunc(startingTagBeginningFinder);
     }
   }
-
+  
+  // Main entry point to the validator, it starts with the `startingTagBeginningFinder` first
   var checkTags = function(string) {
     var lines = string.split("\n");
     setParserFunc(startingTagBeginningFinder);
@@ -207,8 +219,15 @@ var htmlTagValidator = function() {
   		}
   	}
   	
+    // currentComment gets cleared whenever a complete comment is found, so if the loops end and one still
+    // exists, we can assume that it was never closed.
     if(currentComment) {
       throwEndingCommentError(currentComment);
+    
+    // The startTags array populates when a starting tag is found, but pops back out when
+    // matching ending tags are found. If there are any starting tags left at the end of
+    // the loop we can assume that the ending tag was never found and throw and error
+    // for the last tag in the array.
     } else if(startingTags.length > 0) { 
   		var lastStartTag = startingTags[startingTags.length - 1];
   		throwEndingTagError(lastStartTag);
