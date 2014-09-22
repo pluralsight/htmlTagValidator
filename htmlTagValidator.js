@@ -231,7 +231,7 @@ var htmlTagValidator = function() {
     currentTagName = "";
     startingTags = [];
     currentComment = null;
-    options = opts;
+    options = opts || {};
 
   	for(var lineIndex=0, l = lines.length; lineIndex < l; lineIndex++) {
   		for(characterIndex=0, ll=lines[lineIndex].length; characterIndex < ll; characterIndex++) {
