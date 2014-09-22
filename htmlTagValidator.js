@@ -9,7 +9,8 @@ var htmlTagValidator = function() {
       commentPattern = new RegExp("^<!--.*-->"),
       doctypePattern = new RegExp("^<!doctype\s.*", "i");
   
-  var parserFunc, previousParserFunc, currentTagName, startingTags, characterIndex, currentComment;
+  var parserFunc, previousParserFunc, currentTagName, startingTags,
+      characterIndex, currentComment, options;
 
   var selfClosing = [
   	"area",
@@ -54,6 +55,12 @@ var htmlTagValidator = function() {
     throw newError;
   }
   
+  var throwSelfClosingFormatError = function(tagObj) {
+    var newError = new Error("Ending `/` not found for: `"+ tagObj.name +"` at line: " + tagObj.line + " char: " + tagObj.char)
+    newError.lineData = tagObj.name;
+    throw newError;
+  }
+  
   var setParserFunc = function(func) {
     previousParserFunc = parserFunc;
     parserFunc = func;
@@ -82,7 +89,12 @@ var htmlTagValidator = function() {
       // If the current tag name is a self closing tag, start looking for a new
       // tag name with startingTagBeginningFinder
   	} else if(selfClosing.indexOf(currentTagName) >= 0){
-      setParserFunc(startingTagBeginningFinder);
+      if(options['strict_self_closing_tags']) {
+        setParserFunc(selfClosingEndingSlashFinder);
+      } else {
+        currentTagName = "";
+        setParserFunc(startingTagBeginningFinder);
+      }
       
       // If nothing else trips a check, the record the currentTag name and either:
       //   ignore all the contents of the tag is an ignoredWithin tag (script, style, pre, etc)
@@ -102,6 +114,15 @@ var htmlTagValidator = function() {
         setParserFunc(startingTagEndingFinder);
       }
   	}
+  }
+
+  var selfClosingEndingSlashFinder = function selfClosingEndingSlashFinder(character, lIndex, cIndex) {
+    if(character === selfClosingTagSecondToLastChar) {
+      currentTagName = '';
+      setParserFunc(endingTagBeginningFinder);
+    } else if(character === startingTagLastChar) {
+      throwSelfClosingFormatError(tagObject(lIndex, cIndex));
+    }
   }
 
   var startingTagEndingFinder = function startingTagEndingFinder(character, lIndex, cIndex) {
@@ -204,13 +225,14 @@ var htmlTagValidator = function() {
   }
   
   // Main entry point to the validator, it starts with the `startingTagBeginningFinder` first
-  var checkTags = function(string) {
+  var checkTags = function(string, opts) {
     var lines = string.split("\n");
     setParserFunc(startingTagBeginningFinder);
     currentTagName = "";
     startingTags = [];
     currentComment = null;
-  	
+    options = opts;
+
   	for(var lineIndex=0, l = lines.length; lineIndex < l; lineIndex++) {
   		for(characterIndex=0, ll=lines[lineIndex].length; characterIndex < ll; characterIndex++) {
   			if(!parserFunc) {break;}

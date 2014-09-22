@@ -4,11 +4,12 @@
 
 var expect = require('chai').expect,
     validate = require('./htmlTagValidator.js'),
-    fs = require('fs');
+    fs = require('fs'),
+    options = {};
     
 var validateHtml = function(path) {
   var html = fs.readFileSync(__dirname + path, 'utf8');
-  return validate(html);
+  return validate(html, options);
 }
 
 var validateHtmlReturnData = function(path) {
@@ -67,10 +68,40 @@ describe('htmlTagValidator', function() {
     }); 
   });
   
-  describe('with self closing tags', function() {
-    it('does not raise an error', function() {
-      expect(function(){ validateHtml('/testHtml/basicSelfClosing.html')}).to.not.throw(Error)
-    }); 
+  describe('with strict_self_closing_tags = false options', function(){
+    describe('with xhtml self closing tags', function() {
+      it('does not raise an error', function() {
+        expect(function(){ validateHtml('/testHtml/basicSelfClosing.html')}).to.not.throw(Error)
+      }); 
+    });
+    
+    describe('with html5 self closing tags', function() {
+      it('raises an error', function() {
+        expect(function(){ validateHtml('/testHtml/nonEndingSlashSelfClosing.html')}).to.not.throw(Error)
+      }); 
+    });
+  });
+  
+  describe('with strict_self_closing_tags = true options', function(){
+    beforeEach(function(){
+      options['strict_self_closing_tags'] = true
+    });
+    
+    afterEach(function(){
+      options['strict_self_closing_tags'] = false
+    });
+    
+    describe('with xhtml self closing tags', function() {
+      it('does not raise an error', function() {
+        expect(function(){ validateHtml('/testHtml/basicSelfClosing.html')}).to.not.throw(Error)
+      }); 
+    });
+    
+    describe('with html5 self closing tags', function() {
+      it('raises an error', function() {
+        expect(function(){ validateHtml('/testHtml/nonEndingSlashSelfClosing.html')}).to.throw(Error)
+      }); 
+    });
   });
   
   describe('with content nested within pre tags', function() {

@@ -22,6 +22,11 @@ client:
 </script>
 ```
 
+### Options
+* **strict_self_closing_tags** Defaults to false, settings this to true will enforce xhtml
+  style closing tags: `<link src"mycss.css" />`. Setting to false allows html5 style self closing tags:
+  `<link src"mycss.css">`.
+
 ## Developing
 To run within node-inspector:
 
