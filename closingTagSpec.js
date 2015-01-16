@@ -36,6 +36,54 @@ describe('htmlTagValidator', function() {
     });
   });
 
+  describe('with malformed class value', function(){
+    it('raises an error', function(){
+      expect(function(){validateHtml('/testHtml/malformedClassValue.html')}).to.throw(Error)
+    });
+
+    describe("error data", function() {
+      it("contains line data", function() {
+         var errorData = validateHtmlReturnData('/testHtml/malformedClassValue.html');
+
+         expect(errorData).to.have.property('line', 1);
+         expect(errorData).to.have.property('char', 11);
+         expect(errorData).to.have.property('name', "div");
+      });
+    });
+  });
+
+  describe('with malformed id value', function(){
+    it('raises an error', function(){
+      expect(function(){validateHtml('/testHtml/malformedIValue.html')}).to.throw(Error)
+    });
+
+    describe("error data", function() {
+      it("contains line data", function() {
+        var errorData = validateHtmlReturnData('/testHtml/malformedIdValue.html');
+
+        expect(errorData).to.have.property('line', 1);
+        expect(errorData).to.have.property('char', 8);
+        expect(errorData).to.have.property('name', "div");
+      });
+    });
+  });
+
+  describe('with malformed attribute name', function(){
+    it('raises an error', function(){
+      expect(function(){validateHtml('/testHtml/malformedAttributeName.html')}).to.throw(Error)
+    });
+
+    describe("error data", function() {
+      it("contains line data", function() {
+        var errorData = validateHtmlReturnData('/testHtml/malformedAttributeName.html');
+
+        expect(errorData).to.have.property('line', 1);
+        expect(errorData).to.have.property('char', 10);
+        expect(errorData).to.have.property('name', "div");
+      });
+    });
+  });
+
   describe('with a malformed html tag', function() {
     describe('at the beginning tag', function(){
       it('raises an error', function() {

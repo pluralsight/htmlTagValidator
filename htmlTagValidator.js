@@ -7,10 +7,18 @@ var htmlTagValidator = function() {
       doctypeSecondCharacterPattern = new RegExp("[dD]"),
       startTagPattern = new RegExp("[a-z0-9-]"),
       commentPattern = new RegExp("^<!--.*-->"),
-      doctypePattern = new RegExp("^<!doctype\s.*", "i");
+      doctypePattern = new RegExp("^<!doctype\s.*", "i"),
+      classPossibleCharacters = new RegExp("[a-z0-9-_]"),
+      classValuePattern = new RegExp("-?[_a-zA-Z]+[_a-zA-Z0-9-]*"),
+      idPossibleCharacters = new RegExp("[a-z0-9-_:.]"),
+      idValuePattern = new RegExp("^[a-z]+[a-z0-9\-_:\.]*$", 'i'),
+      attributeNamePossibleCharacters = new RegExp("[A-Za-z-]"),
+      attributeNamePattern = new RegExp("^[a-zA-Z0-9-_]*$"),
+      attributeValuePattern = new RegExp("^\s?(\".*\"|'.*')\s?$");
 
   var parserFunc, previousParserFunc, currentTagName, startingTags,
-      characterIndex, currentComment, options;
+      characterIndex, currentComment, options, currentAttributeName,
+      currentAttributeValue;
 
   var selfClosing = [
   	"area",
@@ -39,12 +47,36 @@ var htmlTagValidator = function() {
     "style"
   ]
 
-  var tagObject = function(lIndex, cIndex) {
-  	return {name: currentTagName, line: lIndex + 1, char: cIndex};
+  var tagObject = function(lIndex, cIndex, name) {
+  	return {name: name || currentTagName, line: lIndex + 1, char: cIndex};
   }
 
   var throwEndingTagError = function(tagObj) {
     var newError = new Error("Ending tag not found for: " + tagObj.name + " at line: " + tagObj.line + " char: " + tagObj.char)
+    newError.lineData = tagObj;
+    throw newError;
+  }
+
+  var throwMalformedAttributeValueError = function(tagObj) {
+    var newError = new Error("Malformed attribute value found at line: " + tagObj.line + " char: " + tagObj.char)
+    newError.lineData = tagObj;
+    throw newError;
+  }
+
+  var throwMalformedAttributeNameError = function(tagObj) {
+    var newError = new Error("Malformed attribute name found at line: " + tagObj.line + " char: " + tagObj.char)
+    newError.lineData = tagObj;
+    throw newError;
+  }
+
+  var throwMalformedClassValueError = function(tagObj) {
+    var newError = new Error("Malformed class value found at line: " + tagObj.line + " char: " + tagObj.char)
+    newError.lineData = tagObj;
+    throw newError;
+  }
+
+  var throwMalformedIdValueError = function(tagObj) {
+    var newError = new Error("Malformed id value found at line: " + tagObj.line + " char: " + tagObj.char)
     newError.lineData = tagObj;
     throw newError;
   }
@@ -133,10 +165,61 @@ var htmlTagValidator = function() {
     }
   }
 
-  var startingTagEndingFinder = function startingTagEndingFinder(character, lIndex, cIndex) {
-  	if(character === startingTagLastChar) {
+  var attributeValueFinder = function attributeValueFinder(character, lIndex, cIndex) {
+    if(classPossibleCharacters.test(character) || /["'\s]/.test(character)) {
+      currentAttributeValue += character;
+    } else {
+      if(!(attributeValuePattern.test(currentAttributeValue))) {
+        throwMalformedAttributeValueError(tagObject(lIndex, cIndex - currentAttributeValue.length, startingTags[startingTags.length - 1]['name']));
+      }
+
+      if(/^\s?class\s?$/.test(currentAttributeName) && !(classValuePattern.test(currentAttributeValue))) {
+        throwMalformedClassValueError(tagObject(lIndex, cIndex, startingTags[startingTags.length - 1]['name']));
+      } else if(/^\s?id\s?$/.test(currentAttributeName) && !(idValuePattern.test(currentAttributeValue))) {
+        throwMalformedIdValueError(tagObject(lIndex, cIndex, startingTags[startingTags.length - 1]['name']));
+      }
+
+      if(character === startingTagLastChar) {
+        setParserFunc(endingTagBeginningFinder);
+      } else {
+        setParserFunc(startingTagEndingFinder);
+      }
+    }
+  }
+
+  var validateAttributeName = function(character, lIndex, cIndex) {
+    if(!(attributeNamePattern.test(currentAttributeName))) {
+      throwMalformedAttributeNameError(tagObject(lIndex, cIndex, startingTags[startingTags.length - 1]['name']))
+    }
+  }
+
+  var attributeNameFinder = function attributeNameFinder(character, lIndex, cIndex) {
+    if(character === "=") {
+      validateAttributeName(character, lIndex, cIndex)
+      currentAttributeValue = "";
+      setParserFunc(attributeValueFinder);
+    } else if(/\s/.test(character)) {
+      validateAttributeName(character, lIndex, cIndex)
+      setParserFunc(startingTagEndingFinder);
+    } else if(character === startingTagLastChar) {
+      validateAttributeName(character, lIndex, cIndex)
       setParserFunc(endingTagBeginningFinder);
-  	}
+    } else {
+      currentAttributeName += character;
+    }
+  }
+
+  var startingTagEndingFinder = function startingTagEndingFinder(character, lIndex, cIndex) {
+    if(character === "=") {
+      goBackNumChars(1);
+      setParserFunc(attributeNameFinder)
+    } else if(character === startingTagLastChar) {
+      setParserFunc(endingTagBeginningFinder);
+  	} else if(/[^\s]/.test(character)) {
+      goBackNumChars(1);
+      currentAttributeName = "";
+      setParserFunc(attributeNameFinder)
+    }
   }
 
   var startingTagBeginningFinder = function startingTagBeginningFinder(character, lIndex, cIndex) {
