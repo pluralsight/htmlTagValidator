@@ -7,13 +7,13 @@ var htmlTagValidator = function() {
       doctypeSecondCharacterPattern = new RegExp("[dD]"),
       startTagPattern = new RegExp("[a-z0-9-]"),
       commentPattern = new RegExp("^<!--.*-->"),
-      doctypePattern = new RegExp("^<!doctype\s.*", "i"),
+      doctypePattern = new RegExp("^<!doctype\\s.*", "i"),
       classPossibleCharacters = new RegExp("[a-z0-9-_]"),
-      classValuePattern = new RegExp("-?[_a-zA-Z]+[_a-zA-Z0-9-]*"),
-      idPossibleCharacters = new RegExp("[a-z0-9-_:.]"),
-      idValuePattern = new RegExp("^[a-z]+[a-z0-9\-_:\.]*$", 'i'),
+      classValuePattern = new RegExp("[\"'']?-?[_a-zA-Z]+[_a-zA-Z0-9-]*[\"'']?"),
+      idPossibleCharacters = new RegExp("[\"'']?[a-z0-9-_:.][\"'']?"),
+      idValuePattern = new RegExp("^[a-z]+[a-z0-9_:.-]*$", 'i'),
       attributeNamePossibleCharacters = new RegExp("[A-Za-z-]"),
-      attributeValuePossibleCharacters = new RegExp("[A-Za-z0-9-_.:/@]"),
+      attributeValuePossibleCharacters = new RegExp("[A-Za-z0-9_.:/@\\s-]"),
       attributeNamePattern = new RegExp("^[a-zA-Z0-9-_]*$"),
       attributeValuePattern = new RegExp("^\\s?(\".*\"|'.*')\\s?$");
 
@@ -109,6 +109,10 @@ var htmlTagValidator = function() {
     characterIndex -= num;
   }
 
+  var goForwardNumChars = function(num) {
+    characterIndex += num;
+  }
+
   // Handle starting html tags
   var startingTagNameFinder = function startingTagNameFinder(character, lIndex, cIndex) {
     // If the character matches the matcher for approved tag name characters add it to
@@ -167,9 +171,14 @@ var htmlTagValidator = function() {
   }
 
   var attributeValueFinder = function attributeValueFinder(character, lIndex, cIndex) {
-    if(attributeValuePossibleCharacters.test(character) || /["'\s]/.test(character)) {
+    if(attributeValuePossibleCharacters.test(character) || /["']/.test(character) && currentAttributeValue.length == 0) {
       currentAttributeValue += character;
     } else {
+      if (currentAttributeValue[0] === character) {
+        currentAttributeValue += character;
+        setParserFunc(startingTagEndingFinder);
+      }
+
       if(!(attributeValuePattern.test(currentAttributeValue))) {
         throwMalformedAttributeValueError(tagObject(lIndex, cIndex - currentAttributeValue.length, startingTags[startingTags.length - 1]['name']));
       }
@@ -198,6 +207,7 @@ var htmlTagValidator = function() {
     if(character === "=") {
       validateAttributeName(character, lIndex, cIndex)
       currentAttributeValue = "";
+
       setParserFunc(attributeValueFinder);
     } else if(/\s/.test(character)) {
       validateAttributeName(character, lIndex, cIndex)

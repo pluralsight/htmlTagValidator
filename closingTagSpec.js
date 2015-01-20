@@ -309,4 +309,10 @@ describe('htmlTagValidator', function() {
       expect(function(){ validateHtml('/testHtml/basicDiv5.html')}).to.not.throw(Error)
     });
   });
+
+  describe('with multiple class names', function() {
+    it('does not raise an error', function() {
+      expect(function(){ validateHtml('/testHtml/multipleClassNames.html')}).to.not.throw(Error)
+    });
+  });
 });
