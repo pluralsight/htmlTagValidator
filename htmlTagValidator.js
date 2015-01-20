@@ -13,8 +13,9 @@ var htmlTagValidator = function() {
       idPossibleCharacters = new RegExp("[a-z0-9-_:.]"),
       idValuePattern = new RegExp("^[a-z]+[a-z0-9\-_:\.]*$", 'i'),
       attributeNamePossibleCharacters = new RegExp("[A-Za-z-]"),
+      attributeValuePossibleCharacters = new RegExp("[A-Za-z-_.:/]"),
       attributeNamePattern = new RegExp("^[a-zA-Z0-9-_]*$"),
-      attributeValuePattern = new RegExp("^\s?(\".*\"|'.*')\s?$");
+      attributeValuePattern = new RegExp("^\\s?(\".*\"|'.*')\\s?$");
 
   var parserFunc, previousParserFunc, currentTagName, startingTags,
       characterIndex, currentComment, options, currentAttributeName,
@@ -166,7 +167,7 @@ var htmlTagValidator = function() {
   }
 
   var attributeValueFinder = function attributeValueFinder(character, lIndex, cIndex) {
-    if(classPossibleCharacters.test(character) || /["'\s]/.test(character)) {
+    if(attributeValuePossibleCharacters.test(character) || /["'\s]/.test(character)) {
       currentAttributeValue += character;
     } else {
       if(!(attributeValuePattern.test(currentAttributeValue))) {

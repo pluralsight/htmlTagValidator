@@ -297,4 +297,10 @@ describe('htmlTagValidator', function() {
       expect(function(){ validateHtml('/testHtml/doctype.html')}).to.not.throw(Error)
     });
   });
+
+  describe('with anchor tags', function() {
+    it('does not raise an error', function() {
+      expect(function(){ validateHtml('/testHtml/anchorTags.html')}).to.not.throw(Error)
+    });
+  });
 });
