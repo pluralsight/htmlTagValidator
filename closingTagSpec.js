@@ -308,6 +308,10 @@ describe('htmlTagValidator', function() {
     it('does not raise an error with hyphened class name', function() {
       expect(function(){ validateHtml('/testHtml/basicDiv5.html')}).to.not.throw(Error)
     });
+
+    it('does not raise an error with id attribute', function() {
+      expect(function(){ validateHtml('/testHtml/basicDivWithId.html')}).to.not.throw(Error)
+    });
   });
 
   describe('with multiple class names', function() {
