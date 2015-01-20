@@ -303,4 +303,10 @@ describe('htmlTagValidator', function() {
       expect(function(){ validateHtml('/testHtml/anchorTags.html')}).to.not.throw(Error)
     });
   });
+
+  describe('with div class', function() {
+    it('does not raise an error with hyphened class name', function() {
+      expect(function(){ validateHtml('/testHtml/basicDiv5.html')}).to.not.throw(Error)
+    });
+  });
 });

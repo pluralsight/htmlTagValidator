@@ -13,7 +13,7 @@ var htmlTagValidator = function() {
       idPossibleCharacters = new RegExp("[a-z0-9-_:.]"),
       idValuePattern = new RegExp("^[a-z]+[a-z0-9\-_:\.]*$", 'i'),
       attributeNamePossibleCharacters = new RegExp("[A-Za-z-]"),
-      attributeValuePossibleCharacters = new RegExp("[A-Za-z-_.:/]"),
+      attributeValuePossibleCharacters = new RegExp("[A-Za-z0-9-_.:/]"),
       attributeNamePattern = new RegExp("^[a-zA-Z0-9-_]*$"),
       attributeValuePattern = new RegExp("^\\s?(\".*\"|'.*')\\s?$");
 
