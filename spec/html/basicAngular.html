@@ -1,0 +1,15 @@
+<html test-attr="yaydata">
+  <head>
+    <title></title>
+  </head>
+  <body data-something="yaydata">
+    <div class="main">
+      <h1 id="main-head" title="this is the hello world example">Hello you</h1>
+      <button (click)="handleClick($event)"></button>
+      <p [innerHtml]="model.body" complex=tagvalue checked>
+        Hello world <strong>I'm bold!</strong> Yes you are
+      </p>
+    </div>
+    <input>
+  </body>
+</html>
