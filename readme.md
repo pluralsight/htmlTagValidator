@@ -1,36 +1,17 @@
-# htmlTagValidator
-This library is used to validate certain aspects of HTML, currently closing tags and closing comments.
+# html-tag-validator
+This library takes some HTML source code, provided as a string, and generate an AST. An error will be thrown describing what is malformed in the source document if the AST cannot be generated.
 
-The usecase for this is if you are testing html, and need to indicate that closing tags are missing.
-unclosed tags are hard to find in browser based methods since the browser and things like jQuery
-will automatically close any unclosed tags, which is great for avoiding errors, but not so much
-if you really want to know.
-## Usage
+## Install
+
+```
 npm install html-tag-validator
-
-node:
-```javascript
-var validate = require('htmlTagValidator');
-validate(<html string goes here>);
 ```
 
-client:
-```html
-<script src="htmlTagValidator.js"></script>
-<script>
-  htmlTagValidator(<html string goes here>);
-</script>
+## Usage
+
+``` javascript
+var htmlTagValidator = require('html-tag-validator');
+htmlTagValidator("<html></html>", function (err, ast) {
+	console.log(ast);
+});
 ```
-
-### Options
-* **strict_self_closing_tags** Defaults to false, settings this to true will enforce xhtml
-  style closing tags: `<link src"mycss.css" />`. Setting to false allows html5 style self closing tags:
-  `<link src"mycss.css">`.
-
-## Developing
-To run within node-inspector:
-
-* In one terminal window run: `mocha -w --debug-brk closingTagSpec.js`
-
-* In a second terminal window run: `node-inspector --config ./inspector-config.json`
-Vist the site given
