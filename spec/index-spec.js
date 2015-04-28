@@ -24,10 +24,4 @@ describe('html-tag-validator', function() {
       });
     });
   });
-  // describe('with a single html element with missing closing tag', function() {
-  //   it('raises an error', function() {
-  //     console.log(validateHtml('/testHtml/basicDiv.html'))
-  //     expect(function(){ validateHtml('/testHtml/basicDiv.html')}).to.throw('Expected open tag: div to match closing tag: p')
-  //   });
-  // });
 });
