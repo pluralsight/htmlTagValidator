@@ -1,8 +1,12 @@
 {
   "name": "html-tag-validator",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "index.js",
   "author": "Code School",
+  "contributors": [
+    { "name": "Nick Wronski", "url": "https://github.com/nwronski" }, 
+    { "name": "Adam Rensel", "url": "https://github.com/renz45" }
+  ],
   "license": "MIT",
   "description": "PEG.js implementation of HTML tag validator",
   "repository": "git@github.com:codeschool/htmlTagValidator.git#peg",

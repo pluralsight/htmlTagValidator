@@ -32,24 +32,42 @@ module.exports = (function() {
         peg$startRuleFunctions = { start: peg$parsestart },
         peg$startRuleFunction  = peg$parsestart,
 
-        peg$c0 = function(s) { return s },
+        peg$c0 = function(s) { 
+        		return {
+        			document: s
+        		}; 
+        	},
         peg$c1 = { type: "other", description: "HTML Tag" },
         peg$c2 = { type: "other", description: "Tag" },
         peg$c3 = peg$FAILED,
-        peg$c4 = function(otn) {return isSelfClosing(otn)},
+        peg$c4 = function(otn) {return isSelfClosing(otn.name)},
         peg$c5 = void 0,
         peg$c6 = function(otn, c, ctn) {
-        		if(otn !== ctn) {
-        			return error("Expected open tag <" + otn + "> to match closing tag <" + ctn + ">");
+        		if(otn.name !== ctn.name) {
+        			return error("Expected open tag <" + otn.name + "> to match closing tag <" + ctn.name + ">");
         		}
-        		return  "<" + otn + ">" + c + "</" + ctn + ">"
+        		return {
+        			'type': 'element',
+        			'selfClosing': false,
+        			'name': otn.name,
+        			'attributes': otn.attributes,
+        			'children': c
+        		};
+        		// return  "<" + otn + ">" + c + "</" + ctn + ">";
         	},
         peg$c7 = { type: "other", description: "Self-closing Tag" },
         peg$c8 = function(ot) {
-        		if(!isSelfClosing(ot)) {
-        			return error("<" + ot + ">" + " is not a valid self closing tag");
+        		if(!isSelfClosing(ot.name)) {
+        			return error("<" + ot.name + ">" + " is not a valid self closing tag");
         		}
-        		return "<" + ot + ">";
+        		return {
+        			'type': 'element',
+        			'selfClosing': true,
+        			'name': ot.name,
+        			'attributes': ot.attributes,
+        			'children': null
+        		};
+        		// return "<" + ot + ">";
         	},
         peg$c9 = { type: "other", description: "Opening Tag" },
         peg$c10 = "<",
@@ -57,32 +75,37 @@ module.exports = (function() {
         peg$c12 = [],
         peg$c13 = ">",
         peg$c14 = { type: "literal", value: ">", description: "\">\"" },
-        peg$c15 = function(t, attr) {  return t; },
+        peg$c15 = function(t, attrs) { return { 'name': t, 'attributes': attrs}; },
         peg$c16 = { type: "other", description: "Closing Tag" },
         peg$c17 = "</",
         peg$c18 = { type: "literal", value: "</", description: "\"</\"" },
-        peg$c19 = function(t) { return t },
+        peg$c19 = function(t) { return { 'name': t }; },
         peg$c20 = { type: "other", description: "Tag Name" },
         peg$c21 = /^[A-Za-z]/,
         peg$c22 = { type: "class", value: "[A-Za-z]", description: "[A-Za-z]" },
         peg$c23 = /^[0-9A-Z_a-z\-]/,
         peg$c24 = { type: "class", value: "[0-9A-Z_a-z\\-]", description: "[0-9A-Z_a-z\\-]" },
-        peg$c25 = function(a, s) { return a+s.join("") },
+        peg$c25 = function(a, s) { return a + s.textNode(); },
         peg$c26 = { type: "other", description: "Content" },
-        peg$c27 = function(s) { return s.join("") },
+        peg$c27 = function(s) { return s; },
         peg$c28 = { type: "other", description: "Attribute" },
         peg$c29 = null,
-        peg$c30 = function(ta, t) { return [ta.join(""), t]; },
+        peg$c30 = function(ta, t) { 
+        		return {
+        			'name': ta, 
+        			'value': t
+        		}; 
+        	},
         peg$c31 = { type: "other", description: "Attribute Name" },
         peg$c32 = /^[^\t\n\f \/>"'=]/,
         peg$c33 = { type: "class", value: "[^\\t\\n\\f \\/>\"'=]", description: "[^\\t\\n\\f \\/>\"'=]" },
-        peg$c34 = function(n) { return n },
+        peg$c34 = function(n) { return n.textNode(); },
         peg$c35 = { type: "other", description: "Attribute Value (Double Quoted)" },
         peg$c36 = "\"",
         peg$c37 = { type: "literal", value: "\"", description: "\"\\\"\"" },
         peg$c38 = /^[^"]/,
         peg$c39 = { type: "class", value: "[^\"]", description: "[^\"]" },
-        peg$c40 = function(v) { return v.join(""); },
+        peg$c40 = function(v) { return v.textNode(); },
         peg$c41 = { type: "other", description: "Attribute Value (Single Quoted)" },
         peg$c42 = "'",
         peg$c43 = { type: "literal", value: "'", description: "\"'\"" },
@@ -101,11 +124,18 @@ module.exports = (function() {
         		}
         		return i;
         	},
-        peg$c54 = { type: "other", description: "Character" },
-        peg$c55 = /^[^<>]/,
-        peg$c56 = { type: "class", value: "[^<>]", description: "[^<>]" },
-        peg$c57 = /^[ \f\n\r\t\x0B]/,
-        peg$c58 = { type: "class", value: "[ \\f\\n\\r\\t\\x0B]", description: "[ \\f\\n\\r\\t\\x0B]" },
+        peg$c54 = { type: "other", description: "Text Node" },
+        peg$c55 = function(tn) { 
+        		return {
+        			'type': 'text',
+        			'content': tn.textNode()
+        		}; 
+        	},
+        peg$c56 = { type: "other", description: "Character" },
+        peg$c57 = /^[^<>]/,
+        peg$c58 = { type: "class", value: "[^<>]", description: "[^<>]" },
+        peg$c59 = /^[ \f\n\r\t\x0B]/,
+        peg$c60 = { type: "class", value: "[ \\f\\n\\r\\t\\x0B]", description: "[ \\f\\n\\r\\t\\x0B]" },
 
         peg$currPos          = 0,
         peg$reportedPos      = 0,
@@ -534,15 +564,15 @@ module.exports = (function() {
       peg$silentFails++;
       s0 = peg$currPos;
       s1 = [];
-      s2 = peg$parsechar();
+      s2 = peg$parsetag();
       if (s2 === peg$FAILED) {
-        s2 = peg$parsetag();
+        s2 = peg$parsetext_node();
       }
       while (s2 !== peg$FAILED) {
         s1.push(s2);
-        s2 = peg$parsechar();
+        s2 = peg$parsetag();
         if (s2 === peg$FAILED) {
-          s2 = peg$parsetag();
+          s2 = peg$parsetext_node();
         }
       }
       if (s1 !== peg$FAILED) {
@@ -560,7 +590,7 @@ module.exports = (function() {
     }
 
     function peg$parsetag_attribute() {
-      var s0, s1, s2, s3;
+      var s0, s1, s2, s3, s4;
 
       peg$silentFails++;
       s0 = peg$currPos;
@@ -577,14 +607,25 @@ module.exports = (function() {
       if (s1 !== peg$FAILED) {
         s2 = peg$parsetag_attribute_name();
         if (s2 !== peg$FAILED) {
-          s3 = peg$parseattr_assignment();
-          if (s3 === peg$FAILED) {
-            s3 = peg$c29;
+          s3 = [];
+          s4 = peg$parse_();
+          while (s4 !== peg$FAILED) {
+            s3.push(s4);
+            s4 = peg$parse_();
           }
           if (s3 !== peg$FAILED) {
-            peg$reportedPos = s0;
-            s1 = peg$c30(s2, s3);
-            s0 = s1;
+            s4 = peg$parseattr_assignment();
+            if (s4 === peg$FAILED) {
+              s4 = peg$c29;
+            }
+            if (s4 !== peg$FAILED) {
+              peg$reportedPos = s0;
+              s1 = peg$c30(s2, s4);
+              s0 = s1;
+            } else {
+              peg$currPos = s0;
+              s0 = peg$c3;
+            }
           } else {
             peg$currPos = s0;
             s0 = peg$c3;
@@ -837,7 +878,7 @@ module.exports = (function() {
     }
 
     function peg$parseattr_assignment() {
-      var s0, s1, s2;
+      var s0, s1, s2, s3;
 
       peg$silentFails++;
       s0 = peg$currPos;
@@ -849,14 +890,25 @@ module.exports = (function() {
         if (peg$silentFails === 0) { peg$fail(peg$c52); }
       }
       if (s1 !== peg$FAILED) {
-        s2 = peg$parsetag_attribute_value();
-        if (s2 === peg$FAILED) {
-          s2 = peg$c29;
+        s2 = [];
+        s3 = peg$parse_();
+        while (s3 !== peg$FAILED) {
+          s2.push(s3);
+          s3 = peg$parse_();
         }
         if (s2 !== peg$FAILED) {
-          peg$reportedPos = s0;
-          s1 = peg$c53(s2);
-          s0 = s1;
+          s3 = peg$parsetag_attribute_value();
+          if (s3 === peg$FAILED) {
+            s3 = peg$c29;
+          }
+          if (s3 !== peg$FAILED) {
+            peg$reportedPos = s0;
+            s1 = peg$c53(s3);
+            s0 = s1;
+          } else {
+            peg$currPos = s0;
+            s0 = peg$c3;
+          }
         } else {
           peg$currPos = s0;
           s0 = peg$c3;
@@ -874,17 +926,26 @@ module.exports = (function() {
       return s0;
     }
 
-    function peg$parsechar() {
-      var s0, s1;
+    function peg$parsetext_node() {
+      var s0, s1, s2;
 
       peg$silentFails++;
-      if (peg$c55.test(input.charAt(peg$currPos))) {
-        s0 = input.charAt(peg$currPos);
-        peg$currPos++;
+      s0 = peg$currPos;
+      s1 = [];
+      s2 = peg$parsechar();
+      if (s2 !== peg$FAILED) {
+        while (s2 !== peg$FAILED) {
+          s1.push(s2);
+          s2 = peg$parsechar();
+        }
       } else {
-        s0 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c56); }
+        s1 = peg$c3;
       }
+      if (s1 !== peg$FAILED) {
+        peg$reportedPos = s0;
+        s1 = peg$c55(s1);
+      }
+      s0 = s1;
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
@@ -894,9 +955,10 @@ module.exports = (function() {
       return s0;
     }
 
-    function peg$parse_() {
-      var s0;
+    function peg$parsechar() {
+      var s0, s1;
 
+      peg$silentFails++;
       if (peg$c57.test(input.charAt(peg$currPos))) {
         s0 = input.charAt(peg$currPos);
         peg$currPos++;
@@ -904,14 +966,37 @@ module.exports = (function() {
         s0 = peg$FAILED;
         if (peg$silentFails === 0) { peg$fail(peg$c58); }
       }
+      peg$silentFails--;
+      if (s0 === peg$FAILED) {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c56); }
+      }
+
+      return s0;
+    }
+
+    function peg$parse_() {
+      var s0;
+
+      if (peg$c59.test(input.charAt(peg$currPos))) {
+        s0 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s0 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c60); }
+      }
 
       return s0;
     }
 
 
-    	function stripws(s) {
-    		return s.replace(/^\s+/, "").replace(/\s+$/, "");
-    	}
+    	Array.prototype.textNode = function () {
+    		return this.join('').textNode();
+    	};
+
+    	String.prototype.textNode = function () {
+    		return this.replace(/^\s+|\s+$/g, '');
+    	};
 
     	function isSelfClosing(tagName) {
     		var selfClosingTags = ['area','base','br','col','command','embed','hr','img',

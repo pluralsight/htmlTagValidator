@@ -10,15 +10,15 @@ module.exports = function(grunt) {
     },
     watch: {
       scripts: {
-        files: ['Gruntfile.js', 'spec/*.js', 'src/html-grammar.pegjs', 'spec/html/*.html', 'index.js'],
+        files: ['Gruntfile.js', 'test/*.js', 'src/html-grammar.pegjs', 'test/html/*.html', 'index.js'],
         tasks: ['default', 'mochaTest:test']
       }
     },
     mochaTest: {
       test: {
-        src: ['spec/index-spec.js'],
+        src: ['test/index-spec.js'],
         options: {
-          reporter: 'spec'
+          reporter: 'list'
         }
       }
     }
@@ -32,5 +32,5 @@ module.exports = function(grunt) {
   // The default tasks to run when you type: grunt
   // grunt.registerTask('default', ['shell:pegjs', 'shell:browserify']);
   grunt.registerTask('default', ['shell:pegjs']);
-  grunt.registerTask('dev', ['watch']);
+  grunt.registerTask('dev', ['default', 'mochaTest:test', 'watch']);
 };
