@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <script type="text/javascript">
+      var Cat;
+
+      Cat = (function() {
+        function Cat(name1) {
+          this.name = name1;
+        }
+
+        Cat.prototype.meow = function() {
+          return "Meow, my name is " + name + "!";
+        };
+
+        return Cat;
+
+      })();
+
+      var myCat = new Cat("Catherine Catterson");
+      alert(myCat.meow());
+    </script>
+  </head>
+  <body>
+    <p>My cool page</p>
+  </body>
+</html>

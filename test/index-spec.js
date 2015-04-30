@@ -44,4 +44,44 @@ describe('html-tag-validator', function() {
   it('malformed conditional comment 2', function(done) {
     tree.error("Conditional comment end tag found without conditional comment start tag", this, done);
   });
+
+  it('basic script', function(done) {
+    tree.ok(this, done);
+  });
+
+  it('basic script 2', function(done) {
+    tree.ok(this, done);
+  });
+
+  it('malformed script', function(done) {
+    tree.error("Found open <script> tag without closing </script> tag", this, done);
+  });
+
+  it('invalid script attribute', function(done) {
+    tree.error("The <script> tag async attribute should not have a value", this, done);
+  });
+
+  it('invalid script attribute 2', function(done) {
+    tree.error("The <script> tag src attribute requires a value", this, done);
+  });
+
+  it('invalid script attribute 3', function(done) {
+    tree.error("The <script> tag does not have a bees attribute", this, done);
+  });
+
+  it('basic style', function(done) {
+    tree.ok(this, done);
+  });
+
+  it('doctype', function(done) {
+    tree.ok(this, done);
+  });
+
+  it('invalid doctype', function(done) {
+    tree.error("The DOCTYPE definition for an HTML 5 document should be <!DOCTYPE html>", this, done);
+  });
+
+  it('invalid doctype 2', function(done) {
+    tree.error("The DOCTYPE definition must be placed at the beginning of the first line of the document", this, done);
+  });
 });
