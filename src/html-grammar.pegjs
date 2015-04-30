@@ -8,34 +8,57 @@
 		return this.replace(/^\s+|\s+$/g, '');
 	};
 
+	Array.prototype.tagify = function () {
+		return this.textNode().toLowerCase();
+	};
+
 	function isSelfClosing(tagName) {
 		var selfClosingTags = ['area','base','br','col','command','embed','hr','img',
 													 'input','keygen','link','meta','param','source','track','wbr'];
 		return selfClosingTags.indexOf(tagName) !== -1;
 	}
+
+	function stack(arr) {
+		return (Array.isArray(arr) ? arr.map(function (elem) { return elem[1]; }) : []).textNode();
+	}
+
+	function collapse(arr) {
+		if (Array.isArray(arr) && arr.length) {
+			var i, len, n, obj, ref, v;
+			obj = {};
+			for (i = 0, len = arr.length; i < len; i++) {
+			  ref = arr[i], n = ref.name, v = ref.value;
+			  obj[n] = v;
+			}
+			return obj;
+		} else {
+			return {};
+		}
+	}
 }
 
 /* Start Grammar */
 start
-	= s:(content) 
-	{ 
+	= s:(content)
+	{
 		return {
 			document: s
-		}; 
+		};
 	}
 
 tag "HTML Tag"
- = normal_tag / self_closing_tag 
+ 	= normal_tag
+	/ self_closing_tag
 
 normal_tag "Tag"
-	= otn:open_tag !{return isSelfClosing(otn.name)} c:content ctn:close_tag
+	= otn:open_tag ! { return isSelfClosing(otn.name) } s c:content ctn:close_tag
 	{
 		if(otn.name !== ctn.name) {
 			return error("Expected open tag <" + otn.name + "> to match closing tag <" + ctn.name + ">");
 		}
 		return {
 			'type': 'element',
-			'selfClosing': false,
+			'void': false,
 			'name': otn.name,
 			'attributes': otn.attributes,
 			'children': c
@@ -51,53 +74,159 @@ self_closing_tag "Self-closing Tag"
 		}
 		return {
 			'type': 'element',
-			'selfClosing': true,
+			'void': true,
 			'name': ot.name,
 			'attributes': ot.attributes,
-			'children': null
+			'children': []
 		};
 		// return "<" + ot + ">";
 	}
 
 open_tag "Opening Tag"
-	= "<" t:tagname attrs:(tag_attribute)* ">"
-	{ return { 'name': t, 'attributes': attrs}; }
+	= "<" t:(tagname) attrs:(tag_attribute)* s cl:("/")? s ">"
+	{
+		return { 'name': t, 'attributes': collapse(attrs)};
+	}
 
 close_tag "Closing Tag"
-	= "</" t:tagname ">"
+	= "</" t:(tagname) ">"
 	{ return { 'name': t }; }
 
 tagname "Tag Name"
-	= a:[A-Za-z] s:[0-9A-Z_a-z-]*
-	{ return a + s.textNode(); }
+	= tns:([A-Za-z]) tne:([0-9A-Z_a-z-])*
+	{ return tns.textNode() + tne.textNode(); }
 
 content "Content"
-	= s:(tag/text_node)*
-	{ return s; }
+	= c:(node)*
+	{ return c; }
+
+node "Node"
+	= n:(node_types) s
+	{ return n; }
+
+node_types "Node Types"
+	= tag
+	/ comment
+	/ text_node
+
+comment "Block Comment"
+	= comment_open com:(comment_content) comment_close
+	{ return com; }
+
+comment_nodes "Comment Node Types"
+	= tag
+	/ text_node
+
+conditional_start
+	= "[" s csc:([^\]]+)? s "]>"
+{ return csc.tagify(); }
+
+conditional_end
+	= "<!" s "[" s "endif" s "]"
+	{ return true; }
+
+comment_open "Comment Start"
+	= "<!--"
+
+comment_close "Comment Close"
+	= "-->"
+
+comment_content
+	= comment_conditional
+	/ comment_block
+
+comment_conditional
+	= s cons:(conditional_start)? s com:(comment_nodes) s cone:(conditional_end)? s
+	! { return cons === null && cone === null; }
+	{
+		var condition = '';
+		if (cone === null) {
+			return error("Conditional comment start tag found without conditional comment end tag");
+		} else if (cons === null) {
+			return error("Conditional comment end tag found without conditional comment start tag");
+		} else {
+			condition = cons;
+		}
+		return {
+			'type': 'comment',
+			'conditional': true,
+			'condition': condition,
+			'children': com
+		};
+	}
+
+comment_conditional_body
+	= ccb:(conditional_scan)
+
+conditional_scan
+	= cs:(!comment_terminator char)*
+	{ return stack(cs); }
+
+comment_terminator
+	= conditional_end
+	/ comment_close
+
+comment_block
+	= s cb:comment_scan s
+	{
+		var tn = cb !== null ? cb.textNode() : '';
+		if(tn.indexOf('--') !== -1) {
+			return error("Cannot have two or more consecutive hyphens inside of a block comment");
+		}
+		return {
+			'type': 'comment',
+			'conditional': false,
+			'condition': null,
+			'children': {
+				'type': 'text',
+				'contents': tn
+			}
+		};
+	}
+
+comment_scan
+	= cs:(!comment_close char)*
+	{ return stack(cs);  }
 
 tag_attribute "Attribute"
-  = _+ ta:tag_attribute_name _* t:(attr_assignment)?
-	{ 
+  = e ta:(tag_attribute_name) t:(attr_assignment)?
+	{
 		return {
-			'name': ta, 
+			'name': ta,
 			'value': t
-		}; 
+		};
 	}
 
 tag_attribute_name "Attribute Name"
-	= n:([^\t\n\f \/\>\"\'\=]+)
-	{ return n.textNode(); }
+	= n:([^\t\n\f \/\>\"\'\=])+ s
+	{ return n.tagify(); }
 
 tag_attribute_value_dblquote "Attribute Value (Double Quoted)"
-	=	('"' v:[^"]* '"')
+	=	tag_attribute_value_dblquote_value
+	/ tag_attribute_value_dblquote_empty
+
+tag_attribute_value_dblquote_value
+	= '"' v:([^"])* '"'
 	{ return v.textNode(); }
+
+tag_attribute_value_dblquote_empty
+	= '"' v:([\s])* '"'
+	{ return ''; }
 
 tag_attribute_value_singlequote "Attribute Value (Single Quoted)"
-	=	("'" v:[^']* "'")
+	=	tag_attribute_value_singlequote_value
+	/ tag_attribute_value_singlequote_empty
+
+tag_attribute_value_singlequote_value
+	= "'" v:([^'])* "'"
 	{ return v.textNode(); }
 
+tag_attribute_value_singlequote_empty
+	= "'" v:([\s])* "'"
+	{ return ''; }
+
 tag_attribute_value_noquote "Attribute Value (Unquoted)"
-	= v:[^\=\'\"\<\>` ]+
+	= v:([^\=\'\"\<\>` ])+
 	{ return v.textNode(); }
 
 tag_attribute_value "Attribute Value"
@@ -106,25 +235,31 @@ tag_attribute_value "Attribute Value"
 	/ tag_attribute_value_noquote
 
 attr_assignment "Attribute Assignment"
-	= "=" _* i:tag_attribute_value?
+	= "=" s i:tag_attribute_value?
 	{
-		if(!i) {
+		if(i === null) {
 			return error("Found an attribute assignment \"=\" not followed by a value");
 		}
 		return i;
 	}
+
 text_node "Text Node"
 	= tn:(char)+
-	{ 
+	{
 		return {
 			'type': 'text',
-			'content': tn.textNode()
-		}; 
+			'contents': tn.textNode()
+		};
 	}
 
 char "Character"
 	= [^<>]
-_
+
+e "Enforced Whitespace"
+	= _+
+
+s "Optional Whitespace"
+	= _*
+
+_ "Whitespace"
 	= [ \f\n\r\t\v]
-
-
