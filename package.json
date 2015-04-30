@@ -4,8 +4,14 @@
   "main": "index.js",
   "author": "Code School",
   "contributors": [
-    { "name": "Nick Wronski", "url": "https://github.com/nwronski" }, 
-    { "name": "Adam Rensel", "url": "https://github.com/renz45" }
+    {
+      "name": "Nick Wronski",
+      "url": "https://github.com/nwronski"
+    },
+    {
+      "name": "Adam Rensel",
+      "url": "https://github.com/renz45"
+    }
   ],
   "license": "MIT",
   "description": "PEG.js implementation of HTML tag validator",
@@ -17,7 +23,8 @@
     "grunt-mocha-test": "^0.12.7",
     "grunt-shell": "^1.1.2",
     "lodash": "^3.7.0",
-    "mocha": "^1.21.4"
+    "mocha": "^1.21.4",
+    "prettyjson": "^1.1.0"
   },
   "dependencies": {
     "pegjs": "^0.8.0"
