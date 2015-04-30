@@ -1,38 +1,38 @@
 Central issue to track progress of PEG.js version of html-tag-validator
 
 - [x] Set up grunt and create tasks to automate development, testing, building, etc...
-- HTML attributes 
+- HTML attributes
   - [x] Regular `value="bees"` and `value='bees'`
   - [x] Attributes without quotes `value=1`
-  - [ ] Attributes without values `checked`
+  - [x] Attributes without values `checked`
   - [x] Angular 2.0 values `[checked]="true"` `(click)="myFunc()"`
-  - [ ] Inline `style` declarations `style="color: bold; content: 'my text';"`
-  - [ ] Inline JavaScript in event attributes `click="run(event)"`
+  - [x] Inline `style` declarations `style="color: bold; content: 'my text';"`
+  - [x] Inline JavaScript in event attributes `click="run(event)"`
 - Self-closing tags
-  - [ ] Enforce whitelist of self-closing tags 
+  - [ ] Enforce whitelist of self-closing tags
 ``` html
 <img src="cat.gif" />
 ```
 - HTML `doctype` declarations
-  - [ ] Support `doctype` syntax and position 
+  - [ ] Support `doctype` syntax and position
 ``` html
 <!DOCTYPE html>
 ```
 - Special tags
-  - [ ] `script` tags 
-```html 
+  - [ ] `script` tags
+```html
 <script type="text/javascript" async src="cat.js"></script>
 ```
-  - [ ] `style` tags 
-```html 
+  - [ ] `style` tags
+```html
 <style type="text/css"></style>
 ```
-  - [ ] `meta` tags 
+  - [ ] `meta` tags
 ``` html
 <meta charset="UTF-8">
 ```
 - Text nodes
-  - [ ] parse text nodes
+  - [x] parse text nodes
 ``` html
 <p>
   text node
@@ -40,12 +40,12 @@ Central issue to track progress of PEG.js version of html-tag-validator
 </p>
 ```
 - Comment nodes
-  - [ ] parse block comments
+  - [x] parse block comments
 ``` html
 <!--This is a comment. Comments are not displayed in the browser-->
 ```
 - Conditional comments
-  - [ ] parse conditional comments
+  - [x] parse conditional comments
 ``` html
 <!--[if gte mso 12]>
   <style>
@@ -59,73 +59,117 @@ Central issue to track progress of PEG.js version of html-tag-validator
 - AST
   - [ ] Create standard AST format
     - Node types
-      - [ ] `element`
-        - [ ] self-closing
-        - [ ] closing
+      - `element`
+        - [x] self-closing
+```
+type:       element
+void:       true
+name:       div
+attributes: {}
+children:   []
+```
+        - [x] closing
+```
+type:       element
+void:       false
+name:       div
+attributes: {}
+children:   []
+```
       - [ ] `script`
       - [ ] `style`
-      - [ ] `text` 
-      - [ ] `comment`
+      - [x] `text`
+```
+type:     text
+contents: Hello there
+```
+      - `comment`
+        - [x] block comment
+```
+type:        comment
+conditional: false
+condition:   null
+children:
+  type:     text
+  contents: Some sort of html comment
+```
+        - [x] conditional block comment
+```
+type:        comment
+conditional: true
+condition:   if ie 8
+children:
+  type:       element
+  void:       false
+  name:       p
+  attributes: {}
+  children:
+    -
+      type:     text
+      contents: IE is version 8!
+```
   - [ ] Have parser export AST
 
   - AST spec (in progress)
 ``` json
 {
-  "type": "element",
-  "selfClosing": false,
-  "tagName": "html",
-  "attributes": { },
-  "children": [
-    {
-      "type": "element",
-      "selfClosing": false,
-      "tagName": "head",
-      "attributes": {},
-      "children": [
-        {
-          "type": "script",
-          "content": "function myFunc() { console.log('hello, world!'); };"
-        },
-        {
-          "type": "script",
-          "attributes": {
-            "type": "javascript",
-            "src": "path/to/my/script.js"
+  "document": {
+    "type": "element",
+    "void": false,
+    "name": "html",
+    "attributes": { },
+    "children": [
+      {
+        "type": "element",
+        "void": false,
+        "name": "head",
+        "attributes": {},
+        "children": [
+          {
+            "type": "script",
+            "contents": "function myFunc() { console.log('hello, world!'); };"
           },
-          "content": ""
-        }
-      ]
-    },
-    {
-      "type": "element",
-      "selfClosing": false,
-      "tagName": "body",
-      "attributes": {
-        "class": "class1 class2",
-        "bgcolor": "black"
+          {
+            "type": "script",
+            "attributes": {
+              "type": "javascript",
+              "src": "path/to/my/script.js"
+            },
+            "contents": null
+          }
+        ]
       },
-      "children": [
-        {
-          "type": "text",
-          "content": "I am some text"
+      {
+        "type": "element",
+        "void": false,
+        "name": "body",
+        "attributes": {
+          "class": "class1 class2",
+          "bgcolor": "black"
         },
-        {
-          "type": "element",
-          "selfClosing": false,
-          "tagName": "p",
-          "attributes": {
-            "id": "myPTag",
-            "style": "font-weight: bold;"
+        "children": [
+          {
+            "type": "text",
+            "content": "I am some text"
           },
-          "children": [
-            {
-             "type": "text",
-             "content": "I am some more text"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+          {
+            "type": "element",
+            "void": false,
+            "name": "p",
+            "attributes": {
+              "id": "myPTag",
+              "style": "font-weight: bold;"
+            },
+            "children": [
+              {
+               "type": "text",
+               "content": "I am some more text"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
