@@ -72,11 +72,11 @@ describe('html-tag-validator', function() {
   // it('invalid script attribute 3', function(done) {
   //   tree.error("The <script> tag does not have a bees attribute", this, done);
   // });
-
-  it('basic style', function(done) {
-    tree.ok(this, done);
-  });
-
+  //
+  // it('basic style', function(done) {
+  //   tree.ok(this, done);
+  // });
+  //
   // it('doctype', function(done) {
   //   tree.ok(this, done);
   // });
@@ -88,4 +88,16 @@ describe('html-tag-validator', function() {
   // it('invalid doctype 2', function(done) {
   //   tree.error("The DOCTYPE definition must be placed at the beginning of the first line of the document", this, done);
   // });
+  //
+  // it('full featured test', function(done) {
+  //   tree.ok(this, done);
+  // });
+  //
+  // it('full featured test 2', function(done) {
+  //   tree.ok(this, done);
+  // });
+
+  it('basic iframe', function(done) {
+    tree.ok(this, done);
+  });
 });

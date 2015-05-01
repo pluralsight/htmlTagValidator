@@ -16,8 +16,9 @@
 - [x] Inline JavaScript in event attributes `click="run(event)"`
 
 ### Self-closing tags
+
 - [x] Enforce whitelist of self-closing tags
-- [ ] Enforce rule against invalid XHTML format `<img src="cat.gif" />`
+- ~~Enforce rule against invalid XHTML format `<img src="cat.gif" />`~~ this is okay/ignored according to spec
 - [x] Support self-closing tag syntax
 
   ``` html
@@ -25,14 +26,39 @@
   ```
 
 ### HTML `DOCTYPE` declarations
+
 - [x] Support `DOCTYPE` syntax
 - [x] Enforce correct `DOCTYPE` position in document
+- [x] Allow for having a `DOCTYPE` definition inside of an `iframe` element within a parent document
 
   ``` html
   <!DOCTYPE html>
   ```
 
 ### Special tags
+
+- [x] whitelist of allowed attributes `global` and `event` for all special tags
+- [x] whitelist of `required`, `normal`, and `void` attributes for each special tag
+
+#### Hierarchal rules
+
+- [ ] If you omit the `title` tag, the document will not validate as HTML
+- [ ] You can not have more than one `title` element in an HTML document
+- [ ] The `link` element goes only in the `head` section of an HTML document
+- [ ] The `meta` element goes only in the `head` section of an HTML document
+- [ ] If the "scoped" attribute is not used, each `style` tag must be located in the `head` section.
+
+#### Tag-specific rules
+
+- [x] `title`
+  - [x] `title` tag is required to have content between the start and end tags
+
+    ``` html
+    <head>
+      <title>Nick's happy fun page</title>
+    </head>
+    ```
+
 - [x] `script` tags
   - [x] validate `script` tags only have specific attributes
   - [x] a `script` tag cannot have a `src` AND contents at the same time
@@ -48,8 +74,16 @@
   <style type="text/css"></style>
   ```
 
+- [x] `iframe` tags
+  - [x] validate `iframe` tags only have specific attributes
+
+  ```html
+  <iframe src="cats.html"></iframe>
+  ```
+
 - [ ] `pre` tags
   - [ ] parse `pre` tags without trimming like regular elements
+    - This is tricky because there could still be other HTML elements within the `pre` tag that should still be parsed
 
     ``` html
     <pre>
@@ -60,9 +94,8 @@
     </pre>
     ```
 
-- [ ] `link` tags
+- [x] `link` tags
   - [x] validate `link` tags as void elements with specific attributes
-  - [ ] validate `link` tags are only allowed in `head`
 
     ``` html
     <head>
@@ -70,11 +103,10 @@
     </head>
     ```
 
-- [ ] `meta` tags
+- [x] `meta` tags
   - [x] validate `meta` tags as void elements
   - [x] validate `meta` tags only have specific attributes
   - [x] validate `meta` tags have specific rules for `content`, `name` and `http-equiv` attributes
-  - [ ] validate `meta` tags are only allowed in `head`
 
     ``` html
     <head>
@@ -131,8 +163,9 @@
     ```
     type:       element
     void:       true
-    name:       div
-    attributes: {}
+    name:       input
+    attributes:
+      value:    bees
     children:   []
     ```
 
@@ -151,8 +184,8 @@
   ```
   type:       script
   attributes:
-    type: text/javascript
-  content:
+    type:     text/javascript
+  contents:
     """
 
       var Cat;
@@ -182,7 +215,7 @@
   type:       style
   attributes:
     type: text/css
-  content:
+  contents:
     """
 
       p {
@@ -199,6 +232,26 @@
       }
 
     """
+  ```
+
+- [x] `title`
+
+  ```
+  type:       title
+  attributes: {}
+  contents:   Nick's happy fun page
+  ```
+
+- [x] `iframe`
+
+  ```
+  type:         iframe
+  attributes:
+    height:     300px
+    width:      400px
+  contents:
+    doctype:    html
+    document:   {}  // or []
   ```
 
 - [x] `text`
