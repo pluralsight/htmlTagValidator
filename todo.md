@@ -17,36 +17,69 @@
 
 ### Self-closing tags
 - [x] Enforce whitelist of self-closing tags
+- [ ] Enforce rule against invalid XHTML format `<img src="cat.gif" />`
 
   ``` html
-  <img src="cat.gif" />
+  <img src="cat.gif">
   ```
 
 ### HTML `doctype` declarations
-- [ ] Support `doctype` syntax and position
+- [x] Support `doctype` syntax and position
 
   ``` html
   <!DOCTYPE html>
   ```
 
 ### Special tags
-- [ ] `script` tags
+- [x] `script` tags
+  - [x] validate `script` tags only have specific attributes
+  - [x] a `script` tag cannot have a `src` AND contents at the same time
 
   ```html
   <script type="text/javascript" async src="cat.js"></script>
   ```
 
-- [ ] `style` tags
+- [x] `style` tags
+  - [x] validate `style` tags only have specific attributes
 
   ```html
   <style type="text/css"></style>
   ```
 
-- [ ] `meta` tags
+- [ ] `pre` tags
+  - [ ] parse `pre` tags without trimming like regular elements
 
-  ``` html
-  <meta charset="UTF-8">
-  ```
+    ``` html
+    <pre>
+
+      The whitespace above, below and          here
+      should be preserved.
+
+    </pre>
+    ```
+
+- [ ] `link` tags
+  - [x] validate `link` tags as void elements with specific attributes
+  - [ ] validate `link` tags are only allowed in `head`
+
+    ``` html
+    <head>
+      <link rel="stylesheet" type="text/css" href="theme.css">
+    </head>
+    ```
+
+- [ ] `meta` tags
+  - [x] validate `meta` tags as void elements
+  - [x] validate `meta` tags only have specific attributes
+  - [x] validate `meta` tags have specific rules for `content`, `name` and `http-equiv` attributes
+  - [ ] validate `meta` tags are only allowed in `head`
+
+    ``` html
+    <head>
+      <meta charset="UTF-8">
+      <meta name="author" content="Nick Wronski">
+    </head>
+    ```
 
 ### Text nodes
 - [x] parse text nodes
@@ -80,7 +113,7 @@
 
 ### Create standard AST format
 
-- `element`
+- `element` (includes `link` and `meta` special tags)
   - [x] self-closing
 
     ```
@@ -91,7 +124,7 @@
     children:   []
     ```
 
-  - [x] closing
+  - [x] normal (closing)
 
     ```
     type:       element
@@ -101,9 +134,60 @@
     children:   []
     ```
 
-- [ ] `script`
+- [x] `script`, `style`
 
-- [ ] `style`
+  ```
+  type:       script
+  attributes:
+    type: text/javascript
+  content:
+    """
+
+      var Cat;
+
+      Cat = (function() {
+        function Cat(name1) {
+          this.name = name1;
+        }
+
+        Cat.prototype.meow = function() {
+          return "Meow, my name is " + name + "!";
+        };
+
+        return Cat;
+
+      })();
+
+      var myCat = new Cat("Catherine Catterson");
+      alert(myCat.meow());
+
+    """
+  ```
+
+- [x] `style`
+
+  ```
+  type:       style
+  attributes:
+    type: text/css
+  content:
+    """
+
+      p {
+        color: black;
+      }
+
+      body {
+        background-color: white;
+      }
+
+      .main {
+        color: #FF1212;
+        font-weight: bold;
+      }
+
+    """
+  ```
 
 - [x] `text`
 

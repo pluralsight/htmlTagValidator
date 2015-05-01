@@ -1,5 +1,6 @@
 /* Helper Functions */
 {
+	// Monkey patching
 	Array.prototype.textNode = function () {
 		return this.join('').textNode();
 	};
@@ -16,42 +17,116 @@
 		return this.textNode().toLowerCase();
 	};
 
+	// Validation Rules
+	var table = {
+		'script': {
+			'required': [],
+			'normal': ['charset', 'src', 'type'],
+			'void': ['async', 'defer'],
+			'rules': function scriptRules(attributes, contents) {
+				if (attributes['src'] != null && contents.textNode() !== '') {
+					// If the "src" attribute is present, the <script> element must be empty.
+					return {
+						'error': "A <script> tag with a src attribute cannot have contents between the start and end tags"
+					};
+				}
+				return true;
+			}
+		},
+		'style': {
+			'required': [],
+			'normal': ['media', 'scoped', 'type'],
+			'void': [],
+			'rules': function styleRules(attributes, contents) {
+				// TODO: If the "scoped" attribute is not used, each <style> tag must be located in the <head> section.
+				return true;
+			}
+		},
+		'meta': {
+			'required': [],
+			'normal': ['charset', 'content', 'http-equiv', 'name', 'scheme'],
+			'void': [],
+			'rules': function metaRules(attributes, contents, closing) {
+				// TODO: <meta> tags always goes inside the <head> element.
+				if ((attributes['name'] != null || attributes['http-equiv'] != null) && attributes['content'] == null) {
+					return {
+						'error': "The <meta> tag content attribute must be defined if the name or http-equiv attributes are defined"
+					};
+				} else if ((attributes['name'] == null && attributes['http-equiv'] == null) && attributes['content'] != null) {
+					return {
+						'error': "The <meta> tag content attribute cannot be defined if the name or http-equiv attributes are defined"
+					};
+				}
+				return true;
+			}
+		},
+		'link': {
+			'required': ['rel'],
+			'normal': ['rel', 'crossorigin', 'href', 'hreflang', 'media', 'sizes', 'type'],
+			'void': [],
+			'rules': function linkRules(attributes, contents, closing) {
+				// TODO: This element goes only in the <head> section
+				return true;
+			}
+		}
+	};
+
+	// Verification Functions
+
 	function isSelfClosing(tagName) {
 		var selfClosingTags = ['area','base','br','col','command','embed','hr','img',
 													 'input','keygen','link','meta','param','source','track','wbr'];
 		return selfClosingTags.indexOf(tagName) !== -1;
 	}
 
-	function checkAttributes(tag, attributes) {
-		var table = {
-					'script': {
-						'normal': ['charset', 'src', 'type'],
-						'void': ['async', 'defer']
-					},
-					'style': {
-						'normal': ['media', 'scoped', 'type'],
-						'void': []
-					}
-				}, inNormal, inVoid, name, value;
+	function checkAttributes(tag, attributes, contents, closing) {
+		var inNormal, inVoid, name, value, rule;
+
+		if (table[tag]['required'].length) {
+			table[tag]['required'].map(function (req) {
+				if (attributes[req] == null) {
+			    return {
+						'error': "The <" + tag + "> tag must include a " + req + " attribute"
+					};
+				}
+			});
+		}
+
 		for (name in attributes) {
 		  value = attributes[name];
 		  inVoid = table[tag]['void'].indexOf(name) !== -1;
 		  inNormal = table[tag]['normal'].indexOf(name) !== -1;
 		  if (!(inVoid || inNormal)) {
-		    return error("The <" + tag + "> tag does not have a " + name + " attribute");
+		    return {
+					'error': "The <" + tag + "> tag does not have a " + name + " attribute"
+				};
 		  }
 		  if (value != null) {
 		    if (!inNormal) {
-		      return error("The <" + tag + "> tag " + name + " attribute should not have a value");
+		      return {
+						'error': "The <" + tag + "> tag " + name + " attribute should not have a value"
+					};
 		    }
 		  } else {
 		    if (!inVoid) {
-		      return error("The <" + tag + "> tag " + name + " attribute requires a value");
+		      return {
+						'error': "The <" + tag + "> tag " + name + " attribute requires a value"
+					};
 		    }
 		  }
 		}
-		return true;
+
+		rule = table[tag]['rules'](attributes, contents, closing);
+		if (rule !== true) {
+			return rule;
+		}
+
+		return {
+			'value': attributes
+		};
 	}
+
+	// Utility Functions
 
 	function stack(arr) {
 		return (Array.isArray(arr) ? arr.map(function (elem) { return elem[1]; }) : []);
@@ -132,30 +207,30 @@ comment_nodes "Comment Node Types"
 /* HTML elements*/
 
 tag "HTML Tag"
- 	= script_tag
+ 	= special_tag
 	/ normal_tag
 	/ self_closing_tag
 
-script_tag
-	= sot:(script_open) sc:(script_content) sct:(script_close)?
+special_tag
+	= sot:(special_tag_open) sc:(special_tag_content) sct:(special_tag_close)?
 	{
-		var err;
+		var attrs = checkAttributes(sot.name, sot.attributes, sc, sct);
 		if (sct === null) {
 			return error("Found open <" + sot.name + "> tag without closing </" + sot.name + "> tag");
 		} else if (sot.name !== sct.name) {
 			return error("Expected open tag <" + sot.name + "> to match closing tag </" + sct.name + ">");
-		} else if ((err = checkAttributes(sot.name, sot.attributes)) !== true) {
-			return err;
+		} else if (attrs.error != null) {
+			return error(attrs.error);
 		}
 		return {
 			'type': sot.name,
-			'attributes': sot.attributes,
+			'attributes': attrs.value,
 			'content': sc
 		};
 	}
 
-script_open
-	= "<" s st:(script_types) attrs:(tag_attribute)* s ">"
+special_tag_open
+	= "<" s st:(special_tag_types) attrs:(tag_attribute)* s ">"
 	{
 		return {
 			'name': st,
@@ -163,21 +238,21 @@ script_open
 		};
 	}
 
-script_types
+special_tag_types
 	= st:([a-z])+
 	& { return ['script', 'style'].indexOf(st.tagify()) !== -1; }
 	{ return st.tagify(); }
 
-script_content
-	= scs:(script_scan)
+special_tag_content
+	= scs:(special_tag_scan)
 	{ return scs; }
 
-script_scan
+special_tag_scan
 	= cs:(!"</" char)*
 	{ return stack(cs).scriptify();  }
 
-script_close
-	= "<" s "/" s sc:(script_types) ">"
+special_tag_close
+	= "<" s "/" s sc:(special_tag_types) ">"
 	{
 		return {
 			'name': sc
@@ -185,10 +260,13 @@ script_close
 	}
 
 normal_tag "Tag"
-	= otn:(open_tag) ! { return isSelfClosing(otn.name) } s c:(content) ctn:(close_tag)
+	= otn:(open_tag) sp:(s) c:(content) ctn:(close_tag)
+	& { return !isSelfClosing(otn.name) || otn.name === ctn.name; }
 	{
 		if (otn.name !== ctn.name) {
 			return error("Expected open tag <" + otn.name + "> to match closing tag </" + ctn.name + ">");
+		} else if (isSelfClosing(otn.name)) {
+			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
 		}
 		return {
 			'type': 'element',
@@ -205,6 +283,14 @@ self_closing_tag "Self-closing Tag"
 		if(!isSelfClosing(ot.name)) {
 			return error("<" + ot.name + ">" + " is not a valid self closing tag");
 		}
+		// Special rules for <link> and <meta>
+		if (['link', 'meta'].indexOf(ot.name) !== -1) {
+			var attrs = checkAttributes(ot.name, ot.attributes);
+			if (attrs.error != null) {
+				return error(attrs.error);
+			}
+		}
+
 		return {
 			'type': 'element',
 			'void': true,
@@ -218,6 +304,7 @@ self_closing_tag "Self-closing Tag"
 open_tag "Opening Tag"
 	= "<" t:(tagname) attrs:(tag_attribute)* s cl:("/")? s ">"
 	{
+		// TODO: HTML 5 spec does not allow tags of the form <tagname />
 		return { 'name': t, 'attributes': collapse(attrs)};
 	}
 
@@ -229,7 +316,7 @@ close_tag "Closing Tag"
 
 tagname "Tag Name"
 	= tns:([A-Za-z]) tne:([0-9A-Z_a-z-])*
-	{ return tns.textNode() + tne.textNode(); }
+	{ return [tns].concat(tne).tagify(); }
 
 tag_attribute "Attribute"
   = e ta:(tag_attribute_name) t:(attr_assignment)?

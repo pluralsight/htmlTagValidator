@@ -81,17 +81,17 @@ module.exports = (function() {
         peg$c20 = { type: "other", description: "Comment Node Types" },
         peg$c21 = { type: "other", description: "HTML Tag" },
         peg$c22 = function(sot, sc, sct) {
-        		var err;
+        		var attrs = checkAttributes(sot.name, sot.attributes, sc, sct);
         		if (sct === null) {
         			return error("Found open <" + sot.name + "> tag without closing </" + sot.name + "> tag");
         		} else if (sot.name !== sct.name) {
         			return error("Expected open tag <" + sot.name + "> to match closing tag </" + sct.name + ">");
-        		} else if ((err = checkAttributes(sot.name, sot.attributes)) !== true) {
-        			return err;
+        		} else if (attrs.error != null) {
+        			return error(attrs.error);
         		}
         		return {
         			'type': sot.name,
-        			'attributes': sot.attributes,
+        			'attributes': attrs.value,
         			'content': sc
         		};
         	},
@@ -119,10 +119,12 @@ module.exports = (function() {
         		};
         	},
         peg$c37 = { type: "other", description: "Tag" },
-        peg$c38 = function(otn) { return isSelfClosing(otn.name) },
-        peg$c39 = function(otn, c, ctn) {
+        peg$c38 = function(otn, sp, c, ctn) { return !isSelfClosing(otn.name) || otn.name === ctn.name; },
+        peg$c39 = function(otn, sp, c, ctn) {
         		if (otn.name !== ctn.name) {
         			return error("Expected open tag <" + otn.name + "> to match closing tag </" + ctn.name + ">");
+        		} else if (isSelfClosing(otn.name)) {
+        			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
         		}
         		return {
         			'type': 'element',
@@ -137,6 +139,14 @@ module.exports = (function() {
         		if(!isSelfClosing(ot.name)) {
         			return error("<" + ot.name + ">" + " is not a valid self closing tag");
         		}
+        		// Special rules for <link> and <meta>
+        		if (['link', 'meta'].indexOf(ot.name) !== -1) {
+        			var attrs = checkAttributes(ot.name, ot.attributes);
+        			if (attrs.error != null) {
+        				return error(attrs.error);
+        			}
+        		}
+
         		return {
         			'type': 'element',
         			'void': true,
@@ -148,6 +158,7 @@ module.exports = (function() {
         	},
         peg$c42 = { type: "other", description: "Opening Tag" },
         peg$c43 = function(t, attrs, cl) {
+        		// TODO: HTML 5 spec does not allow tags of the form <tagname />
         		return { 'name': t, 'attributes': collapse(attrs)};
         	},
         peg$c44 = { type: "other", description: "Closing Tag" },
@@ -157,7 +168,7 @@ module.exports = (function() {
         peg$c48 = { type: "class", value: "[A-Za-z]", description: "[A-Za-z]" },
         peg$c49 = /^[0-9A-Z_a-z\-]/,
         peg$c50 = { type: "class", value: "[0-9A-Z_a-z\\-]", description: "[0-9A-Z_a-z\\-]" },
-        peg$c51 = function(tns, tne) { return tns.textNode() + tne.textNode(); },
+        peg$c51 = function(tns, tne) { return [tns].concat(tne).tagify(); },
         peg$c52 = { type: "other", description: "Attribute" },
         peg$c53 = function(ta, t) {
         		return {
@@ -750,7 +761,7 @@ module.exports = (function() {
       var s0, s1;
 
       peg$silentFails++;
-      s0 = peg$parsescript_tag();
+      s0 = peg$parsespecial_tag();
       if (s0 === peg$FAILED) {
         s0 = peg$parsenormal_tag();
         if (s0 === peg$FAILED) {
@@ -766,15 +777,15 @@ module.exports = (function() {
       return s0;
     }
 
-    function peg$parsescript_tag() {
+    function peg$parsespecial_tag() {
       var s0, s1, s2, s3;
 
       s0 = peg$currPos;
-      s1 = peg$parsescript_open();
+      s1 = peg$parsespecial_tag_open();
       if (s1 !== peg$FAILED) {
-        s2 = peg$parsescript_content();
+        s2 = peg$parsespecial_tag_content();
         if (s2 !== peg$FAILED) {
-          s3 = peg$parsescript_close();
+          s3 = peg$parsespecial_tag_close();
           if (s3 === peg$FAILED) {
             s3 = peg$c1;
           }
@@ -798,7 +809,7 @@ module.exports = (function() {
       return s0;
     }
 
-    function peg$parsescript_open() {
+    function peg$parsespecial_tag_open() {
       var s0, s1, s2, s3, s4, s5, s6;
 
       s0 = peg$currPos;
@@ -812,7 +823,7 @@ module.exports = (function() {
       if (s1 !== peg$FAILED) {
         s2 = peg$parses();
         if (s2 !== peg$FAILED) {
-          s3 = peg$parsescript_types();
+          s3 = peg$parsespecial_tag_types();
           if (s3 !== peg$FAILED) {
             s4 = [];
             s5 = peg$parsetag_attribute();
@@ -862,7 +873,7 @@ module.exports = (function() {
       return s0;
     }
 
-    function peg$parsescript_types() {
+    function peg$parsespecial_tag_types() {
       var s0, s1, s2;
 
       s0 = peg$currPos;
@@ -912,11 +923,11 @@ module.exports = (function() {
       return s0;
     }
 
-    function peg$parsescript_content() {
+    function peg$parsespecial_tag_content() {
       var s0, s1;
 
       s0 = peg$currPos;
-      s1 = peg$parsescript_scan();
+      s1 = peg$parsespecial_tag_scan();
       if (s1 !== peg$FAILED) {
         peg$reportedPos = s0;
         s1 = peg$c30(s1);
@@ -926,7 +937,7 @@ module.exports = (function() {
       return s0;
     }
 
-    function peg$parsescript_scan() {
+    function peg$parsespecial_tag_scan() {
       var s0, s1, s2, s3, s4;
 
       s0 = peg$currPos;
@@ -1003,7 +1014,7 @@ module.exports = (function() {
       return s0;
     }
 
-    function peg$parsescript_close() {
+    function peg$parsespecial_tag_close() {
       var s0, s1, s2, s3, s4, s5, s6;
 
       s0 = peg$currPos;
@@ -1027,7 +1038,7 @@ module.exports = (function() {
           if (s3 !== peg$FAILED) {
             s4 = peg$parses();
             if (s4 !== peg$FAILED) {
-              s5 = peg$parsescript_types();
+              s5 = peg$parsespecial_tag_types();
               if (s5 !== peg$FAILED) {
                 if (input.charCodeAt(peg$currPos) === 62) {
                   s6 = peg$c11;
@@ -1075,22 +1086,22 @@ module.exports = (function() {
       s0 = peg$currPos;
       s1 = peg$parseopen_tag();
       if (s1 !== peg$FAILED) {
-        peg$reportedPos = peg$currPos;
-        s2 = peg$c38(s1);
-        if (s2) {
-          s2 = peg$c0;
-        } else {
-          s2 = peg$c5;
-        }
+        s2 = peg$parses();
         if (s2 !== peg$FAILED) {
-          s3 = peg$parses();
+          s3 = peg$parsecontent();
           if (s3 !== peg$FAILED) {
-            s4 = peg$parsecontent();
+            s4 = peg$parseclose_tag();
             if (s4 !== peg$FAILED) {
-              s5 = peg$parseclose_tag();
+              peg$reportedPos = peg$currPos;
+              s5 = peg$c38(s1, s2, s3, s4);
+              if (s5) {
+                s5 = peg$c5;
+              } else {
+                s5 = peg$c0;
+              }
               if (s5 !== peg$FAILED) {
                 peg$reportedPos = s0;
-                s1 = peg$c39(s1, s4, s5);
+                s1 = peg$c39(s1, s2, s3, s4);
                 s0 = s1;
               } else {
                 peg$currPos = s0;
@@ -2433,6 +2444,7 @@ module.exports = (function() {
     }
 
 
+    	// Monkey patching
     	Array.prototype.textNode = function () {
     		return this.join('').textNode();
     	};
@@ -2449,42 +2461,116 @@ module.exports = (function() {
     		return this.textNode().toLowerCase();
     	};
 
+    	// Validation Rules
+    	var table = {
+    		'script': {
+    			'required': [],
+    			'normal': ['charset', 'src', 'type'],
+    			'void': ['async', 'defer'],
+    			'rules': function scriptRules(attributes, contents) {
+    				if (attributes['src'] != null && contents.textNode() !== '') {
+    					// If the "src" attribute is present, the <script> element must be empty.
+    					return {
+    						'error': "A <script> tag with a src attribute cannot have contents between the start and end tags"
+    					};
+    				}
+    				return true;
+    			}
+    		},
+    		'style': {
+    			'required': [],
+    			'normal': ['media', 'scoped', 'type'],
+    			'void': [],
+    			'rules': function styleRules(attributes, contents) {
+    				// TODO: If the "scoped" attribute is not used, each <style> tag must be located in the <head> section.
+    				return true;
+    			}
+    		},
+    		'meta': {
+    			'required': [],
+    			'normal': ['charset', 'content', 'http-equiv', 'name', 'scheme'],
+    			'void': [],
+    			'rules': function metaRules(attributes, contents, closing) {
+    				// TODO: <meta> tags always goes inside the <head> element.
+    				if ((attributes['name'] != null || attributes['http-equiv'] != null) && attributes['content'] == null) {
+    					return {
+    						'error': "The <meta> tag content attribute must be defined if the name or http-equiv attributes are defined"
+    					};
+    				} else if ((attributes['name'] == null && attributes['http-equiv'] == null) && attributes['content'] != null) {
+    					return {
+    						'error': "The <meta> tag content attribute cannot be defined if the name or http-equiv attributes are defined"
+    					};
+    				}
+    				return true;
+    			}
+    		},
+    		'link': {
+    			'required': ['rel'],
+    			'normal': ['rel', 'crossorigin', 'href', 'hreflang', 'media', 'sizes', 'type'],
+    			'void': [],
+    			'rules': function linkRules(attributes, contents, closing) {
+    				// TODO: This element goes only in the <head> section
+    				return true;
+    			}
+    		}
+    	};
+
+    	// Verification Functions
+
     	function isSelfClosing(tagName) {
     		var selfClosingTags = ['area','base','br','col','command','embed','hr','img',
     													 'input','keygen','link','meta','param','source','track','wbr'];
     		return selfClosingTags.indexOf(tagName) !== -1;
     	}
 
-    	function checkAttributes(tag, attributes) {
-    		var table = {
-    					'script': {
-    						'normal': ['charset', 'src', 'type'],
-    						'void': ['async', 'defer']
-    					},
-    					'style': {
-    						'normal': ['media', 'scoped', 'type'],
-    						'void': []
-    					}
-    				}, inNormal, inVoid, name, value;
+    	function checkAttributes(tag, attributes, contents, closing) {
+    		var inNormal, inVoid, name, value, rule;
+
+    		if (table[tag]['required'].length) {
+    			table[tag]['required'].map(function (req) {
+    				if (attributes[req] == null) {
+    			    return {
+    						'error': "The <" + tag + "> tag must include a " + req + " attribute"
+    					};
+    				}
+    			});
+    		}
+
     		for (name in attributes) {
     		  value = attributes[name];
     		  inVoid = table[tag]['void'].indexOf(name) !== -1;
     		  inNormal = table[tag]['normal'].indexOf(name) !== -1;
     		  if (!(inVoid || inNormal)) {
-    		    return error("The <" + tag + "> tag does not have a " + name + " attribute");
+    		    return {
+    					'error': "The <" + tag + "> tag does not have a " + name + " attribute"
+    				};
     		  }
     		  if (value != null) {
     		    if (!inNormal) {
-    		      return error("The <" + tag + "> tag " + name + " attribute should not have a value");
+    		      return {
+    						'error': "The <" + tag + "> tag " + name + " attribute should not have a value"
+    					};
     		    }
     		  } else {
     		    if (!inVoid) {
-    		      return error("The <" + tag + "> tag " + name + " attribute requires a value");
+    		      return {
+    						'error': "The <" + tag + "> tag " + name + " attribute requires a value"
+    					};
     		    }
     		  }
     		}
-    		return true;
+
+    		rule = table[tag]['rules'](attributes, contents, closing);
+    		if (rule !== true) {
+    			return rule;
+    		}
+
+    		return {
+    			'value': attributes
+    		};
     	}
+
+    	// Utility Functions
 
     	function stack(arr) {
     		return (Array.isArray(arr) ? arr.map(function (elem) { return elem[1]; }) : []);
