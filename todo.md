@@ -18,13 +18,15 @@
 ### Self-closing tags
 - [x] Enforce whitelist of self-closing tags
 - [ ] Enforce rule against invalid XHTML format `<img src="cat.gif" />`
+- [x] Support self-closing tag syntax
 
   ``` html
   <img src="cat.gif">
   ```
 
-### HTML `doctype` declarations
-- [x] Support `doctype` syntax and position
+### HTML `DOCTYPE` declarations
+- [x] Support `DOCTYPE` syntax
+- [x] Enforce correct `DOCTYPE` position in document
 
   ``` html
   <!DOCTYPE html>
@@ -112,6 +114,16 @@
   ```
 
 ### Create standard AST format
+
+- Base format and `DOCTYPE`
+  - [x] `DOCTYPE`
+  - [x] base format
+    - object for single root element, or array for multiple root elements
+
+  ```
+  doctype:    html
+  document:   {}  // or []
+  ```
 
 - `element` (includes `link` and `meta` special tags)
   - [x] self-closing
@@ -232,6 +244,7 @@
 
 ``` json
 {
+  "doctype": "html",
   "document": {
     "type": "element",
     "void": false,
