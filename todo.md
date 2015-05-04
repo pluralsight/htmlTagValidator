@@ -42,11 +42,11 @@
 
 #### Hierarchal rules
 
-- [ ] If you omit the `title` tag, the document will not validate as HTML
-- [ ] You can not have more than one `title` element in an HTML document
-- [ ] The `link` element goes only in the `head` section of an HTML document
-- [ ] The `meta` element goes only in the `head` section of an HTML document
-- [ ] If the "scoped" attribute is not used, each `style` tag must be located in the `head` section.
+- [x] If you omit the `title` tag, the document will not validate as HTML
+- [x] You can not have more than one `title` element in an HTML document
+- [x] The `link` element goes only in the `head` section of an HTML document
+- [x] The `meta` element goes only in the `head` section of an HTML document
+- [x] If the "scoped" attribute is not used, each `style` tag must be located in the `head` section.
 
 #### Tag-specific rules
 

@@ -1,128 +1,88 @@
 /* Helper Functions */
 {
 	// Monkey patching
+	if (!Array.prototype.find) {
+	  Array.prototype.find = function(predicate) {
+	    if (this == null) {
+	      throw new TypeError('Array.prototype.find called on null or undefined');
+	    }
+	    if (!isFunction(predicate)) {
+	      throw new TypeError('predicate must be a function');
+	    }
+	    var list = Object(this);
+	    var length = list.length >>> 0;
+	    var thisArg = arguments[1];
+	    var value;
+
+	    for (var i = 0; i < length; i++) {
+	      value = list[i];
+	      if (predicate.call(thisArg, value, i, list)) {
+	        return value;
+	      }
+	    }
+	    return undefined;
+	  };
+	}
+
+	if (!Array.prototype.findWhere) {
+		Array.prototype.findWhere = function (props) {
+			return this.find(function (val, i, all) {
+				return has(val, props);
+			});
+		};
+	}
+
+	if (!Array.prototype.countWhere) {
+		Array.prototype.countWhere = function (props) {
+			var count, i, len, val;
+
+			count = 0;
+
+			for (i = 0, len = this.length; i < len; i++) {
+			  val = this[i];
+			  if (has(val, props)) {
+			    count += 1;
+			  }
+			}
+			return count;
+		};
+	}
+
 	Array.prototype.textNode = function () {
-		return this.join('').textNode();
+		var res = this;
+		if (this.length && isArray(this[0])) {
+			res = stack(this);
+		}
+		return res.join('').textNode();
 	};
 
 	String.prototype.textNode = function () {
-		return this.replace(/^\s+|\s+$/g, '');
+		return this.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
 	};
 
 	Array.prototype.scriptify = function () {
-		var script = this.join('').replace(/^\n+|\n+$/g, '');
-		return script.textNode() !== '' ? script : null;
+		var res = this;
+		if (this.length && isArray(this[0])) {
+			res = stack(this);
+		}
+		res = res.join('').replace(/^\n+|\n+$/g, '');
+		return res.textNode() !== '' ? res : null;
 	};
 
 	Array.prototype.tagify = function () {
 		return this.textNode().toLowerCase();
 	};
 
+	// TODO: Note - these would be used to implement <pre> tags instead of textNode()
+	Array.prototype.preserveNode = function () { return this.join(''); };
+
+	String.prototype.preserveNode = function () { return this; };
+
 	// Codex of tag and attribute names
-	var codex = {
-		// Attribute types
-		'global': [
-			'accesskey', 'class', 'contenteditable', 'contextmenu', 'dir',
-			'draggable', 'dropzone', 'hidden', 'id', 'lang', 'spellcheck',
-			'style', 'tabindex', 'title', 'translate'
-		],
-		'event': [
-			'onafterprint', 'onbeforeprint', 'onbeforeunload', 'onerror',
-			'onhashchange', 'onload', 'onmessage', 'onoffline', 'ononline',
-			'onpagehide', 'onpageshow', 'onpopstate', 'onresize', 'onstorage',
-			'onunload', 'onblur', 'onchange', 'oncontextmenu', 'onfocus',
-			'oninput', 'oninvalid', 'onreset', 'onsearch', 'onselect',
-			'onsubmit', 'onkeydown', 'onkeypress', 'onkeyup', 'onclick',
-			'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave',
-			'ondragover', 'ondragstart', 'ondrop', 'onmousedown',
-			'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup',
-			'onmousewheel', 'onscroll', 'onwheel', 'oncopy', 'oncut',
-			'onpaste', 'onabort', 'oncanplay', 'oncanplaythrough',
-			'oncuechange', 'ondurationchange', 'onemptied', 'onended',
-			'onerror', 'onloadeddata', 'onloadedmetadata', 'onloadstart',
-			'onpause', 'onplay', 'onplaying', 'onprogress', 'onratechange',
-			'onseeked', 'onseeking', 'onstalled', 'onsuspend', 'ontimeupdate',
-			'onvolumechange', 'onwaiting', 'onerror', 'onshow', 'ontoggle'
-		],
-		// Tag types
-		'self-closing': [
-			'area','base','br','col','command','embed','hr',
-			'img', 'input','keygen','link','meta','param',
-			'source','track', 'wbr'
-		]
-	};
+	var codex = require('./html-grammar-codex');
 
 	// Validation Rules for special tag types
-	var table = {
-		'script': {
-			'additional': ['global'],
-			'required': [],
-			'normal': ['charset', 'src', 'type'],
-			'void': ['async', 'defer'],
-			'rules': function scriptRules(attributes, contents) {
-				if (attributes['src'] != null && contents.textNode() !== '') {
-					// If the "src" attribute is present, the <script> element must be empty.
-					return {
-						'error': "A <script> tag with a src attribute cannot have contents between the start and end tags"
-					};
-				}
-				return true;
-			}
-		},
-		'style': {
-			'additional': ['global', 'event'],
-			'required': [],
-			'normal': ['media', 'scoped', 'type'],
-			'void': [],
-			'rules': null
-		},
-		'title': {
-			'additional': ['global'],
-			'required': [],
-			'normal': [],
-			'void': [],
-			'rules': function styleRules(attributes, contents) {
-				if (contents === null) {
-					return {
-						'error': "The <title> tag is required to have content between the start and end tags"
-					};
-				}
-				return true;
-			}
-		},
-		'meta': {
-			'additional': ['global'],
-			'required': [],
-			'normal': ['charset', 'content', 'http-equiv', 'name', 'scheme'],
-			'void': [],
-			'rules': function metaRules(attributes, contents) {
-				if ((attributes['name'] != null || attributes['http-equiv'] != null) && attributes['content'] == null) {
-					return {
-						'error': "The <meta> tag content attribute must be defined if the name or http-equiv attributes are defined"
-					};
-				} else if ((attributes['name'] == null && attributes['http-equiv'] == null) && attributes['content'] != null) {
-					return {
-						'error': "The <meta> tag content attribute cannot be defined unless the name or http-equiv attributes are defined"
-					};
-				}
-				return true;
-			}
-		},
-		'link': {
-			'additional': ['global', 'event'],
-			'required': ['rel'],
-			'normal': ['rel', 'crossorigin', 'href', 'hreflang', 'media', 'sizes', 'type'],
-			'void': [],
-			'rules': null
-		},
-		'iframe': {
-			'additional': ['global', 'event'],
-			'required': [],
-			'normal': ['height', 'name', 'sandbox', 'seamless', 'src', 'srcdoc', 'width'],
-			'void': [],
-			'rules': null
-		}
-	};
+	var table = require('./html-grammar-rules');
 
 	// Verification Functions
 
@@ -141,8 +101,8 @@
 
 	function isAttributeAllowed(tag, attribute, value) {
 		var i, len, ref, shared, props = table[tag];
-		// Ignore unknown tags and attributes of the format data-*, [*], or (*)
-		if (props == null || /(^data\-)|(^\[[\S]+\]$)|(^\([\S]+\)$)/i.test(attribute)) {
+		// Ignore unknown tags and attributes of the format data-*, aria-*, [*], or (*)
+		if (props == null || /(^(data|aria)\-)|(^\[[\S]+\]$)|(^\([\S]+\)$)/i.test(attribute)) {
 			return true;
 		}
 
@@ -212,7 +172,7 @@
 		}
 
 		// Run any custom validation rules that exist
-		if (has(props, 'rules') && (typeof props['rules'] === 'function')) {
+		if (has(props, 'rules') && (isFunction(props['rules']))) {
 			if ((rule = props['rules'](attributes, contents)) !== true) {
 				return rule;
 			}
@@ -243,33 +203,126 @@
 			We can look at the children for specific elements to determine if
 			anything is in a place it is not allowed.
 		*/
-
-		// TODO: If you omit the <title> tag, the document will not validate as HTML
-		// TODO: You can not have more than one <title> element in an HTML document
-		// TODO: The <link> element goes only in the <head> section of an HTML document
-		// TODO: The <meta> element goes only in the <head> section of an HTML document
-		// TODO: If the "scoped" attribute is not used, each <style> tag must be located in the <head> section.
-
+		// TODO: Each of these needs a corresponding test
+		var countTitle, countLink, countMeta;
+		switch (tag) {
+		  case 'head':
+				countTitle = children.countWhere({'type': 'title'});
+				if (countTitle < 1) {
+					return {
+						'error': "The document will not validate as HTML if you omit the <title> tag in the document <head> section"
+					};
+				} else if (countTitle > 1) {
+					return {
+						'error': "You can not have more than one <title> element in an HTML document"
+					};
+				}
+		    break;
+		  default:
+				if (isArray(children) && children.length > 0) {
+					countLink = children.countWhere({'type': 'element', 'name': 'link'});
+					if (countLink > 0) {
+						return {
+							'error': "The <link> element goes only in the <head> section of an HTML document"
+						};
+					}
+					countMeta = children.countWhere({'type': 'element', 'name': 'meta'});
+					if (countMeta > 0) {
+						return {
+							'error': "The <meta> element goes only in the <head> section of an HTML document"
+						};
+					}
+					// Process one level deep so that trace is as accurate as possible
+					if (children.find(function (child) {
+						if (child['type'] === 'style' && !has(child.attributes, 'scoped')) {
+							return true;
+						}
+						return false;
+					}) !== undefined) {
+						return {
+							'error': "If the scoped attribute is not used, each <style> tag must be located in the <head> section"
+						};
+					}
+				}
+				break;
+		}
 		return true;
 	}
 
 	// Utility Functions
 
+	function safe(obj) {
+		// If it is not a string or array, is it not safe
+		return ((isArray(obj) || isString(obj)) ? obj : []);
+	}
+
+	function str(obj) {
+		return Object.prototype.toString.call(obj);
+	}
+
+	function isPlain(obj) {
+		return str(obj) === "[object Object]";
+	}
+
+	function isFunction(obj) {
+		return str(obj) === "[object Function]";
+	}
+
+	function isString(obj) {
+		return str(obj) === "[object String]";
+	}
+
+	function isArray(obj) {
+		if (Array.isArray) {
+			return Array.isArray(obj);
+		}
+		return str(obj) === "[object Array]";
+	}
+
 	function has(thing, item) {
-		if (Array.isArray(thing) || thing.length) {
-			return thing.indexOf(item) !== -1;
-		} else if (thing.hasOwnProperty) {
-			return thing.hasOwnProperty(item);
+		var k, v, len;
+		if (isArray(thing)) {
+			if (isString(item)) {
+				// thing is an array, find substring item
+				return thing.indexOf(item) !== -1;
+			} else {
+				// thing is an array, find item in array
+				return thing.findWhere(item) !== undefined;
+			}
+		} else if (isPlain(thing)) {
+			// thing is an object
+			if (isPlain(item)) {
+				// item is an object, find each prop key and value in item within thing
+				for (k in item) {
+				  v = item[k];
+				  if (!(thing.hasOwnProperty(k) && thing[k] === v)) {
+				    return false;
+				  }
+				}
+				return true;
+			} else if (isArray(item)) {
+				// item is an array, find each string prop within thing
+				for (i = 0, len = item.length; i < len; i++) {
+				  k = item[i];
+				  if (!thing.hasOwnProperty(k)) {
+				    return false;
+				  }
+				}
+				return true;
+			} else {
+				// thing is an object, item is a string, find item string in thing
+				return thing.hasOwnProperty(item);
+			}
 		}
 		return false;
 	}
 
 	function stack(arr) {
-		return (Array.isArray(arr) ? arr.map(function (elem) { return elem[1]; }) : []);
+		return (isArray(arr) ? arr.map(function (elem) { return elem[1]; }) : []);
 	}
 
 	function collapse(arr) {
-		if (Array.isArray(arr) && arr.length) {
+		if (isArray(arr) && arr.length) {
 			var i, len, n, obj, ref, v;
 			obj = {};
 			for (i = 0, len = arr.length; i < len; i++) {
@@ -306,7 +359,7 @@ doctype "HTML DOCTYPE"
 	= ls:(!doctype_terminators .)* doctype_start dt:([a-zA-Z])+ s ex:(char+)? s ">"
 	&	{ return dt.tagify() === 'doctype'; }
 	{
-		if (ls === null || stack(ls).textNode() === '') {
+		if (ls === null || safe(ls).textNode() === '') {
 			if (ex.tagify() === 'html') {
 				return {
 					'value': ex.tagify()
@@ -326,7 +379,7 @@ doctype_start
 
 doctype_terminators
 	= doctype_start
-	/ "<iframe"
+	/ "<" s "iframe"
 
 /* HTML node types*/
 
@@ -385,7 +438,7 @@ special_tag "Non-parsed Element"
 		}
 		return {
 			'type': sot.name,
-			'attributes': sot.value,
+			'attributes': sot.attributes,
 			'contents': sc
 		};
 	}
@@ -410,7 +463,7 @@ special_tag_content
 
 special_tag_scan
 	= cs:(!"</" char)*
-	{ return stack(cs).scriptify();  }
+	{ return safe(cs).scriptify();  }
 
 special_tag_close
 	= "<" s "/" s sc:(special_tag_types) s ">"
@@ -501,7 +554,7 @@ tag_attribute "Attribute"
 tag_attribute_name "Attribute Name"
 	= s n:(![\/\>\"\'\= ] char)*
 	& { return n.length; }
-	{ return stack(n).tagify(); }
+	{ return safe(n).tagify(); }
 
 tag_attribute_value_dblquote "Attribute Value (Double Quoted)"
 	=	tag_attribute_value_dblquote_empty
@@ -592,7 +645,7 @@ comment_block
 
 comment_scan
 	= cs:(!comment_close char)*
-	{ return stack(cs).textNode();  }
+	{ return safe(cs).textNode();  }
 
 /* HTML conditional block comments*/
 
@@ -629,7 +682,7 @@ comment_conditional_body
 
 conditional_scan
 	= cs:(!conditional_terminator char)*
-	{ return stack(cs).textNode(); }
+	{ return safe(cs).textNode(); }
 
 conditional_terminator
 	= conditional_end

@@ -57,7 +57,7 @@ module.exports = (function() {
         peg$c10 = { type: "literal", value: ">", description: "\">\"" },
         peg$c11 = function(ls, dt, ex) { return dt.tagify() === 'doctype'; },
         peg$c12 = function(ls, dt, ex) {
-        		if (ls === null || stack(ls).textNode() === '') {
+        		if (ls === null || safe(ls).textNode() === '') {
         			if (ex.tagify() === 'html') {
         				return {
         					'value': ex.tagify()
@@ -73,19 +73,21 @@ module.exports = (function() {
         	},
         peg$c13 = "<!",
         peg$c14 = { type: "literal", value: "<!", description: "\"<!\"" },
-        peg$c15 = "<iframe",
-        peg$c16 = { type: "literal", value: "<iframe", description: "\"<iframe\"" },
-        peg$c17 = { type: "other", description: "Content" },
-        peg$c18 = function(c) { return c; },
-        peg$c19 = { type: "other", description: "Node" },
-        peg$c20 = function(n) { return n; },
-        peg$c21 = { type: "other", description: "Node Types" },
-        peg$c22 = { type: "other", description: "Comment Node Types" },
-        peg$c23 = { type: "other", description: "HTML Tag" },
-        peg$c24 = { type: "other", description: "IFRAME Element" },
-        peg$c25 = function(iot, ic, ict) { return has(['iframe'], iot.name); },
-        peg$c26 = function(iot, ic, ict) { return ict === null || iot.name === ict.name; },
-        peg$c27 = function(iot, ic, ict) {
+        peg$c15 = "<",
+        peg$c16 = { type: "literal", value: "<", description: "\"<\"" },
+        peg$c17 = "iframe",
+        peg$c18 = { type: "literal", value: "iframe", description: "\"iframe\"" },
+        peg$c19 = { type: "other", description: "Content" },
+        peg$c20 = function(c) { return c; },
+        peg$c21 = { type: "other", description: "Node" },
+        peg$c22 = function(n) { return n; },
+        peg$c23 = { type: "other", description: "Node Types" },
+        peg$c24 = { type: "other", description: "Comment Node Types" },
+        peg$c25 = { type: "other", description: "HTML Tag" },
+        peg$c26 = { type: "other", description: "IFRAME Element" },
+        peg$c27 = function(iot, ic, ict) { return has(['iframe'], iot.name); },
+        peg$c28 = function(iot, ic, ict) { return ict === null || iot.name === ict.name; },
+        peg$c29 = function(iot, ic, ict) {
         		var err;
         		if ((err = validateSpecialTag(iot, ic, ict)) !== true) {
         			return error(err.error);
@@ -98,9 +100,9 @@ module.exports = (function() {
         			'contents': ic
         		};
         	},
-        peg$c28 = { type: "other", description: "Non-parsed Element" },
-        peg$c29 = function(sot, sc, sct) { return has(['script', 'style', 'title'], sot.name); },
-        peg$c30 = function(sot, sc, sct) {
+        peg$c30 = { type: "other", description: "Non-parsed Element" },
+        peg$c31 = function(sot, sc, sct) { return has(['script', 'style', 'title'], sot.name); },
+        peg$c32 = function(sot, sc, sct) {
         		var err;
         		if ((err = validateSpecialTag(sot, sc, sct)) !== true) {
         			return error(err.error);
@@ -109,12 +111,10 @@ module.exports = (function() {
         		}
         		return {
         			'type': sot.name,
-        			'attributes': sot.value,
+        			'attributes': sot.attributes,
         			'contents': sc
         		};
         	},
-        peg$c31 = "<",
-        peg$c32 = { type: "literal", value: "<", description: "\"<\"" },
         peg$c33 = function(st, attrs) {
         		return {
         			'name': st,
@@ -128,7 +128,7 @@ module.exports = (function() {
         peg$c38 = function(scs) { return scs; },
         peg$c39 = "</",
         peg$c40 = { type: "literal", value: "</", description: "\"</\"" },
-        peg$c41 = function(cs) { return stack(cs).scriptify();  },
+        peg$c41 = function(cs) { return safe(cs).scriptify();  },
         peg$c42 = "/",
         peg$c43 = { type: "literal", value: "/", description: "\"/\"" },
         peg$c44 = function(sc) {
@@ -208,7 +208,7 @@ module.exports = (function() {
         peg$c63 = /^[\/>"'= ]/,
         peg$c64 = { type: "class", value: "[\\/>\"'= ]", description: "[\\/>\"'= ]" },
         peg$c65 = function(n) { return n.length; },
-        peg$c66 = function(n) { return stack(n).tagify(); },
+        peg$c66 = function(n) { return safe(n).tagify(); },
         peg$c67 = { type: "other", description: "Attribute Value (Double Quoted)" },
         peg$c68 = "\"",
         peg$c69 = { type: "literal", value: "\"", description: "\"\\\"\"" },
@@ -266,7 +266,7 @@ module.exports = (function() {
         			}
         		};
         	},
-        peg$c100 = function(cs) { return stack(cs).textNode();  },
+        peg$c100 = function(cs) { return safe(cs).textNode();  },
         peg$c101 = function(cons, com, cone) { return cons === null && cone === null; },
         peg$c102 = function(cons, com, cone) {
         		var condition = '';
@@ -296,7 +296,7 @@ module.exports = (function() {
         peg$c112 = "]",
         peg$c113 = { type: "literal", value: "]", description: "\"]\"" },
         peg$c114 = function() { return true; },
-        peg$c115 = function(cs) { return stack(cs).textNode(); },
+        peg$c115 = function(cs) { return safe(cs).textNode(); },
         peg$c116 = { type: "other", description: "Character" },
         peg$c117 = /^[^<>]/,
         peg$c118 = { type: "class", value: "[^<>]", description: "[^<>]" },
@@ -692,16 +692,42 @@ module.exports = (function() {
     }
 
     function peg$parsedoctype_terminators() {
-      var s0;
+      var s0, s1, s2, s3;
 
       s0 = peg$parsedoctype_start();
       if (s0 === peg$FAILED) {
-        if (input.substr(peg$currPos, 7) === peg$c15) {
-          s0 = peg$c15;
-          peg$currPos += 7;
+        s0 = peg$currPos;
+        if (input.charCodeAt(peg$currPos) === 60) {
+          s1 = peg$c15;
+          peg$currPos++;
         } else {
-          s0 = peg$FAILED;
+          s1 = peg$FAILED;
           if (peg$silentFails === 0) { peg$fail(peg$c16); }
+        }
+        if (s1 !== peg$FAILED) {
+          s2 = peg$parses();
+          if (s2 !== peg$FAILED) {
+            if (input.substr(peg$currPos, 6) === peg$c17) {
+              s3 = peg$c17;
+              peg$currPos += 6;
+            } else {
+              s3 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c18); }
+            }
+            if (s3 !== peg$FAILED) {
+              s1 = [s1, s2, s3];
+              s0 = s1;
+            } else {
+              peg$currPos = s0;
+              s0 = peg$c0;
+            }
+          } else {
+            peg$currPos = s0;
+            s0 = peg$c0;
+          }
+        } else {
+          peg$currPos = s0;
+          s0 = peg$c0;
         }
       }
 
@@ -721,13 +747,13 @@ module.exports = (function() {
       }
       if (s1 !== peg$FAILED) {
         peg$reportedPos = s0;
-        s1 = peg$c18(s1);
+        s1 = peg$c20(s1);
       }
       s0 = s1;
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c17); }
+        if (peg$silentFails === 0) { peg$fail(peg$c19); }
       }
 
       return s0;
@@ -743,7 +769,7 @@ module.exports = (function() {
         s2 = peg$parses();
         if (s2 !== peg$FAILED) {
           peg$reportedPos = s0;
-          s1 = peg$c20(s1);
+          s1 = peg$c22(s1);
           s0 = s1;
         } else {
           peg$currPos = s0;
@@ -756,7 +782,7 @@ module.exports = (function() {
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c19); }
+        if (peg$silentFails === 0) { peg$fail(peg$c21); }
       }
 
       return s0;
@@ -776,7 +802,7 @@ module.exports = (function() {
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c21); }
+        if (peg$silentFails === 0) { peg$fail(peg$c23); }
       }
 
       return s0;
@@ -793,7 +819,7 @@ module.exports = (function() {
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c22); }
+        if (peg$silentFails === 0) { peg$fail(peg$c24); }
       }
 
       return s0;
@@ -816,7 +842,7 @@ module.exports = (function() {
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c23); }
+        if (peg$silentFails === 0) { peg$fail(peg$c25); }
       }
 
       return s0;
@@ -837,7 +863,7 @@ module.exports = (function() {
           }
           if (s3 !== peg$FAILED) {
             peg$reportedPos = peg$currPos;
-            s4 = peg$c25(s1, s2, s3);
+            s4 = peg$c27(s1, s2, s3);
             if (s4) {
               s4 = peg$c5;
             } else {
@@ -845,7 +871,7 @@ module.exports = (function() {
             }
             if (s4 !== peg$FAILED) {
               peg$reportedPos = peg$currPos;
-              s5 = peg$c26(s1, s2, s3);
+              s5 = peg$c28(s1, s2, s3);
               if (s5) {
                 s5 = peg$c5;
               } else {
@@ -853,7 +879,7 @@ module.exports = (function() {
               }
               if (s5 !== peg$FAILED) {
                 peg$reportedPos = s0;
-                s1 = peg$c27(s1, s2, s3);
+                s1 = peg$c29(s1, s2, s3);
                 s0 = s1;
               } else {
                 peg$currPos = s0;
@@ -878,7 +904,7 @@ module.exports = (function() {
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c24); }
+        if (peg$silentFails === 0) { peg$fail(peg$c26); }
       }
 
       return s0;
@@ -899,7 +925,7 @@ module.exports = (function() {
           }
           if (s3 !== peg$FAILED) {
             peg$reportedPos = peg$currPos;
-            s4 = peg$c29(s1, s2, s3);
+            s4 = peg$c31(s1, s2, s3);
             if (s4) {
               s4 = peg$c5;
             } else {
@@ -907,7 +933,7 @@ module.exports = (function() {
             }
             if (s4 !== peg$FAILED) {
               peg$reportedPos = s0;
-              s1 = peg$c30(s1, s2, s3);
+              s1 = peg$c32(s1, s2, s3);
               s0 = s1;
             } else {
               peg$currPos = s0;
@@ -928,7 +954,7 @@ module.exports = (function() {
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c28); }
+        if (peg$silentFails === 0) { peg$fail(peg$c30); }
       }
 
       return s0;
@@ -939,11 +965,11 @@ module.exports = (function() {
 
       s0 = peg$currPos;
       if (input.charCodeAt(peg$currPos) === 60) {
-        s1 = peg$c31;
+        s1 = peg$c15;
         peg$currPos++;
       } else {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c32); }
+        if (peg$silentFails === 0) { peg$fail(peg$c16); }
       }
       if (s1 !== peg$FAILED) {
         s2 = peg$parses();
@@ -1144,11 +1170,11 @@ module.exports = (function() {
 
       s0 = peg$currPos;
       if (input.charCodeAt(peg$currPos) === 60) {
-        s1 = peg$c31;
+        s1 = peg$c15;
         peg$currPos++;
       } else {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c32); }
+        if (peg$silentFails === 0) { peg$fail(peg$c16); }
       }
       if (s1 !== peg$FAILED) {
         s2 = peg$parses();
@@ -1289,11 +1315,11 @@ module.exports = (function() {
       peg$silentFails++;
       s0 = peg$currPos;
       if (input.charCodeAt(peg$currPos) === 60) {
-        s1 = peg$c31;
+        s1 = peg$c15;
         peg$currPos++;
       } else {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c32); }
+        if (peg$silentFails === 0) { peg$fail(peg$c16); }
       }
       if (s1 !== peg$FAILED) {
         s2 = peg$parses();
@@ -2606,128 +2632,88 @@ module.exports = (function() {
 
 
     	// Monkey patching
+    	if (!Array.prototype.find) {
+    	  Array.prototype.find = function(predicate) {
+    	    if (this == null) {
+    	      throw new TypeError('Array.prototype.find called on null or undefined');
+    	    }
+    	    if (!isFunction(predicate)) {
+    	      throw new TypeError('predicate must be a function');
+    	    }
+    	    var list = Object(this);
+    	    var length = list.length >>> 0;
+    	    var thisArg = arguments[1];
+    	    var value;
+
+    	    for (var i = 0; i < length; i++) {
+    	      value = list[i];
+    	      if (predicate.call(thisArg, value, i, list)) {
+    	        return value;
+    	      }
+    	    }
+    	    return undefined;
+    	  };
+    	}
+
+    	if (!Array.prototype.findWhere) {
+    		Array.prototype.findWhere = function (props) {
+    			return this.find(function (val, i, all) {
+    				return has(val, props);
+    			});
+    		};
+    	}
+
+    	if (!Array.prototype.countWhere) {
+    		Array.prototype.countWhere = function (props) {
+    			var count, i, len, val;
+
+    			count = 0;
+
+    			for (i = 0, len = this.length; i < len; i++) {
+    			  val = this[i];
+    			  if (has(val, props)) {
+    			    count += 1;
+    			  }
+    			}
+    			return count;
+    		};
+    	}
+
     	Array.prototype.textNode = function () {
-    		return this.join('').textNode();
+    		var res = this;
+    		if (this.length && isArray(this[0])) {
+    			res = stack(this);
+    		}
+    		return res.join('').textNode();
     	};
 
     	String.prototype.textNode = function () {
-    		return this.replace(/^\s+|\s+$/g, '');
+    		return this.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
     	};
 
     	Array.prototype.scriptify = function () {
-    		var script = this.join('').replace(/^\n+|\n+$/g, '');
-    		return script.textNode() !== '' ? script : null;
+    		var res = this;
+    		if (this.length && isArray(this[0])) {
+    			res = stack(this);
+    		}
+    		res = res.join('').replace(/^\n+|\n+$/g, '');
+    		return res.textNode() !== '' ? res : null;
     	};
 
     	Array.prototype.tagify = function () {
     		return this.textNode().toLowerCase();
     	};
 
+    	// TODO: Note - these would be used to implement <pre> tags instead of textNode()
+    	Array.prototype.preserveNode = function () { return this.join(''); };
+
+    	String.prototype.preserveNode = function () { return this; };
+
     	// Codex of tag and attribute names
-    	var codex = {
-    		// Attribute types
-    		'global': [
-    			'accesskey', 'class', 'contenteditable', 'contextmenu', 'dir',
-    			'draggable', 'dropzone', 'hidden', 'id', 'lang', 'spellcheck',
-    			'style', 'tabindex', 'title', 'translate'
-    		],
-    		'event': [
-    			'onafterprint', 'onbeforeprint', 'onbeforeunload', 'onerror',
-    			'onhashchange', 'onload', 'onmessage', 'onoffline', 'ononline',
-    			'onpagehide', 'onpageshow', 'onpopstate', 'onresize', 'onstorage',
-    			'onunload', 'onblur', 'onchange', 'oncontextmenu', 'onfocus',
-    			'oninput', 'oninvalid', 'onreset', 'onsearch', 'onselect',
-    			'onsubmit', 'onkeydown', 'onkeypress', 'onkeyup', 'onclick',
-    			'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave',
-    			'ondragover', 'ondragstart', 'ondrop', 'onmousedown',
-    			'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup',
-    			'onmousewheel', 'onscroll', 'onwheel', 'oncopy', 'oncut',
-    			'onpaste', 'onabort', 'oncanplay', 'oncanplaythrough',
-    			'oncuechange', 'ondurationchange', 'onemptied', 'onended',
-    			'onerror', 'onloadeddata', 'onloadedmetadata', 'onloadstart',
-    			'onpause', 'onplay', 'onplaying', 'onprogress', 'onratechange',
-    			'onseeked', 'onseeking', 'onstalled', 'onsuspend', 'ontimeupdate',
-    			'onvolumechange', 'onwaiting', 'onerror', 'onshow', 'ontoggle'
-    		],
-    		// Tag types
-    		'self-closing': [
-    			'area','base','br','col','command','embed','hr',
-    			'img', 'input','keygen','link','meta','param',
-    			'source','track', 'wbr'
-    		]
-    	};
+    	var codex = require('./html-grammar-codex');
 
     	// Validation Rules for special tag types
-    	var table = {
-    		'script': {
-    			'additional': ['global'],
-    			'required': [],
-    			'normal': ['charset', 'src', 'type'],
-    			'void': ['async', 'defer'],
-    			'rules': function scriptRules(attributes, contents) {
-    				if (attributes['src'] != null && contents.textNode() !== '') {
-    					// If the "src" attribute is present, the <script> element must be empty.
-    					return {
-    						'error': "A <script> tag with a src attribute cannot have contents between the start and end tags"
-    					};
-    				}
-    				return true;
-    			}
-    		},
-    		'style': {
-    			'additional': ['global', 'event'],
-    			'required': [],
-    			'normal': ['media', 'scoped', 'type'],
-    			'void': [],
-    			'rules': null
-    		},
-    		'title': {
-    			'additional': ['global'],
-    			'required': [],
-    			'normal': [],
-    			'void': [],
-    			'rules': function styleRules(attributes, contents) {
-    				if (contents === null) {
-    					return {
-    						'error': "The <title> tag is required to have content between the start and end tags"
-    					};
-    				}
-    				return true;
-    			}
-    		},
-    		'meta': {
-    			'additional': ['global'],
-    			'required': [],
-    			'normal': ['charset', 'content', 'http-equiv', 'name', 'scheme'],
-    			'void': [],
-    			'rules': function metaRules(attributes, contents) {
-    				if ((attributes['name'] != null || attributes['http-equiv'] != null) && attributes['content'] == null) {
-    					return {
-    						'error': "The <meta> tag content attribute must be defined if the name or http-equiv attributes are defined"
-    					};
-    				} else if ((attributes['name'] == null && attributes['http-equiv'] == null) && attributes['content'] != null) {
-    					return {
-    						'error': "The <meta> tag content attribute cannot be defined unless the name or http-equiv attributes are defined"
-    					};
-    				}
-    				return true;
-    			}
-    		},
-    		'link': {
-    			'additional': ['global', 'event'],
-    			'required': ['rel'],
-    			'normal': ['rel', 'crossorigin', 'href', 'hreflang', 'media', 'sizes', 'type'],
-    			'void': [],
-    			'rules': null
-    		},
-    		'iframe': {
-    			'additional': ['global', 'event'],
-    			'required': [],
-    			'normal': ['height', 'name', 'sandbox', 'seamless', 'src', 'srcdoc', 'width'],
-    			'void': [],
-    			'rules': null
-    		}
-    	};
+    	var table = require('./html-grammar-rules');
 
     	// Verification Functions
 
@@ -2746,8 +2732,8 @@ module.exports = (function() {
 
     	function isAttributeAllowed(tag, attribute, value) {
     		var i, len, ref, shared, props = table[tag];
-    		// Ignore unknown tags and attributes of the format data-*, [*], or (*)
-    		if (props == null || /(^data\-)|(^\[[\S]+\]$)|(^\([\S]+\)$)/i.test(attribute)) {
+    		// Ignore unknown tags and attributes of the format data-*, aria-*, [*], or (*)
+    		if (props == null || /(^(data|aria)\-)|(^\[[\S]+\]$)|(^\([\S]+\)$)/i.test(attribute)) {
     			return true;
     		}
 
@@ -2817,7 +2803,7 @@ module.exports = (function() {
     		}
 
     		// Run any custom validation rules that exist
-    		if (has(props, 'rules') && (typeof props['rules'] === 'function')) {
+    		if (has(props, 'rules') && (isFunction(props['rules']))) {
     			if ((rule = props['rules'](attributes, contents)) !== true) {
     				return rule;
     			}
@@ -2848,33 +2834,126 @@ module.exports = (function() {
     			We can look at the children for specific elements to determine if
     			anything is in a place it is not allowed.
     		*/
-
-    		// TODO: If you omit the <title> tag, the document will not validate as HTML
-    		// TODO: You can not have more than one <title> element in an HTML document
-    		// TODO: The <link> element goes only in the <head> section of an HTML document
-    		// TODO: The <meta> element goes only in the <head> section of an HTML document
-    		// TODO: If the "scoped" attribute is not used, each <style> tag must be located in the <head> section.
-
+    		// TODO: Each of these needs a corresponding test
+    		var countTitle, countLink, countMeta;
+    		switch (tag) {
+    		  case 'head':
+    				countTitle = children.countWhere({'type': 'title'});
+    				if (countTitle < 1) {
+    					return {
+    						'error': "The document will not validate as HTML if you omit the <title> tag in the document <head> section"
+    					};
+    				} else if (countTitle > 1) {
+    					return {
+    						'error': "You can not have more than one <title> element in an HTML document"
+    					};
+    				}
+    		    break;
+    		  default:
+    				if (isArray(children) && children.length > 0) {
+    					countLink = children.countWhere({'type': 'element', 'name': 'link'});
+    					if (countLink > 0) {
+    						return {
+    							'error': "The <link> element goes only in the <head> section of an HTML document"
+    						};
+    					}
+    					countMeta = children.countWhere({'type': 'element', 'name': 'meta'});
+    					if (countMeta > 0) {
+    						return {
+    							'error': "The <meta> element goes only in the <head> section of an HTML document"
+    						};
+    					}
+    					// Process one level deep so that trace is as accurate as possible
+    					if (children.find(function (child) {
+    						if (child['type'] === 'style' && !has(child.attributes, 'scoped')) {
+    							return true;
+    						}
+    						return false;
+    					}) !== undefined) {
+    						return {
+    							'error': "If the scoped attribute is not used, each <style> tag must be located in the <head> section"
+    						};
+    					}
+    				}
+    				break;
+    		}
     		return true;
     	}
 
     	// Utility Functions
 
+    	function safe(obj) {
+    		// If it is not a string or array, is it not safe
+    		return ((isArray(obj) || isString(obj)) ? obj : []);
+    	}
+
+    	function str(obj) {
+    		return Object.prototype.toString.call(obj);
+    	}
+
+    	function isPlain(obj) {
+    		return str(obj) === "[object Object]";
+    	}
+
+    	function isFunction(obj) {
+    		return str(obj) === "[object Function]";
+    	}
+
+    	function isString(obj) {
+    		return str(obj) === "[object String]";
+    	}
+
+    	function isArray(obj) {
+    		if (Array.isArray) {
+    			return Array.isArray(obj);
+    		}
+    		return str(obj) === "[object Array]";
+    	}
+
     	function has(thing, item) {
-    		if (Array.isArray(thing) || thing.length) {
-    			return thing.indexOf(item) !== -1;
-    		} else if (thing.hasOwnProperty) {
-    			return thing.hasOwnProperty(item);
+    		var k, v, len;
+    		if (isArray(thing)) {
+    			if (isString(item)) {
+    				// thing is an array, find substring item
+    				return thing.indexOf(item) !== -1;
+    			} else {
+    				// thing is an array, find item in array
+    				return thing.findWhere(item) !== undefined;
+    			}
+    		} else if (isPlain(thing)) {
+    			// thing is an object
+    			if (isPlain(item)) {
+    				// item is an object, find each prop key and value in item within thing
+    				for (k in item) {
+    				  v = item[k];
+    				  if (!(thing.hasOwnProperty(k) && thing[k] === v)) {
+    				    return false;
+    				  }
+    				}
+    				return true;
+    			} else if (isArray(item)) {
+    				// item is an array, find each string prop within thing
+    				for (i = 0, len = item.length; i < len; i++) {
+    				  k = item[i];
+    				  if (!thing.hasOwnProperty(k)) {
+    				    return false;
+    				  }
+    				}
+    				return true;
+    			} else {
+    				// thing is an object, item is a string, find item string in thing
+    				return thing.hasOwnProperty(item);
+    			}
     		}
     		return false;
     	}
 
     	function stack(arr) {
-    		return (Array.isArray(arr) ? arr.map(function (elem) { return elem[1]; }) : []);
+    		return (isArray(arr) ? arr.map(function (elem) { return elem[1]; }) : []);
     	}
 
     	function collapse(arr) {
-    		if (Array.isArray(arr) && arr.length) {
+    		if (isArray(arr) && arr.length) {
     			var i, len, n, obj, ref, v;
     			obj = {};
     			for (i = 0, len = arr.length; i < len; i++) {

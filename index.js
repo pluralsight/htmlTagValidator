@@ -5,7 +5,7 @@ function htmlTagValidator(source, callback) {
 	  try {
 	  	var ast = htmlParser.parse(source);
 	    callback(null, ast);
-	  } catch (e) { 
+	  } catch (e) {
 	    callback(e);
 	  }
   }, 0);

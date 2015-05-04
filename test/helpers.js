@@ -1,6 +1,7 @@
 var expect            = require('chai').expect,
     fs                = require('fs'),
     _                 = require('lodash'),
+    htmlTagValidator  = require('../index'),
     prettyjson        = require('prettyjson'),
     getTree, assertOkTree, assertErrorTree;
 
