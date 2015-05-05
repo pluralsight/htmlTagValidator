@@ -50,7 +50,7 @@ module.exports = {
     'img': [
       'alt', 'src', 'srcset', 'crossorigin', 'usemap', 'ismap', 'width',
       'height'
-      ],
+    ],
     'iframe': [
       'src', 'srcdoc', 'name', 'sandbox', 'seamless', 'width', 'height'
     ],

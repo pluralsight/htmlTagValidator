@@ -139,11 +139,13 @@ module.exports = (function() {
         peg$c45 = { type: "other", description: "Tag" },
         peg$c46 = function(otn, sp, c, ctn) { return !isSelfClosing(otn.name) || otn.name === ctn.name; },
         peg$c47 = function(otn, sp, c, ctn) {
-        		var err;
+        		var err, attrs;
         		if (otn.name !== ctn.name) {
         			return error("Expected open tag <" + otn.name + "> to match closing tag </" + ctn.name + ">");
         		} else if (isSelfClosing(otn.name)) {
         			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
+        		} else if (has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
+        			return error(attrs.error);
         		} else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
         			return error(err.error);
         		}
@@ -157,6 +159,7 @@ module.exports = (function() {
         	},
         peg$c48 = { type: "other", description: "Self-closing Tag" },
         peg$c49 = function(ot) {
+        		var attrs;
         		if(!isSelfClosing(ot.name)) {
         			return error("<" + ot.name + ">" + " is not a valid self closing tag");
         		}
@@ -167,13 +170,8 @@ module.exports = (function() {
         						method of a self-closing tag.
         			*/
         			return error("The XHTML self-closing tag format <" + ot.name + " /> is not allowed in HTML 5");
-        		}
-        		// Special rules for <link> and <meta>
-        		if (['link', 'meta'].indexOf(ot.name) !== -1) {
-        			var attrs = checkAttributes(ot.name, ot.attributes);
-        			if (attrs.error != null) {
-        				return error(attrs.error);
-        			}
+        		} else if (has(attrs = checkAttributes(ot.name, ot.attributes), 'error')) {
+        			return error(attrs.error);
         		}
 
         		return {
@@ -2705,6 +2703,7 @@ module.exports = (function() {
     	};
 
     	// TODO: Note - these would be used to implement <pre> tags instead of textNode()
+
     	Array.prototype.preserveNode = function () { return this.join(''); };
 
     	String.prototype.preserveNode = function () { return this; };
@@ -2714,6 +2713,18 @@ module.exports = (function() {
 
     	// Validation Rules for special tag types
     	var table = require('./html-grammar-rules');
+
+    	function fallbackAttributes(tag) {
+    		var obj = {
+    			'additional': ['global', 'event']
+    		};
+    		if (!has(codex['tag-specific'], tag)) {
+    			// Ignore unknown tags by default
+    			return null;
+    		}
+    		obj['additional'].push(codex['tag-specific'][tag]);
+    		return obj;
+    	}
 
     	// Verification Functions
 
@@ -2730,10 +2741,45 @@ module.exports = (function() {
     		return has(codex['event'], attribute);
     	}
 
+    	function customAttributeTest(test, tag, attribute, value) {
+    		var tester;
+
+    		if (isPattern(test)) {
+    		  tester = function () { return test.test(attribute); };
+    		} else if (isFunction(test)) {
+    		  tester = function () { return test.apply(null, arguments.slice(1)); };
+    		} else if (isArray(test)) {
+    		  tester = function () { return has(test, attribute); };
+    		} else if (isString(test)) {
+    		  tester = function () { return attribute === test; };
+    		} else {
+    			return {
+    				'error': "Invalid attributes overrides specified in options object"
+    			};
+    		}
+
+    		return tester();
+    	}
+
     	function isAttributeAllowed(tag, attribute, value) {
-    		var i, len, ref, shared, props = table[tag];
+    		var i, len, ref, shared, props = table[tag], customRule;
+
+    		// Bypass additional checks if attribute name is in options override
+    		if (has(options, 'attributes')) {
+    			if (has(options.attributes, tag)) {
+    				customRule = options.attributes[tag];
+    			} else if (has(options.attributes, '_all')) {
+    				customRule = options.attributes['_all'];
+    			}
+    			// Only halt on success, continue on otherwise
+    			if (customRule && customAttributeTest.apply(this, [customRule, tag, attribute, value])) {
+    				return true;
+    			}
+    		}
+
     		// Ignore unknown tags and attributes of the format data-*, aria-*, [*], or (*)
-    		if (props == null || /(^(data|aria)\-)|(^\[[\S]+\]$)|(^\([\S]+\)$)/i.test(attribute)) {
+    		if ((props == null && (props = fallbackAttributes(tag)) == null) ||
+    			/(^(data|aria)\-)|(^\[[\S]+\]$)|(^\([\S]+\)$)/i.test(attribute)) {
     			return true;
     		}
 
@@ -2760,9 +2806,15 @@ module.exports = (function() {
     		} else if ((ref = props['additional']).length) {
     			for (i = 0, len = ref.length; i < len; i++) {
     			  shared = ref[i];
-    			  if (has(codex[shared], attribute)) {
-    			    return true;
-    			  }
+    				if (isArray(shared)) {
+    					if (has(shared, attribute)) {
+    						return true;
+    					}
+    				} else {
+    					if (has(codex[shared], attribute)) {
+    			    	return true;
+    			  	}
+    				}
     			}
     		}
 
@@ -2777,12 +2829,12 @@ module.exports = (function() {
     		};
 
     		// If the tag is not in the table then allow anything
-    		if (!has(table, tag)) { return ok; }
+    		if (!has(table, tag) && !has(codex['tag-specific'], tag)) { return ok; }
 
-    		props = table[tag];
+    		props = table[tag] || {};
 
     		// Check if all the required attributes are present
-    		if (props['required'].length) {
+    		if (has(props, 'required') && props['required'].length) {
     			ref = props['required'];
     			for (i = 0, len = ref.length; i < len; i++) {
     			  req = ref[i];
@@ -2893,6 +2945,10 @@ module.exports = (function() {
 
     	function isPlain(obj) {
     		return str(obj) === "[object Object]";
+    	}
+
+    	function isPattern(obj) {
+    		return str(obj) === "[object RegExp]";
     	}
 
     	function isFunction(obj) {

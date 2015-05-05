@@ -11,7 +11,11 @@ describe('html-tag-validator', function() {
   });
 
   it('basic angular', function(done) {
-    tree.ok(this, done);
+    tree.ok(this, {
+      'attributes': {
+        '_all': /^ng\-/
+      }
+    }, done);
   });
 
   it('basic self closing', function(done) {
@@ -87,13 +91,21 @@ describe('html-tag-validator', function() {
   });
 
   it('full featured test', function(done) {
-    tree.ok(this, done);
+    tree.ok(this, {
+      'attributes': {
+        'td': ['height', 'width', 'bgcolor']
+      }
+    }, done);
   });
 
   it('full featured test 2', function(done) {
-    tree.ok(this, done);
+    tree.ok(this, {
+      'attributes': {
+        'html': /^ng\-/
+      }
+    }, done);
   });
-
+  
   it('basic iframe', function(done) {
     tree.ok(this, done);
   });

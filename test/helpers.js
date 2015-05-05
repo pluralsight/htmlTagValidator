@@ -17,43 +17,54 @@ var broadcast = function (args) {
 Load the source file for the current test and then try and generate the AST from it.
 @note Uses the name of the test to determine what test input to use such that `bees-test`
   looks for the file `beesTest.html` in the `./test/html/` directory.
+@note Alternative arguments format to pass options object is: that, options, callback.
 @param [Object] that
   The context of the running test
 @param [Function] callback
   The function to call when htmlTagValidator has generated the AST or an error.
 */
 getTree = function (that, callback) {
-  var fileTitle = that.test.title.replace(/(?:\s+)([a-z0-9])/ig, function (matches, $1) {
-    return $1.toUpperCase();
-  });
-  fs.readFile(__dirname + '/html/' + fileTitle + '.html', "utf8", function(err, data) {
+  var args = Array.prototype.slice.call(arguments, 1),
+      fileTitle = that.test.title.replace(/(?:\s+)([a-z0-9])/ig, function (matches, $1) {
+        return $1.toUpperCase();
+      }),
+      filePath = __dirname + '/html/' + fileTitle + '.html';
+  fs.readFile(filePath, "utf8", function(err, data) {
     if (err) {
       callback(err);
     } else {
-      htmlTagValidator(data, callback);
+      args.unshift(data);
+      htmlTagValidator.apply(that, args);
     };
   });
 };
 
 /**
 Assert that the current file returns an AST without errors.
+@note Alternative arguments format to pass options object is: that, options, done.
 @param [Object] that
   The context of the running test
 @param [Function] done
   The function to call when the test is completed
 */
 assertOkTree = function (that, done) {
-  getTree.call(that, that, function (err, ast) {
+  var options = {}, func = done;
+  if (arguments.length > 2) {
+    options = done;
+    func = arguments[2];
+  }
+  getTree.apply(that, [that, options, function (err, ast) {
     broadcast(arguments);
     expect(err).to.be.null;
     expect(ast).to.be.ok;
-    done.call(that);
-  });
+    func.call(that);
+  }]);
 };
 
 /**
 Assert that the current file returns an error containing the properties and values in the
 given object.
+@note Alternative arguments format to pass options object is: obj, that, options, done.
 @param [Object|String] obj
   The properties and values to assert within the error generated for the running test. If
   a string is given, then it is asserted that the error message contains the text provided.
@@ -63,20 +74,25 @@ given object.
   The function to call when the test is completed
 */
 assertErrorTree = function (obj, that, done) {
-  getTree.call(that, that, function (err, ast) {
-    broadcast(arguments);
+  var options = {}, func = done;
+  if (arguments.length > 3) {
+    options = done;
+    func = arguments[3];
+  }
+  getTree.apply(that, [that, options, function (err, ast) {
     expect(ast).to.be.undefined;
     if (_.isString(obj)) { obj = { 'message': obj }; }
     _.forEach(obj, function (v, k) {
       expect(err).to.include.keys(k);
       expect(err[k]).to.contain(v);
     });
-    done.call(that);
-  });
+    func.call(that);
+  }]);
 };
 
 module.exports = {
   'get': getTree,
   'ok': assertOkTree,
-  'error': assertErrorTree
+  'error': assertErrorTree,
+  'broadcast': broadcast
 };
