@@ -7,9 +7,11 @@ var expect            = require('chai').expect,
 
 var broadcast = function (args) {
   _.forEach(args, function (arg) {
-    console.log('\n');
-    console.log(_.isObject(arg) ? prettyjson.render(arg, {}) : arg);
-    console.log('\n');
+    if (arg != null) {
+      console.log('\n');
+      console.log(_.isObject(arg) ? prettyjson.render(arg, {}) : arg);
+      console.log('\n');
+    }
   });
 };
 
