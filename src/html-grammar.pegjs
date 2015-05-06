@@ -1,12 +1,18 @@
 /* Helper Functions */
 {
-	// Monkey patching
+			// Parser utilities
+	var _u = require('./html-parser-util'),
+			// Codex of tag and attribute names
+			codex = _u.initializeOptions(require('./html-grammar-codex'), options);
+
+	// TODO: Refactor me to no longer extend native objects
+	// Monkey patching (is bad...)
 	if (!Array.prototype.find) {
 	  Array.prototype.find = function(predicate) {
 	    if (this == null) {
 	      throw new TypeError('Array.prototype.find called on null or undefined');
 	    }
-	    if (!isFunction(predicate)) {
+	    if (!_u.isFunc(predicate)) {
 	      throw new TypeError('predicate must be a function');
 	    }
 	    var list = Object(this);
@@ -27,7 +33,7 @@
 	if (!Array.prototype.findWhere) {
 		Array.prototype.findWhere = function (props) {
 			return this.find(function (val, i, all) {
-				return has(val, props);
+				return _u.has(val, props);
 			});
 		};
 	}
@@ -40,7 +46,7 @@
 
 			for (i = 0, len = this.length; i < len; i++) {
 			  val = this[i];
-			  if (has(val, props)) {
+			  if (_u.has(val, props)) {
 			    count += 1;
 			  }
 			}
@@ -50,8 +56,8 @@
 
 	Array.prototype.textNode = function () {
 		var res = this;
-		if (this.length && isArray(this[0])) {
-			res = stack(this);
+		if (this.length && _u.isArray(this[0])) {
+			res = _u.stack(this);
 		}
 		return res.join('').textNode();
 	};
@@ -62,15 +68,19 @@
 
 	Array.prototype.scriptify = function () {
 		var res = this;
-		if (this.length && isArray(this[0])) {
-			res = stack(this);
+		if (this.length && _u.isArray(this[0])) {
+			res = _u.stack(this);
 		}
 		res = res.join('').replace(/^\n+|\n+$/g, '');
 		return res.textNode() !== '' ? res : null;
 	};
 
 	Array.prototype.tagify = function () {
-		return this.textNode().toLowerCase();
+		return this.textNode().tagify();
+	};
+
+	String.prototype.tagify = function () {
+		return this.toLowerCase();
 	};
 
 	// TODO: Note - these would be used to implement <pre> tags instead of textNode()
@@ -79,114 +89,49 @@
 
 	String.prototype.preserveNode = function () { return this; };
 
-	// Codex of tag and attribute names
-	var codex = require('./html-grammar-codex');
-
-	// Validation Rules for special tag types
-	var table = require('./html-grammar-rules');
-
-	function fallbackAttributes(tag) {
-		var obj = {
-			'additional': ['global', 'event']
-		};
-		if (!has(codex['tag-specific'], tag)) {
-			// Ignore unknown tags by default
-			return null;
-		}
-		obj['additional'].push(codex['tag-specific'][tag]);
-		return obj;
-	}
-
 	// Verification Functions
 
 	function isSelfClosing(tag) {
-		return has(codex['self-closing'], tag);
-	}
-
-	function isGlobalAttribute(attribute) {
-		// Note: Global attributes also include attributes beginning with `data-`
-		return has(codex['global'], attribute);
-	}
-
-	function isEventAttribute(attribute) {
-		return has(codex['event'], attribute);
-	}
-
-	function customAttributeTest(test, tag, attribute, value) {
-		var tester;
-
-		if (isPattern(test)) {
-		  tester = function () { return test.test(attribute); };
-		} else if (isFunction(test)) {
-		  tester = function () { return test.apply(null, arguments.slice(1)); };
-		} else if (isArray(test)) {
-		  tester = function () { return has(test, attribute); };
-		} else if (isString(test)) {
-		  tester = function () { return attribute === test; };
-		} else {
-			return {
-				'error': "Invalid attributes overrides specified in options object"
-			};
-		}
-
-		return tester();
+		var path = 'tags/void',
+				tags = _u.option(path);
+		return tags != null ? _u.customTest.apply(this, [path, tags, [tag]]) : false;
 	}
 
 	function isAttributeAllowed(tag, attribute, value) {
-		var i, len, ref, shared, props = table[tag], customRule;
+		var i, len, ref, shared, props,
+				that = this,
+				attrTest = function (tst) {
+					return _u.customTest.apply(that, ['attributes/' + tst, props[tst], [attribute, value]]);
+				};
 
-		// Bypass additional checks if attribute name is in options override
-		if (has(options, 'attributes')) {
-			if (has(options.attributes, tag)) {
-				customRule = options.attributes[tag];
-			} else if (has(options.attributes, '_all')) {
-				customRule = options.attributes['_all'];
-			}
-			// Only halt on success, continue on otherwise
-			if (customRule && customAttributeTest.apply(this, [customRule, tag, attribute, value])) {
-				return true;
-			}
-		}
+		// Find the rules for this tag in the options
+		props = _u.option('attributes', [tag, '_']);
 
-		// Ignore unknown tags and attributes of the format data-*, aria-*, [*], or (*)
-		if ((props == null && (props = fallbackAttributes(tag)) == null) ||
-			/(^(data|aria)\-)|(^\[[\S]+\]$)|(^\([\S]+\)$)/i.test(attribute)) {
-			return true;
-		}
+		// Do not continue unless attribute options exist for this tag
+		if (props == null) { return true; }
 
 		/*
 			The tag is allowed if it:
 			a) exists in normal and has any value,
 			b) exists in void and has no value,
-			c) or exists in additional and has any or no value
+			c) or exists in mixed and has any or no value
 		*/
-		if (has(props['normal'], attribute)) {
+		if (_u.has(props, 'normal') && attrTest('normal')) {
 			if (value == null) {
 				return {
 					'error': "The <" + tag + "> tag " + attribute + " attribute requires a value"
 				};
 			}
 			return true;
-		} else if (has(props['void'], attribute)) {
+		} else if (_u.has(props, 'void') && attrTest('void')) {
 			if (value != null) {
 				return {
 					'error': "The <" + tag + "> tag " + attribute + " attribute should not have a value"
 				};
 			}
 			return true;
-		} else if ((ref = props['additional']).length) {
-			for (i = 0, len = ref.length; i < len; i++) {
-			  shared = ref[i];
-				if (isArray(shared)) {
-					if (has(shared, attribute)) {
-						return true;
-					}
-				} else {
-					if (has(codex[shared], attribute)) {
-			    	return true;
-			  	}
-				}
-			}
+		} else if (_u.has(props, 'mixed') && attrTest('mixed')) {
+			return true;
 		}
 
     return {
@@ -199,20 +144,24 @@
 			'value': attributes
 		};
 
-		// If the tag is not in the table then allow anything
-		if (!has(table, tag) && !has(codex['tag-specific'], tag)) { return ok; }
+		// If the tag is not in the codex then allow anything
+		props = _u.option('attributes', [tag, '_']);
 
-		props = table[tag] || {};
+		if (props == null) { return ok; }
 
 		// Check if all the required attributes are present
-		if (has(props, 'required') && props['required'].length) {
+		if (_u.has(props, 'required')) {
 			ref = props['required'];
 			for (i = 0, len = ref.length; i < len; i++) {
 			  req = ref[i];
-			  if (!has(attributes, req)) {
-			    return {
-						'error': "The <" + tag + "> tag must include a " + req + " attribute"
-					};
+			  if ((rule = _u.customTest.apply(this, ['attributes/required', req, [attributes, contents]])) !== true) {
+					if (rule === false) {
+				    return {
+							'error': "The <" + tag + "> tag must include a " + req + " attribute"
+						};
+					} else {
+						return rule;
+					}
 			  }
 			}
 		}
@@ -226,8 +175,9 @@
 		}
 
 		// Run any custom validation rules that exist
-		if (has(props, 'rules') && (isFunction(props['rules']))) {
-			if ((rule = props['rules'](attributes, contents)) !== true) {
+		if (_u.has(props, 'rules') && props['rules'] != null) {
+			rule = _u.customTest.apply(this, ['attributes/rules', props['rules'], [attributes, contents]]);
+			if (_u.has(rule, 'error')) {
 				return rule;
 			}
 		}
@@ -251,7 +201,9 @@
 		return true;
 	}
 
-	function isValidChildren(tag, attributes, children) {
+
+	// TODO: Is it possible to move this to the codex?
+ 	function isValidChildren(tag, attributes, children) {
 		/*
 			Special rules apply for the position of certain elements in the document.
 			We can look at the children for specific elements to determine if
@@ -273,7 +225,7 @@
 				}
 		    break;
 		  default:
-				if (isArray(children) && children.length > 0) {
+				if (_u.isArray(children) && children.length > 0) {
 					countLink = children.countWhere({'type': 'element', 'name': 'link'});
 					if (countLink > 0) {
 						return {
@@ -288,7 +240,7 @@
 					}
 					// Process one level deep so that trace is as accurate as possible
 					if (children.find(function (child) {
-						if (child['type'] === 'style' && !has(child.attributes, 'scoped')) {
+						if (child['type'] === 'style' && !_u.has(child.attributes, 'scoped')) {
 							return true;
 						}
 						return false;
@@ -301,96 +253,6 @@
 				break;
 		}
 		return true;
-	}
-
-	// Utility Functions
-
-	function safe(obj) {
-		// If it is not a string or array, is it not safe
-		return ((isArray(obj) || isString(obj)) ? obj : []);
-	}
-
-	function str(obj) {
-		return Object.prototype.toString.call(obj);
-	}
-
-	function isPlain(obj) {
-		return str(obj) === "[object Object]";
-	}
-
-	function isPattern(obj) {
-		return str(obj) === "[object RegExp]";
-	}
-
-	function isFunction(obj) {
-		return str(obj) === "[object Function]";
-	}
-
-	function isString(obj) {
-		return str(obj) === "[object String]";
-	}
-
-	function isArray(obj) {
-		if (Array.isArray) {
-			return Array.isArray(obj);
-		}
-		return str(obj) === "[object Array]";
-	}
-
-	function has(thing, item) {
-		var k, v, len;
-		if (isArray(thing)) {
-			if (isString(item)) {
-				// thing is an array, find substring item
-				return thing.indexOf(item) !== -1;
-			} else {
-				// thing is an array, find item in array
-				return thing.findWhere(item) !== undefined;
-			}
-		} else if (isPlain(thing)) {
-			// thing is an object
-			if (isPlain(item)) {
-				// item is an object, find each prop key and value in item within thing
-				for (k in item) {
-				  v = item[k];
-				  if (!(thing.hasOwnProperty(k) && thing[k] === v)) {
-				    return false;
-				  }
-				}
-				return true;
-			} else if (isArray(item)) {
-				// item is an array, find each string prop within thing
-				for (i = 0, len = item.length; i < len; i++) {
-				  k = item[i];
-				  if (!thing.hasOwnProperty(k)) {
-				    return false;
-				  }
-				}
-				return true;
-			} else {
-				// thing is an object, item is a string, find item string in thing
-				return thing.hasOwnProperty(item);
-			}
-		}
-		return false;
-	}
-
-	function stack(arr) {
-		return (isArray(arr) ? arr.map(function (elem) { return elem[1]; }) : []);
-	}
-
-	function collapse(arr) {
-		if (isArray(arr) && arr.length) {
-			var i, len, n, obj, ref, v;
-			obj = {};
-			for (i = 0, len = arr.length; i < len; i++) {
-			  ref = arr[i], n = ref.name, v = ref.value;
-			  obj[n] = v;
-			}
-			return obj;
-		} else {
-			return {};
-		}
 	}
 }
 
@@ -417,7 +279,7 @@ doctype "HTML DOCTYPE"
 	= ls:(!doctype_terminators .)* doctype_start dt:([a-zA-Z])+ s ex:(char+)? s ">"
 	&	{ return dt.tagify() === 'doctype'; }
 	{
-		if (ls === null || safe(ls).textNode() === '') {
+		if (ls === null || _u.safe(ls).textNode() === '') {
 			if (ex.tagify() === 'html') {
 				return {
 					'value': ex.tagify()
@@ -468,7 +330,7 @@ tag "HTML Tag"
 
 iframe_tag "IFRAME Element"
 	= iot:(special_tag_open) ic:(start) ict:(special_tag_close)?
-	& { return has(['iframe'], iot.name); }
+	& { return _u.has(['iframe'], iot.name); }
 	& { return ict === null || iot.name === ict.name; }
 	{
 		var err;
@@ -486,7 +348,7 @@ iframe_tag "IFRAME Element"
 
 special_tag "Non-parsed Element"
 	= sot:(special_tag_open) sc:(special_tag_content) sct:(special_tag_close)?
-	& { return has(['script', 'style', 'title'], sot.name); }
+	& { return _u.has(['script', 'style', 'title'], sot.name); }
 	{
 		var err;
 		if ((err = validateSpecialTag(sot, sc, sct)) !== true) {
@@ -506,7 +368,7 @@ special_tag_open
 	{
 		return {
 			'name': st,
-			'attributes': collapse(attrs)
+			'attributes': _u.collapse(attrs)
 		};
 	}
 
@@ -521,7 +383,7 @@ special_tag_content
 
 special_tag_scan
 	= cs:(!"</" char)*
-	{ return safe(cs).scriptify();  }
+	{ return _u.safe(cs).scriptify();  }
 
 special_tag_close
 	= "<" s "/" s sc:(special_tag_types) s ">"
@@ -540,7 +402,7 @@ normal_tag "Tag"
 			return error("Expected open tag <" + otn.name + "> to match closing tag </" + ctn.name + ">");
 		} else if (isSelfClosing(otn.name)) {
 			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
-		} else if (has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
+		} else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
 			return error(attrs.error);
 		} else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
 			return error(err.error);
@@ -568,7 +430,7 @@ self_closing_tag "Self-closing Tag"
 						method of a self-closing tag.
 			*/
 			return error("The XHTML self-closing tag format <" + ot.name + " /> is not allowed in HTML 5");
-		} else if (has(attrs = checkAttributes(ot.name, ot.attributes), 'error')) {
+		} else if (_u.has(attrs = checkAttributes(ot.name, ot.attributes), 'error')) {
 			return error(attrs.error);
 		}
 
@@ -585,7 +447,7 @@ self_closing_tag "Self-closing Tag"
 open_tag "Opening Tag"
 	= "<" s t:(tagname) attrs:(tag_attribute)* s cl:("/")? s ">"
 	{
-		return { 'name': t, 'attributes': collapse(attrs), 'closing': cl};
+		return { 'name': t, 'attributes': _u.collapse(attrs), 'closing': cl};
 	}
 
 close_tag "Closing Tag"
@@ -610,7 +472,7 @@ tag_attribute "Attribute"
 tag_attribute_name "Attribute Name"
 	= s n:(![\/\>\"\'\= ] char)*
 	& { return n.length; }
-	{ return safe(n).tagify(); }
+	{ return _u.safe(n).tagify(); }
 
 tag_attribute_value_dblquote "Attribute Value (Double Quoted)"
 	=	tag_attribute_value_dblquote_empty
@@ -701,7 +563,7 @@ comment_block
 
 comment_scan
 	= cs:(!comment_close char)*
-	{ return safe(cs).textNode();  }
+	{ return _u.safe(cs).textNode();  }
 
 /* HTML conditional block comments*/
 
@@ -738,7 +600,7 @@ comment_conditional_body
 
 conditional_scan
 	= cs:(!conditional_terminator char)*
-	{ return safe(cs).textNode(); }
+	{ return _u.safe(cs).textNode(); }
 
 conditional_terminator
 	= conditional_end
