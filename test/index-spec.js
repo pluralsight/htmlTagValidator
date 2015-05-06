@@ -13,7 +13,9 @@ describe('html-tag-validator', function() {
   it('basic angular', function(done) {
     tree.ok(this, {
       'attributes': {
-        '_all': /^ng\-/
+        '_': {
+         'mixed': /^((ng\-)|(^\[[\S]+\]$)|(^\([\S]+\)$))/
+        }
       }
     }, done);
   });
@@ -93,7 +95,12 @@ describe('html-tag-validator', function() {
   it('full featured test', function(done) {
     tree.ok(this, {
       'attributes': {
-        'td': ['height', 'width', 'bgcolor']
+        'table': {
+          'normal': ['align', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'frame', 'rules', 'summary', 'width']
+        },
+        'td': {
+          'normal': ['height', 'width', 'bgcolor']
+        }
       }
     }, done);
   });
@@ -101,11 +108,16 @@ describe('html-tag-validator', function() {
   it('full featured test 2', function(done) {
     tree.ok(this, {
       'attributes': {
-        'html': /^ng\-/
+        '_': {
+          'mixed': [/^((ng\-)|(^\[[\S]+\]$)|(^\([\S]+\)$))/]
+        },
+        'nw-nav-item': {
+          'normal': 'name'
+        }
       }
     }, done);
   });
-  
+
   it('basic iframe', function(done) {
     tree.ok(this, done);
   });
