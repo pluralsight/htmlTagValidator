@@ -105,7 +105,7 @@
 
 - [ ] `pre` tags
   - [ ] parse `pre` tags without trimming like regular elements
-    - **moved to milestones for 0.2.x release**
+    - **moved to milestones for 0.3.x release**
     - This is tricky because there could still be other HTML elements within the `pre` tag that should still be parsed
 
     ``` html

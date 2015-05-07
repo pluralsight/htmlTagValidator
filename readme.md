@@ -47,7 +47,7 @@ The parser implements the basic components of the HTML 5 spec, such as:
  <p class="foo"></p>
  ```
 
-Note: this project is work-in-progress and is **not full spec-compliant**.
+Note: this project is work-in-progress and is **not fully spec-compliant**.
 
 See `todo.md` for plans for current and future releases
 
