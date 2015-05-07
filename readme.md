@@ -119,7 +119,7 @@ document:
             type:       element
             void:       false
             name:       p
-            attributes: 
+            attributes:
               style: color: pink;
             children:
               -

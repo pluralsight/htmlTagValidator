@@ -10,6 +10,10 @@ describe('html-tag-validator', function() {
     tree.ok(this, done);
   });
 
+  it('basic document', function(done) {
+    tree.ok(this, done);
+  });
+
   it('basic angular', function(done) {
     tree.ok(this, {
       'attributes': {
@@ -116,9 +120,5 @@ describe('html-tag-validator', function() {
         }
       }
     }, done);
-  });
-
-  it('basic iframe', function(done) {
-    tree.ok(this, done);
   });
 });
