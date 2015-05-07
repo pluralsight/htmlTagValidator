@@ -82,11 +82,12 @@ assertErrorTree = function (obj, that, done) {
     func = arguments[3];
   }
   getTree.apply(that, [that, options, function (err, ast) {
+    broadcast(arguments);
     expect(ast).to.be.undefined;
     if (_.isString(obj)) { obj = { 'message': obj }; }
     _.forEach(obj, function (v, k) {
       expect(err).to.include.keys(k);
-      expect(err[k]).to.contain(v);
+      expect(err[k]).to.equal(v);
     });
     func.call(that);
   }]);

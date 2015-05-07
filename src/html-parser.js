@@ -139,8 +139,12 @@ module.exports = (function() {
         peg$c45 = { type: "other", description: "Tag" },
         peg$c46 = function(otn, sp, c, ctn) { return !isSelfClosing(otn.name) || otn.name === ctn.name; },
         peg$c47 = function(otn, sp, c, ctn) {
-        		var err, attrs;
-        		if (otn.name !== ctn.name) {
+        		var err, attrs, parts = [];
+        		if(!(ctn.front && ctn.back)) {
+        			if (!ctn.front) { parts.push('</'); }
+        			if (!ctn.back) { parts.push('>'); }
+        			return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
+        		} else if (otn.name !== ctn.name) {
         			return error("Expected open tag <" + otn.name + "> to match closing tag </" + ctn.name + ">");
         		} else if (isSelfClosing(otn.name)) {
         			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
@@ -188,7 +192,13 @@ module.exports = (function() {
         		return { 'name': t, 'attributes': _u.collapse(attrs), 'closing': cl};
         	},
         peg$c52 = { type: "other", description: "Closing Tag" },
-        peg$c53 = function(t) { return { 'name': t }; },
+        peg$c53 = function(o, t, c) {
+        		return {
+        			'name': t,
+        			'front': o !== null,
+        			'back': c !== null
+        		};
+        	},
         peg$c54 = { type: "other", description: "Tag Name" },
         peg$c55 = /^[A-Za-z]/,
         peg$c56 = { type: "class", value: "[A-Za-z]", description: "[A-Za-z]" },
@@ -1410,6 +1420,9 @@ module.exports = (function() {
         s1 = peg$FAILED;
         if (peg$silentFails === 0) { peg$fail(peg$c40); }
       }
+      if (s1 === peg$FAILED) {
+        s1 = peg$c1;
+      }
       if (s1 !== peg$FAILED) {
         s2 = peg$parses();
         if (s2 !== peg$FAILED) {
@@ -1424,9 +1437,12 @@ module.exports = (function() {
                 s5 = peg$FAILED;
                 if (peg$silentFails === 0) { peg$fail(peg$c10); }
               }
+              if (s5 === peg$FAILED) {
+                s5 = peg$c1;
+              }
               if (s5 !== peg$FAILED) {
                 peg$reportedPos = s0;
-                s1 = peg$c53(s3);
+                s1 = peg$c53(s1, s3, s5);
                 s0 = s1;
               } else {
                 peg$currPos = s0;

@@ -397,8 +397,12 @@ normal_tag "Tag"
 	= otn:(open_tag) sp:(s) c:(content) ctn:(close_tag)
 	& { return !isSelfClosing(otn.name) || otn.name === ctn.name; }
 	{
-		var err, attrs;
-		if (otn.name !== ctn.name) {
+		var err, attrs, parts = [];
+		if(!(ctn.front && ctn.back)) {
+			if (!ctn.front) { parts.push('</'); }
+			if (!ctn.back) { parts.push('>'); }
+			return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
+		} else if (otn.name !== ctn.name) {
 			return error("Expected open tag <" + otn.name + "> to match closing tag </" + ctn.name + ">");
 		} else if (isSelfClosing(otn.name)) {
 			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
@@ -451,8 +455,14 @@ open_tag "Opening Tag"
 	}
 
 close_tag "Closing Tag"
-	= "</" s t:(tagname) s ">"
-	{ return { 'name': t }; }
+	= o:("</")? s t:(tagname) s c:(">")?
+	{
+		return {
+			'name': t,
+			'front': o !== null,
+			'back': c !== null
+		};
+	}
 
 /* HTML element attributes*/
 

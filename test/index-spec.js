@@ -6,6 +6,26 @@ describe('html-tag-validator', function() {
     tree.ok(this, done);
   });
 
+  it('basic div 2', function(done) {
+    tree.ok(this, done);
+  });
+
+  it('basic div 3', function(done) {
+    tree.error({
+      'message': "The <div> tag is missing part (>) of its closing tag",
+      'line': 1,
+      'column': 1
+    }, this, done);
+  });
+
+  it('basic div 4', function(done) {
+    tree.error({
+      'message': "The <div> tag is missing part (>) of its closing tag",
+      'line': 1,
+      'column': 6
+    }, this, done);
+  });
+
   it('anchor tags', function(done) {
     tree.ok(this, done);
   });
