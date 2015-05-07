@@ -1,5 +1,4 @@
-// Goal: Write a function that will reverse an array.
-// Requirements: Make all of these tests pass without using the JavaScript reverse method.
+// Validate htmlTagValidator
 // To run: mocha -w closingTagSpec.js
 
 var expect = require('chai').expect,

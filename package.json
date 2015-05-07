@@ -1,18 +1,36 @@
 {
   "name": "html-tag-validator",
-  "version": "0.0.6",
-  "main": "htmlTagValidator.js",
-  "author": "Code School - Adam Rensel",
+  "version": "0.2.2",
+  "main": "index.js",
+  "author": "Code School",
+  "contributors": [
+    {
+      "name": "Nick Wronski",
+      "url": "https://github.com/nwronski"
+    },
+    {
+      "name": "Adam Rensel",
+      "url": "https://github.com/renz45"
+    }
+  ],
   "license": "MIT",
-  "description": "HTML tag validator for detecting things like unclosed tags and comments",
+  "description": "PEG.js implementation of HTML tag validator",
   "repository": "git@github.com:codeschool/htmlTagValidator.git",
+  "scripts": {
+    "test": "grunt mochaTest:test"
+  },
   "devDependencies": {
     "chai": "^1.9.1",
-    "lodash": "^2.4.1",
+    "grunt": "^0.4.5",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-mocha-test": "^0.12.7",
+    "grunt-shell": "^1.1.2",
+    "lodash": "^3.7.0",
     "mocha": "^1.21.4",
-    "node-inspector": "^0.7.4"
+    "pegjs": "^0.8.0",
+    "prettyjson": "^1.1.0"
   },
   "dependencies": {
-    "pegjs": "^0.8.0"
+
   }
 }
