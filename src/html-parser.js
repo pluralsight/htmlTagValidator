@@ -137,7 +137,7 @@ module.exports = (function() {
         		};
         	},
         peg$c45 = { type: "other", description: "Tag" },
-        peg$c46 = function(otn, sp, c, ctn) { return !isSelfClosing(otn.name) || otn.name === ctn.name; },
+        peg$c46 = function(otn, sp, c, ctn) { return /* !isSelfClosing(otn.name) || */ otn.name === ctn.name; },
         peg$c47 = function(otn, sp, c, ctn) {
         		var err, attrs, parts = [];
         		if(!(ctn.front && ctn.back)) {
@@ -213,8 +213,8 @@ module.exports = (function() {
         		};
         	},
         peg$c62 = { type: "other", description: "Attribute Name" },
-        peg$c63 = /^[\/>"'= ]/,
-        peg$c64 = { type: "class", value: "[\\/>\"'= ]", description: "[\\/>\"'= ]" },
+        peg$c63 = /^[=\/\\ ]/,
+        peg$c64 = { type: "class", value: "[=\\/\\\\ ]", description: "[=\\/\\\\ ]" },
         peg$c65 = function(n) { return n.length; },
         peg$c66 = function(n) { return _u.safe(n).tagify(); },
         peg$c67 = { type: "other", description: "Attribute Value (Double Quoted)" },
@@ -252,7 +252,12 @@ module.exports = (function() {
         	};
         },
         peg$c91 = { type: "other", description: "Block Comment" },
-        peg$c92 = function(com) { return com; },
+        peg$c92 = function(com, cc) {
+        		if (cc === null) {
+        			return error('Unterminated HTML comment detected');
+        		}
+        		return com;
+        	},
         peg$c93 = { type: "other", description: "Comment Start" },
         peg$c94 = "<!--",
         peg$c95 = { type: "literal", value: "<!--", description: "\"<!--\"" },
@@ -2083,9 +2088,12 @@ module.exports = (function() {
         s2 = peg$parsecomment_content();
         if (s2 !== peg$FAILED) {
           s3 = peg$parsecomment_close();
+          if (s3 === peg$FAILED) {
+            s3 = peg$c1;
+          }
           if (s3 !== peg$FAILED) {
             peg$reportedPos = s0;
-            s1 = peg$c92(s2);
+            s1 = peg$c92(s2, s3);
             s0 = s1;
           } else {
             peg$currPos = s0;
@@ -2787,7 +2795,16 @@ module.exports = (function() {
     	function checkAttributes(tag, attributes, contents) {
     		var i, len, ref, req, name, value, rule, props, ok = {
     			'value': attributes
-    		};
+    		}, names = Object.keys(attributes);
+
+    		// If there is any weird stuff in the names, do not continue
+    		for (i = 0, len = names.length; i < len; i++) {
+    			if (/[\/\>\"\'\= ]/.test(names[i])) {
+    				return {
+    					'error': 'The <' + tag + '> element has an attribute (' + names[i] + ') with an invalid name'
+    				};
+    			}
+    		}
 
     		// If the tag is not in the codex then allow anything
     		props = _u.option('attributes', [tag, '_']);

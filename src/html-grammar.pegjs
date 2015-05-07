@@ -142,7 +142,16 @@
 	function checkAttributes(tag, attributes, contents) {
 		var i, len, ref, req, name, value, rule, props, ok = {
 			'value': attributes
-		};
+		}, names = Object.keys(attributes);
+
+		// If there is any weird stuff in the names, do not continue
+		for (i = 0, len = names.length; i < len; i++) {
+			if (/[\/\>\"\'\= ]/.test(names[i])) {
+				return {
+					'error': 'The <' + tag + '> element has an attribute (' + names[i] + ') with an invalid name'
+				};
+			}
+		}
 
 		// If the tag is not in the codex then allow anything
 		props = _u.option('attributes', [tag, '_']);
@@ -395,7 +404,7 @@ special_tag_close
 
 normal_tag "Tag"
 	= otn:(open_tag) sp:(s) c:(content) ctn:(close_tag)
-	& { return !isSelfClosing(otn.name) || otn.name === ctn.name; }
+	& { return /* !isSelfClosing(otn.name) || */ otn.name === ctn.name; }
 	{
 		var err, attrs, parts = [];
 		if(!(ctn.front && ctn.back)) {
@@ -480,8 +489,9 @@ tag_attribute "Attribute"
 	}
 
 tag_attribute_name "Attribute Name"
-	= s n:(![\/\>\"\'\= ] char)*
-		/*= s n:(![^\t\n\f \/>"'=] char)**/
+	= s n:(![\=\/\\ ] char)*
+	/*= s n:(![\/\>\"\'\= ] char)**/
+	/*= s n:(![^\t\n\f \/>"'=] char)**/
 	& { return n.length; }
 	{ return _u.safe(n).tagify(); }
 
@@ -541,8 +551,13 @@ text_node "Text Node"
 /* HTML block comments*/
 
 comment "Block Comment"
-	= comment_open com:(comment_content) comment_close
-	{ return com; }
+	= comment_open com:(comment_content) cc:(comment_close)?
+	{
+		if (cc === null) {
+			return error('Unterminated HTML comment detected');
+		}
+		return com;
+	}
 
 comment_open "Comment Start"
 	= "<!--"
