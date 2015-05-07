@@ -3,12 +3,24 @@
 - [x] **[0.1.x]** Done
   - [x] Validate HTML documents against HTML 5 spec
   - [x] Parsing an HTML document to generate an AST
-- [ ] **[0.2.x]** In Progress
-  - [ ] **[In Progress]** Have strict and non-strict attribute and tag modes
+  - [x] `doctype` definition
+  - [x] HTML 5 elements
+  - [x] HTML 5 attributes
+  - [x] Enhanced validation for `script`, `style`, `link` and `meta` elements
+  - [x] Basic support for `iframe` elements
+  - [x] HTML comments
+  - [x] Conditional comments
+  - [x] Allowed `<input>` element `type` values and the attributes supported by each `type`
+  - [x] A properly-formed HTML 5 document should have a `<title>` element with contents
+  - [x] Void elements
+  - [x] Void and normal attributes
+  - [x] and more!
+- [x] **[0.2.x]** Current
   - [x] Allow for `options` to be provided to parser before running
-  - [ ] **[In Progress]** Create documentation for 0.2.x release
+  - [x] Create documentation for 0.2.x release
   - [x] Correct attribute validation for `input` tags based on `type`
 - [ ] **[0.3.x]** Planned
+  - [ ] **[In Progress]** Have strict and non-strict attribute and tag modes
   - [ ] Ability to preserve whitespace in `pre` tags
   - [ ] Allow plugins to extend validations performed by parser
 - [ ] **[0.4.x]** Planned
