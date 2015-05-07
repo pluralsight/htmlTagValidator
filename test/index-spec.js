@@ -27,7 +27,7 @@ describe('html-tag-validator', function() {
   });
 
   it('basic div p', function(done) {
-    tree.error("<p> is not a valid self closing tag", this, done);
+    tree.error("Expected open tag <p> to match closing tag </div>", this, done);
     // tree.error("Expected open tag <p> to match closing tag </div>", this, done);
   });
 
@@ -53,17 +53,26 @@ describe('html-tag-validator', function() {
     tree.ok(this, done);
   });
 
+  it('invalid self closing', function(done) {
+    tree.error("<li> is not a valid self closing tag", this, done);
+  });
+
   it('basic list items', function(done) {
     tree.error({
-      'message': '<li> is not a valid self closing tag',
+      'message': "Expected open tag <li> to match closing tag </ul>",
       'line': 5
 
     }, this, done);
   });
 
+
+  // TODO: Need to re-evaluate these two test once pre tag is fixed in 0.3.x
   it('basic pre', function(done) {
-    // TODO: Need to re-evaluate this test once pre tag is fixed in 0.3.x
     tree.ok(this, done);
+  });
+
+  it('pre missing closing', function(done) {
+    tree.error("Expected open tag <pre> to match closing tag </div>", this, done);
   });
 
   it('malformed attribute', function (done) {
@@ -76,6 +85,14 @@ describe('html-tag-validator', function() {
 
   it('malformed attribute 3', function (done) {
     tree.error("The <div> element has an attribute (\"a\") with an invalid name", this, done);
+  });
+
+  it('malformed class value', function(done) {
+    tree.error("Disallowed character (<) found in attribute value", this, done);
+  });
+
+  it('mismatched tags', function(done) {
+    tree.error("Expected open tag <h1> to match closing tag </h2>", this, done);
   });
 
   it('html comment', function(done) {

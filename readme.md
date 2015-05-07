@@ -223,7 +223,7 @@ if (err) {
 });
 ```
 
-## Developing
+## Contributing
 
 Once the dependencies are installed, start development with the following command:
 

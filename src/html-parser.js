@@ -137,7 +137,7 @@ module.exports = (function() {
         		};
         	},
         peg$c45 = { type: "other", description: "Tag" },
-        peg$c46 = function(otn, sp, c, ctn) { return /* !isSelfClosing(otn.name) || */ otn.name === ctn.name; },
+        peg$c46 = function(otn, sp, c, ctn) { return !isSelfClosing(otn.name) /* || otn.name === ctn.name */; },
         peg$c47 = function(otn, sp, c, ctn) {
         		var err, attrs, parts = [];
         		if(!(ctn.front && ctn.back)) {
@@ -146,9 +146,9 @@ module.exports = (function() {
         			return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
         		} else if (otn.name !== ctn.name) {
         			return error("Expected open tag <" + otn.name + "> to match closing tag </" + ctn.name + ">");
-        		} else if (isSelfClosing(otn.name)) {
+        		} /*else if (isSelfClosing(otn.name)) {
         			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
-        		} else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
+        		}*/ else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
         			return error(attrs.error);
         		} else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
         			return error(err.error);
@@ -239,8 +239,14 @@ module.exports = (function() {
         peg$c86 = "=",
         peg$c87 = { type: "literal", value: "=", description: "\"=\"" },
         peg$c88 = function(i) {
+        		// var matches, allowed = /(&(?![^\s]+;)|[\'\"=<>`]+)/;
+        		// NOTE: equal sign in <meta> tag attribute values, quotes in <style> tags
+        		var matches, allowed = /(&(?![^\s]+;)|[<>`]+)/;
         		if(i === null) {
         			return error("Found an attribute assignment \"=\" not followed by a value");
+        		} else if (allowed.test(i)) {
+        			matches = i.match(allowed);
+        			return error("Disallowed character (" + matches[1] + ") found in attribute value");
         		}
         		return i;
         	},

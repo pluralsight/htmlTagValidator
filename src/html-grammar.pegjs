@@ -404,7 +404,7 @@ special_tag_close
 
 normal_tag "Tag"
 	= otn:(open_tag) sp:(s) c:(content) ctn:(close_tag)
-	& { return /* !isSelfClosing(otn.name) || */ otn.name === ctn.name; }
+	& { return !isSelfClosing(otn.name) /* || otn.name === ctn.name */; }
 	{
 		var err, attrs, parts = [];
 		if(!(ctn.front && ctn.back)) {
@@ -413,9 +413,9 @@ normal_tag "Tag"
 			return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
 		} else if (otn.name !== ctn.name) {
 			return error("Expected open tag <" + otn.name + "> to match closing tag </" + ctn.name + ">");
-		} else if (isSelfClosing(otn.name)) {
+		} /*else if (isSelfClosing(otn.name)) {
 			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
-		} else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
+		}*/ else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
 			return error(attrs.error);
 		} else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
 			return error(err.error);
@@ -529,10 +529,16 @@ tag_attribute_value "Attribute Value"
 	/ tag_attribute_value_noquote
 
 attr_assignment "Attribute Assignment"
-	= s "=" s i:tag_attribute_value?
+	= s "=" s i:(tag_attribute_value)?
 	{
+		// var matches, allowed = /(&(?![^\s]+;)|[\'\"=<>`]+)/;
+		// NOTE: equal sign in <meta> tag attribute values, quotes in <style> tags
+		var matches, allowed = /(&(?![^\s]+;)|[<>`]+)/;
 		if(i === null) {
 			return error("Found an attribute assignment \"=\" not followed by a value");
+		} else if (allowed.test(i)) {
+			matches = i.match(allowed);
+			return error("Disallowed character (" + matches[1] + ") found in attribute value");
 		}
 		return i;
 	}
