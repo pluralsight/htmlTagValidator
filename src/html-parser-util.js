@@ -136,9 +136,15 @@ function desugar(base, root) {
 			}
 			base[k] = v.map(function (elem) {
 				var path;
-				// Try to resolve as a location
-				if (isString(elem) && (path = resolve(elem, root)) !== false) {
-					return path;
+				if (isString(elem)) {
+					// Try to resolve as a location
+					path = resolve(elem, root);
+					if (path !== false) {
+						return path;
+					} else if (elem.indexOf('*') !== -1) {
+						// Convert to regular expression
+						return new RegExp(elem.replace(/[\-\[\]\(\)]/g, "\\$&"), 'i');
+					}
 				}
 				return elem;
 			}).reduceRight(function(a, b) {
@@ -169,8 +175,7 @@ function initializeOptions(codx, opts) {
 	if (!isPlain(opts)) { opts = {}; }
 	var res = mergeOptions(codx, opts),
 			desugared = desugar(res, res);
-	option._options = desugared;
-	return desugared;
+	return option._options = desugared;
 }
 
 function option(path, sequence, base) {
