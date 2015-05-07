@@ -171,7 +171,7 @@ var codex = {
         // Check attributes based on the type of <input> element
         if (!util.has(allowedTypes, attributes['type'])) {
           return {
-            'error': 'An <input> tag does not allow the value ' + attributes['type'] +
+            'error': 'An input tag does not allow the value ' + _u.htmlify(attributes['type']) +
                      ' for the type attribute'
           };
         }
@@ -183,8 +183,8 @@ var codex = {
           }
           if (!util.has(allowedAttrs, attr)) {
             return {
-              'error': 'An <input> tag does not allow the ' + attr +
-                       ' attribute when it has ' + attributes['type'] +
+              'error': 'An input tag does not allow the ' + _u.htmlify(attr) +
+                       ' attribute when it has ' + _u.htmlify(attributes['type']) +
                        ' for the type attribute'
             };
           }
@@ -199,7 +199,7 @@ var codex = {
         if (attributes['src'] != null && contents != null) {
           // If the 'src' attribute is present, the <script> element must be empty.
           return {
-            'error': 'A <script> tag with a src attribute cannot have contents between the start and end tags'
+            'error': 'A script tag with a src attribute cannot have contents between the start and end tags'
           };
         }
         return true;
@@ -215,7 +215,7 @@ var codex = {
       'rules': function styleRules(attributes, contents, util) {
         if (contents == null) {
           return {
-            'error': 'The <title> tag is required to have content between the start and end tags'
+            'error': 'The title tag is required to have content between the start and end tags'
           };
         }
         return true;
@@ -227,11 +227,11 @@ var codex = {
       'rules': function metaRules(attributes, contents, util) {
         if ((attributes['name'] != null || attributes['http-equiv'] != null) && attributes['content'] == null) {
           return {
-            'error': 'The <meta> tag content attribute must be defined if the name or http-equiv attributes are defined'
+            'error': 'The meta tag content attribute must be defined if the name or http-equiv attributes are defined'
           };
         } else if ((attributes['name'] == null && attributes['http-equiv'] == null) && attributes['content'] != null) {
           return {
-            'error': 'The <meta> tag content attribute cannot be defined unless the name or http-equiv attributes are defined'
+            'error': 'The meta tag content attribute cannot be defined unless the name or http-equiv attributes are defined'
           };
         }
         return true;

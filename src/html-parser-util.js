@@ -6,6 +6,13 @@ function safe(obj) {
 	return ((isArray(obj) || isString(obj)) ? obj : []);
 }
 
+function htmlify(str) {
+	return str
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;');
+}
+
 function str(obj) {
 	return Object.prototype.toString.call(obj);
 }
@@ -235,7 +242,7 @@ function customTest(name, test, args) {
 		};
 	} else {
 		return {
-			'error': "Invalid " + name + " overrides specified in options object"
+			'error': "Invalid " + htmlify(name) + " overrides specified in options object"
 		};
 	}
 
@@ -244,6 +251,7 @@ function customTest(name, test, args) {
 
 module.exports = {
 	'safe': 								safe,
+	'htmlify':							htmlify,
 	'str': 									str,
 	'isPlain': 							isPlain,
 	'isPattern': 						isPattern,
