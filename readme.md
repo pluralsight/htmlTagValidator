@@ -28,7 +28,7 @@ The parser implements the basic components of the HTML 5 spec, such as:
 	  ```
 
  - Allowed `<input>` element `type` values and the attributes supported by each `type`
- - A properly-formed HTML 5 document should have a `<title>` element with contents
+ - Hierarchal rules, such as: a properly-formed HTML 5 document should have a `<title>` element with contents
  - Void elements
 
   ``` html
@@ -37,13 +37,13 @@ The parser implements the basic components of the HTML 5 spec, such as:
 
  - Void elements
 
- ``` javascript
+ ``` html
  <script async></script>
 ```
 
  - Normal elements
 
- ``` javascript
+ ``` html
  <p class="foo"></p>
  ```
 
