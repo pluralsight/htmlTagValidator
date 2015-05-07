@@ -64,7 +64,7 @@ module.exports = (function() {
         				};
         			}
         			return {
-        				'error': "The DOCTYPE definition for an HTML 5 document should be <!DOCTYPE html>"
+        				'error': "The DOCTYPE definition for an HTML 5 document should be \"html\""
         			};
         		}
         		return {
@@ -141,13 +141,15 @@ module.exports = (function() {
         peg$c47 = function(otn, sp, c, ctn) {
         		var err, attrs, parts = [];
         		if(!(ctn.front && ctn.back)) {
-        			if (!ctn.front) { parts.push('</'); }
-        			if (!ctn.back) { parts.push('>'); }
-        			return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
+        			// TODO: Find another solution without displaying unencoded brackets
+        			// if (!ctn.front) { parts.push('</'); }
+        			// if (!ctn.back) { parts.push('>'); }
+        			// return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
+        			return error("The " + otn.name.safeHtml() + " tag is missing part of its closing tag");
         		} else if (otn.name !== ctn.name) {
-        			return error("Expected open tag <" + otn.name + "> to match closing tag </" + ctn.name + ">");
+        			return error("Expected open tag " + otn.name.safeHtml() + " to match closing tag " + ctn.name.safeHtml() + "");
         		} /*else if (isSelfClosing(otn.name)) {
-        			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
+        			return error("The " + otn.name.safeHtml() + " tag is a void element and should not have a closing tag");
         		}*/ else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
         			return error(attrs.error);
         		} else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
@@ -165,7 +167,7 @@ module.exports = (function() {
         peg$c49 = function(ot) {
         		var attrs;
         		if(!isSelfClosing(ot.name)) {
-        			return error("<" + ot.name + ">" + " is not a valid self closing tag");
+        			return error("" + ot.name + "" + " is not a valid self closing tag");
         		}
 
         		if (false && ot.closing !== null) {
@@ -173,7 +175,7 @@ module.exports = (function() {
         			TODO: Note - This is where you would toggle on/off the error thrown when using the XHTML
         						method of a self-closing tag.
         			*/
-        			return error("The XHTML self-closing tag format <" + ot.name + " /> is not allowed in HTML 5");
+        			return error("The XHTML self-closing tag format for " + ot.name + " is not allowed in HTML 5");
         		} else if (_u.has(attrs = checkAttributes(ot.name, ot.attributes), 'error')) {
         			return error(attrs.error);
         		}
@@ -239,14 +241,16 @@ module.exports = (function() {
         peg$c86 = "=",
         peg$c87 = { type: "literal", value: "=", description: "\"=\"" },
         peg$c88 = function(i) {
-        		// var matches, allowed = /(&(?![^\s]+;)|[\'\"=<>`]+)/;
         		// NOTE: equal sign in <meta> tag attribute values, quotes in <style> tags
+        		// var matches, allowed = /(&(?![^\s]+;)|[\'\"=<>`]+)/;
         		var matches, allowed = /(&(?![^\s]+;)|[<>`]+)/;
         		if(i === null) {
         			return error("Found an attribute assignment \"=\" not followed by a value");
         		} else if (allowed.test(i)) {
+        			// TODO: Move this this check up to a place where tag name is available
+        			// TODO: & could be allowed in event attributes
         			matches = i.match(allowed);
-        			return error("Disallowed character (" + matches[1] + ") found in attribute value");
+        			return error("Disallowed character (" + matches[1].safeHtml() + ") found in attribute value");
         		}
         		return i;
         	},
@@ -2742,6 +2746,10 @@ module.exports = (function() {
     		return this.toLowerCase();
     	};
 
+    	String.prototype.safeHtml = function () {
+    		return _u.htmlify(this);
+    	}
+
     	// TODO: Note - these would be used to implement <pre> tags instead of textNode()
 
     	Array.prototype.preserveNode = function () { return this.join(''); };
@@ -2778,14 +2786,14 @@ module.exports = (function() {
     		if (_u.has(props, 'normal') && attrTest('normal')) {
     			if (value == null) {
     				return {
-    					'error': "The <" + tag + "> tag " + attribute + " attribute requires a value"
+    					'error': "The " + tag.safeHtml() + " tag " + attribute.safeHtml() + " attribute requires a value"
     				};
     			}
     			return true;
     		} else if (_u.has(props, 'void') && attrTest('void')) {
     			if (value != null) {
     				return {
-    					'error': "The <" + tag + "> tag " + attribute + " attribute should not have a value"
+    					'error': "The " + tag.safeHtml() + " tag " + attribute.safeHtml() + " attribute should not have a value"
     				};
     			}
     			return true;
@@ -2794,7 +2802,7 @@ module.exports = (function() {
     		}
 
         return {
-    			'error': "The <" + tag + "> tag does not have a " + attribute + " attribute"
+    			'error': "The " + tag.safeHtml() + " tag does not have a " + attribute.safeHtml() + " attribute"
     		};
     	}
 
@@ -2807,7 +2815,7 @@ module.exports = (function() {
     		for (i = 0, len = names.length; i < len; i++) {
     			if (/[\/\>\"\'\= ]/.test(names[i])) {
     				return {
-    					'error': 'The <' + tag + '> element has an attribute (' + names[i] + ') with an invalid name'
+    					'error': 'The ' + tag.safeHtml() + ' element has an attribute (' + names[i].safeHtml() + ') with an invalid name'
     				};
     			}
     		}
@@ -2825,7 +2833,7 @@ module.exports = (function() {
     			  if ((rule = _u.customTest.apply(this, ['attributes/required', req, [attributes, contents]])) !== true) {
     					if (rule === false) {
     				    return {
-    							'error': "The <" + tag + "> tag must include a " + req + " attribute"
+    							'error': "The " + tag.safeHtml() + " tag must include a " + req.safeHtml() + " attribute"
     						};
     					} else {
     						return rule;
@@ -2857,11 +2865,11 @@ module.exports = (function() {
     		var attrs = checkAttributes(sot.name, sot.attributes, sc);
     		if (sct === null) {
     			return {
-    				'error': "Found open <" + sot.name + "> tag without closing </" + sot.name + "> tag"
+    				'error': "Found open " + sot.name.safeHtml() + " tag without closing " + sot.name.safeHtml() + " tag"
     			};
     		} else if (sot.name !== sct.name) {
     			return {
-    				'error': "Expected open tag <" + sot.name + "> to match closing tag </" + sct.name + ">"
+    				'error': "Expected open tag " + sot.name.safeHtml() + " to match closing tag " + sct.name.safeHtml() + ""
     			};
     		} else if (attrs.error != null) {
     			return attrs;
@@ -2884,11 +2892,11 @@ module.exports = (function() {
     				countTitle = children.countWhere({'type': 'title'});
     				if (countTitle < 1) {
     					return {
-    						'error': "The document will not validate as HTML if you omit the <title> tag in the document <head> section"
+    						'error': "The document will not validate as HTML if you omit the title tag in the document head section"
     					};
     				} else if (countTitle > 1) {
     					return {
-    						'error': "You can not have more than one <title> element in an HTML document"
+    						'error': "You can not have more than one title element in an HTML document"
     					};
     				}
     		    break;
@@ -2897,13 +2905,13 @@ module.exports = (function() {
     					countLink = children.countWhere({'type': 'element', 'name': 'link'});
     					if (countLink > 0) {
     						return {
-    							'error': "The <link> element goes only in the <head> section of an HTML document"
+    							'error': "The link element goes only in the head section of an HTML document"
     						};
     					}
     					countMeta = children.countWhere({'type': 'element', 'name': 'meta'});
     					if (countMeta > 0) {
     						return {
-    							'error': "The <meta> element goes only in the <head> section of an HTML document"
+    							'error': "The meta element goes only in the head section of an HTML document"
     						};
     					}
     					// Process one level deep so that trace is as accurate as possible
@@ -2914,7 +2922,7 @@ module.exports = (function() {
     						return false;
     					}) !== undefined) {
     						return {
-    							'error': "If the scoped attribute is not used, each <style> tag must be located in the <head> section"
+    							'error': "If the scoped attribute is not used, each style tag must be located in the head section"
     						};
     					}
     				}

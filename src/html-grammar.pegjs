@@ -416,11 +416,11 @@ normal_tag "Tag"
 			// if (!ctn.front) { parts.push('</'); }
 			// if (!ctn.back) { parts.push('>'); }
 			// return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
-			return error("The " + otn.name + " tag is missing part of its closing tag");
+			return error("The " + otn.name.safeHtml() + " tag is missing part of its closing tag");
 		} else if (otn.name !== ctn.name) {
-			return error("Expected open tag " + otn.name + " to match closing tag " + ctn.name + "");
+			return error("Expected open tag " + otn.name.safeHtml() + " to match closing tag " + ctn.name.safeHtml() + "");
 		} /*else if (isSelfClosing(otn.name)) {
-			return error("The <" + otn.name + "> tag is a void element and should not have a closing tag");
+			return error("The " + otn.name.safeHtml() + " tag is a void element and should not have a closing tag");
 		}*/ else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
 			return error(attrs.error);
 		} else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
@@ -546,7 +546,7 @@ attr_assignment "Attribute Assignment"
 			// TODO: Move this this check up to a place where tag name is available
 			// TODO: & could be allowed in event attributes
 			matches = i.match(allowed);
-			return error("Disallowed character (" + matches[1] + ") found in attribute value");
+			return error("Disallowed character (" + matches[1].safeHtml() + ") found in attribute value");
 		}
 		return i;
 	}
