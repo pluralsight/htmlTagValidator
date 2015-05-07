@@ -15,7 +15,7 @@
   ],
   "license": "MIT",
   "description": "PEG.js implementation of HTML tag validator",
-  "repository": "git@github.com:codeschool/htmlTagValidator.git#peg",
+  "repository": "git@github.com:codeschool/htmlTagValidator.git",
   "scripts": {
     "test": "grunt mochaTest:test"
   },
