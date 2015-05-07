@@ -55,12 +55,12 @@ module.exports = (function() {
         peg$c8 = { type: "class", value: "[a-zA-Z]", description: "[a-zA-Z]" },
         peg$c9 = ">",
         peg$c10 = { type: "literal", value: ">", description: "\">\"" },
-        peg$c11 = function(ls, dt, ex) { return dt.tagify() === 'doctype'; },
+        peg$c11 = function(ls, dt, ex) { return _u.tagify(dt) === 'doctype'; },
         peg$c12 = function(ls, dt, ex) {
-        		if (ls === null || _u.safe(ls).textNode() === '') {
-        			if (ex.tagify() === 'html') {
+        		if (ls === null || _u.textNode(ls) === '') {
+        			if (_u.tagify(ex) === 'html') {
         				return {
-        					'value': ex.tagify()
+        					'value': _u.tagify(ex)
         				};
         			}
         			return {
@@ -123,12 +123,12 @@ module.exports = (function() {
         	},
         peg$c34 = /^[a-z]/,
         peg$c35 = { type: "class", value: "[a-z]", description: "[a-z]" },
-        peg$c36 = function(st) { return ['script', 'style', 'title', 'iframe'].indexOf(st.tagify()) !== -1; },
-        peg$c37 = function(st) { return st.tagify(); },
+        peg$c36 = function(st) { return ['script', 'style', 'title', 'iframe'].indexOf(_u.tagify(st)) !== -1; },
+        peg$c37 = function(st) { return _u.tagify(st); },
         peg$c38 = function(scs) { return scs; },
         peg$c39 = "</",
         peg$c40 = { type: "literal", value: "</", description: "\"</\"" },
-        peg$c41 = function(cs) { return _u.safe(cs).scriptify();  },
+        peg$c41 = function(cs) { return _u.scriptify(cs);  },
         peg$c42 = "/",
         peg$c43 = { type: "literal", value: "/", description: "\"/\"" },
         peg$c44 = function(sc) {
@@ -145,11 +145,11 @@ module.exports = (function() {
         			// if (!ctn.front) { parts.push('</'); }
         			// if (!ctn.back) { parts.push('>'); }
         			// return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
-        			return error("The " + otn.name.safeHtml() + " tag is missing part of its closing tag");
+        			return error("The " + _u.htmlify(otn.name) + " tag is missing part of its closing tag");
         		} else if (otn.name !== ctn.name) {
-        			return error("Expected open tag " + otn.name.safeHtml() + " to match closing tag " + ctn.name.safeHtml() + "");
+        			return error("Expected open tag " + _u.htmlify(otn.name) + " to match closing tag " + _u.htmlify(ctn.name) + "");
         		} /*else if (isSelfClosing(otn.name)) {
-        			return error("The " + otn.name.safeHtml() + " tag is a void element and should not have a closing tag");
+        			return error("The " + _u.htmlify(otn.name) + " tag is a void element and should not have a closing tag");
         		}*/ else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
         			return error(attrs.error);
         		} else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
@@ -206,7 +206,7 @@ module.exports = (function() {
         peg$c56 = { type: "class", value: "[A-Za-z]", description: "[A-Za-z]" },
         peg$c57 = /^[0-9A-Z_a-z\-]/,
         peg$c58 = { type: "class", value: "[0-9A-Z_a-z\\-]", description: "[0-9A-Z_a-z\\-]" },
-        peg$c59 = function(tns, tne) { return [tns].concat(tne).tagify(); },
+        peg$c59 = function(tns, tne) { return _u.tagify([tns].concat(tne)); },
         peg$c60 = { type: "other", description: "Attribute" },
         peg$c61 = function(ta, t) {
         		return {
@@ -218,13 +218,13 @@ module.exports = (function() {
         peg$c63 = /^[=\/\\ ]/,
         peg$c64 = { type: "class", value: "[=\\/\\\\ ]", description: "[=\\/\\\\ ]" },
         peg$c65 = function(n) { return n.length; },
-        peg$c66 = function(n) { return _u.safe(n).tagify(); },
+        peg$c66 = function(n) { return _u.tagify(n); },
         peg$c67 = { type: "other", description: "Attribute Value (Double Quoted)" },
         peg$c68 = "\"",
         peg$c69 = { type: "literal", value: "\"", description: "\"\\\"\"" },
         peg$c70 = /^[^"]/,
         peg$c71 = { type: "class", value: "[^\"]", description: "[^\"]" },
-        peg$c72 = function(v) { return v.textNode(); },
+        peg$c72 = function(v) { return _u.textNode(v); },
         peg$c73 = /^[s]/,
         peg$c74 = { type: "class", value: "[s]", description: "[s]" },
         peg$c75 = function(v) { return ''; },
@@ -250,7 +250,7 @@ module.exports = (function() {
         			// TODO: Move this this check up to a place where tag name is available
         			// TODO: & could be allowed in event attributes
         			matches = i.match(allowed);
-        			return error("Disallowed character (" + matches[1].safeHtml() + ") found in attribute value");
+        			return error("Disallowed character (" + _u.htmlify(matches[1]) + ") found in attribute value");
         		}
         		return i;
         	},
@@ -258,7 +258,7 @@ module.exports = (function() {
         peg$c90 = function(tn) {
         	return {
         		'type': 'text',
-        		'contents': tn.textNode()
+        		'contents': _u.textNode(tn)
         	};
         },
         peg$c91 = { type: "other", description: "Block Comment" },
@@ -275,7 +275,7 @@ module.exports = (function() {
         peg$c97 = "-->",
         peg$c98 = { type: "literal", value: "-->", description: "\"-->\"" },
         peg$c99 = function(cb) {
-        		var tn = cb !== null ? cb.textNode() : '';
+        		var tn = cb !== null ? _u.textNode(cb) : '';
         		if(tn.indexOf('--') !== -1) {
         			return error("Cannot have two or more consecutive hyphens inside of a block comment");
         		}
@@ -289,7 +289,7 @@ module.exports = (function() {
         			}
         		};
         	},
-        peg$c100 = function(cs) { return _u.safe(cs).textNode();  },
+        peg$c100 = function(cs) { return _u.textNode(cs);  },
         peg$c101 = function(cons, com, cone) { return cons === null && cone === null; },
         peg$c102 = function(cons, com, cone) {
         		var condition = '';
@@ -313,13 +313,13 @@ module.exports = (function() {
         peg$c106 = { type: "class", value: "[^\\]]", description: "[^\\]]" },
         peg$c107 = "]>",
         peg$c108 = { type: "literal", value: "]>", description: "\"]>\"" },
-        peg$c109 = function(csc) { return csc.tagify(); },
+        peg$c109 = function(csc) { return _u.tagify(csc); },
         peg$c110 = "endif",
         peg$c111 = { type: "literal", value: "endif", description: "\"endif\"" },
         peg$c112 = "]",
         peg$c113 = { type: "literal", value: "]", description: "\"]\"" },
         peg$c114 = function() { return true; },
-        peg$c115 = function(cs) { return _u.safe(cs).textNode(); },
+        peg$c115 = function(cs) { return _u.textNode(cs); },
         peg$c116 = { type: "other", description: "Character" },
         peg$c117 = /^[^<>]/,
         peg$c118 = { type: "class", value: "[^<>]", description: "[^<>]" },
@@ -2668,94 +2668,6 @@ module.exports = (function() {
     			// Codex of tag and attribute names
     			codex = _u.initializeOptions(require('./html-grammar-codex'), options);
 
-    	// TODO: Refactor me to no longer extend native objects
-    	// Monkey patching (is bad...)
-    	if (!Array.prototype.find) {
-    	  Array.prototype.find = function(predicate) {
-    	    if (this == null) {
-    	      throw new TypeError('Array.prototype.find called on null or undefined');
-    	    }
-    	    if (!_u.isFunc(predicate)) {
-    	      throw new TypeError('predicate must be a function');
-    	    }
-    	    var list = Object(this);
-    	    var length = list.length >>> 0;
-    	    var thisArg = arguments[1];
-    	    var value;
-
-    	    for (var i = 0; i < length; i++) {
-    	      value = list[i];
-    	      if (predicate.call(thisArg, value, i, list)) {
-    	        return value;
-    	      }
-    	    }
-    	    return undefined;
-    	  };
-    	}
-
-    	if (!Array.prototype.findWhere) {
-    		Array.prototype.findWhere = function (props) {
-    			return this.find(function (val, i, all) {
-    				return _u.has(val, props);
-    			});
-    		};
-    	}
-
-    	if (!Array.prototype.countWhere) {
-    		Array.prototype.countWhere = function (props) {
-    			var count, i, len, val;
-
-    			count = 0;
-
-    			for (i = 0, len = this.length; i < len; i++) {
-    			  val = this[i];
-    			  if (_u.has(val, props)) {
-    			    count += 1;
-    			  }
-    			}
-    			return count;
-    		};
-    	}
-
-    	Array.prototype.textNode = function () {
-    		var res = this;
-    		if (this.length && _u.isArray(this[0])) {
-    			res = _u.stack(this);
-    		}
-    		return res.join('').textNode();
-    	};
-
-    	String.prototype.textNode = function () {
-    		return this.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
-    	};
-
-    	Array.prototype.scriptify = function () {
-    		var res = this;
-    		if (this.length && _u.isArray(this[0])) {
-    			res = _u.stack(this);
-    		}
-    		res = res.join('').replace(/^\n+|\n+$/g, '');
-    		return res.textNode() !== '' ? res : null;
-    	};
-
-    	Array.prototype.tagify = function () {
-    		return this.textNode().tagify();
-    	};
-
-    	String.prototype.tagify = function () {
-    		return this.toLowerCase();
-    	};
-
-    	String.prototype.safeHtml = function () {
-    		return _u.htmlify(this);
-    	}
-
-    	// TODO: Note - these would be used to implement <pre> tags instead of textNode()
-
-    	Array.prototype.preserveNode = function () { return this.join(''); };
-
-    	String.prototype.preserveNode = function () { return this; };
-
     	// Verification Functions
 
     	function isSelfClosing(tag) {
@@ -2786,14 +2698,14 @@ module.exports = (function() {
     		if (_u.has(props, 'normal') && attrTest('normal')) {
     			if (value == null) {
     				return {
-    					'error': "The " + tag.safeHtml() + " tag " + attribute.safeHtml() + " attribute requires a value"
+    					'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute requires a value"
     				};
     			}
     			return true;
     		} else if (_u.has(props, 'void') && attrTest('void')) {
     			if (value != null) {
     				return {
-    					'error': "The " + tag.safeHtml() + " tag " + attribute.safeHtml() + " attribute should not have a value"
+    					'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute should not have a value"
     				};
     			}
     			return true;
@@ -2802,7 +2714,7 @@ module.exports = (function() {
     		}
 
         return {
-    			'error': "The " + tag.safeHtml() + " tag does not have a " + attribute.safeHtml() + " attribute"
+    			'error': "The " + _u.htmlify(tag) + " tag does not have a " + _u.htmlify(attribute) + " attribute"
     		};
     	}
 
@@ -2815,7 +2727,7 @@ module.exports = (function() {
     		for (i = 0, len = names.length; i < len; i++) {
     			if (/[\/\>\"\'\= ]/.test(names[i])) {
     				return {
-    					'error': 'The ' + tag.safeHtml() + ' element has an attribute (' + names[i].safeHtml() + ') with an invalid name'
+    					'error': 'The ' + _u.htmlify(tag) + ' element has an attribute (' + _u.htmlify(names[i]) + ') with an invalid name'
     				};
     			}
     		}
@@ -2833,7 +2745,7 @@ module.exports = (function() {
     			  if ((rule = _u.customTest.apply(this, ['attributes/required', req, [attributes, contents]])) !== true) {
     					if (rule === false) {
     				    return {
-    							'error': "The " + tag.safeHtml() + " tag must include a " + req.safeHtml() + " attribute"
+    							'error': "The " + _u.htmlify(tag) + " tag must include a " + _u.htmlify(req) + " attribute"
     						};
     					} else {
     						return rule;
@@ -2865,11 +2777,11 @@ module.exports = (function() {
     		var attrs = checkAttributes(sot.name, sot.attributes, sc);
     		if (sct === null) {
     			return {
-    				'error': "Found open " + sot.name.safeHtml() + " tag without closing " + sot.name.safeHtml() + " tag"
+    				'error': "Found open " + _u.htmlify(sot.name) + " tag without closing " + _u.htmlify(sot.name) + " tag"
     			};
     		} else if (sot.name !== sct.name) {
     			return {
-    				'error': "Expected open tag " + sot.name.safeHtml() + " to match closing tag " + sct.name.safeHtml() + ""
+    				'error': "Expected open tag " + _u.htmlify(sot.name) + " to match closing tag " + _u.htmlify(sct.name) + ""
     			};
     		} else if (attrs.error != null) {
     			return attrs;
@@ -2889,7 +2801,7 @@ module.exports = (function() {
     		var countTitle, countLink, countMeta;
     		switch (tag) {
     		  case 'head':
-    				countTitle = children.countWhere({'type': 'title'});
+    				countTitle = _u.countWhere(children, {'type': 'title'});
     				if (countTitle < 1) {
     					return {
     						'error': "The document will not validate as HTML if you omit the title tag in the document head section"
@@ -2902,20 +2814,20 @@ module.exports = (function() {
     		    break;
     		  default:
     				if (_u.isArray(children) && children.length > 0) {
-    					countLink = children.countWhere({'type': 'element', 'name': 'link'});
+    					countLink = _u.countWhere(children, {'type': 'element', 'name': 'link'});
     					if (countLink > 0) {
     						return {
     							'error': "The link element goes only in the head section of an HTML document"
     						};
     					}
-    					countMeta = children.countWhere({'type': 'element', 'name': 'meta'});
+    					countMeta = _u.countWhere(children, {'type': 'element', 'name': 'meta'});
     					if (countMeta > 0) {
     						return {
     							'error': "The meta element goes only in the head section of an HTML document"
     						};
     					}
     					// Process one level deep so that trace is as accurate as possible
-    					if (children.find(function (child) {
+    					if (_u.find(children, function (child) {
     						if (child['type'] === 'style' && !_u.has(child.attributes, 'scoped')) {
     							return true;
     						}

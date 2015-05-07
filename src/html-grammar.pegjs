@@ -5,94 +5,6 @@
 			// Codex of tag and attribute names
 			codex = _u.initializeOptions(require('./html-grammar-codex'), options);
 
-	// TODO: Refactor me to no longer extend native objects
-	// Monkey patching (is bad...)
-	if (!Array.prototype.find) {
-	  Array.prototype.find = function(predicate) {
-	    if (this == null) {
-	      throw new TypeError('Array.prototype.find called on null or undefined');
-	    }
-	    if (!_u.isFunc(predicate)) {
-	      throw new TypeError('predicate must be a function');
-	    }
-	    var list = Object(this);
-	    var length = list.length >>> 0;
-	    var thisArg = arguments[1];
-	    var value;
-
-	    for (var i = 0; i < length; i++) {
-	      value = list[i];
-	      if (predicate.call(thisArg, value, i, list)) {
-	        return value;
-	      }
-	    }
-	    return undefined;
-	  };
-	}
-
-	if (!Array.prototype.findWhere) {
-		Array.prototype.findWhere = function (props) {
-			return this.find(function (val, i, all) {
-				return _u.has(val, props);
-			});
-		};
-	}
-
-	if (!Array.prototype.countWhere) {
-		Array.prototype.countWhere = function (props) {
-			var count, i, len, val;
-
-			count = 0;
-
-			for (i = 0, len = this.length; i < len; i++) {
-			  val = this[i];
-			  if (_u.has(val, props)) {
-			    count += 1;
-			  }
-			}
-			return count;
-		};
-	}
-
-	Array.prototype.textNode = function () {
-		var res = this;
-		if (this.length && _u.isArray(this[0])) {
-			res = _u.stack(this);
-		}
-		return res.join('').textNode();
-	};
-
-	String.prototype.textNode = function () {
-		return this.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
-	};
-
-	Array.prototype.scriptify = function () {
-		var res = this;
-		if (this.length && _u.isArray(this[0])) {
-			res = _u.stack(this);
-		}
-		res = res.join('').replace(/^\n+|\n+$/g, '');
-		return res.textNode() !== '' ? res : null;
-	};
-
-	Array.prototype.tagify = function () {
-		return this.textNode().tagify();
-	};
-
-	String.prototype.tagify = function () {
-		return this.toLowerCase();
-	};
-
-	String.prototype.safeHtml = function () {
-		return _u.htmlify(this);
-	}
-
-	// TODO: Note - these would be used to implement <pre> tags instead of textNode()
-
-	Array.prototype.preserveNode = function () { return this.join(''); };
-
-	String.prototype.preserveNode = function () { return this; };
-
 	// Verification Functions
 
 	function isSelfClosing(tag) {
@@ -123,14 +35,14 @@
 		if (_u.has(props, 'normal') && attrTest('normal')) {
 			if (value == null) {
 				return {
-					'error': "The " + tag.safeHtml() + " tag " + attribute.safeHtml() + " attribute requires a value"
+					'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute requires a value"
 				};
 			}
 			return true;
 		} else if (_u.has(props, 'void') && attrTest('void')) {
 			if (value != null) {
 				return {
-					'error': "The " + tag.safeHtml() + " tag " + attribute.safeHtml() + " attribute should not have a value"
+					'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute should not have a value"
 				};
 			}
 			return true;
@@ -139,7 +51,7 @@
 		}
 
     return {
-			'error': "The " + tag.safeHtml() + " tag does not have a " + attribute.safeHtml() + " attribute"
+			'error': "The " + _u.htmlify(tag) + " tag does not have a " + _u.htmlify(attribute) + " attribute"
 		};
 	}
 
@@ -152,7 +64,7 @@
 		for (i = 0, len = names.length; i < len; i++) {
 			if (/[\/\>\"\'\= ]/.test(names[i])) {
 				return {
-					'error': 'The ' + tag.safeHtml() + ' element has an attribute (' + names[i].safeHtml() + ') with an invalid name'
+					'error': 'The ' + _u.htmlify(tag) + ' element has an attribute (' + _u.htmlify(names[i]) + ') with an invalid name'
 				};
 			}
 		}
@@ -170,7 +82,7 @@
 			  if ((rule = _u.customTest.apply(this, ['attributes/required', req, [attributes, contents]])) !== true) {
 					if (rule === false) {
 				    return {
-							'error': "The " + tag.safeHtml() + " tag must include a " + req.safeHtml() + " attribute"
+							'error': "The " + _u.htmlify(tag) + " tag must include a " + _u.htmlify(req) + " attribute"
 						};
 					} else {
 						return rule;
@@ -202,11 +114,11 @@
 		var attrs = checkAttributes(sot.name, sot.attributes, sc);
 		if (sct === null) {
 			return {
-				'error': "Found open " + sot.name.safeHtml() + " tag without closing " + sot.name.safeHtml() + " tag"
+				'error': "Found open " + _u.htmlify(sot.name) + " tag without closing " + _u.htmlify(sot.name) + " tag"
 			};
 		} else if (sot.name !== sct.name) {
 			return {
-				'error': "Expected open tag " + sot.name.safeHtml() + " to match closing tag " + sct.name.safeHtml() + ""
+				'error': "Expected open tag " + _u.htmlify(sot.name) + " to match closing tag " + _u.htmlify(sct.name) + ""
 			};
 		} else if (attrs.error != null) {
 			return attrs;
@@ -226,7 +138,7 @@
 		var countTitle, countLink, countMeta;
 		switch (tag) {
 		  case 'head':
-				countTitle = children.countWhere({'type': 'title'});
+				countTitle = _u.countWhere(children, {'type': 'title'});
 				if (countTitle < 1) {
 					return {
 						'error': "The document will not validate as HTML if you omit the title tag in the document head section"
@@ -239,20 +151,20 @@
 		    break;
 		  default:
 				if (_u.isArray(children) && children.length > 0) {
-					countLink = children.countWhere({'type': 'element', 'name': 'link'});
+					countLink = _u.countWhere(children, {'type': 'element', 'name': 'link'});
 					if (countLink > 0) {
 						return {
 							'error': "The link element goes only in the head section of an HTML document"
 						};
 					}
-					countMeta = children.countWhere({'type': 'element', 'name': 'meta'});
+					countMeta = _u.countWhere(children, {'type': 'element', 'name': 'meta'});
 					if (countMeta > 0) {
 						return {
 							'error': "The meta element goes only in the head section of an HTML document"
 						};
 					}
 					// Process one level deep so that trace is as accurate as possible
-					if (children.find(function (child) {
+					if (_u.find(children, function (child) {
 						if (child['type'] === 'style' && !_u.has(child.attributes, 'scoped')) {
 							return true;
 						}
@@ -290,12 +202,12 @@ start
 
 doctype "HTML DOCTYPE"
 	= ls:(!doctype_terminators .)* doctype_start dt:([a-zA-Z])+ s ex:(char+)? s ">"
-	&	{ return dt.tagify() === 'doctype'; }
+	&	{ return _u.tagify(dt) === 'doctype'; }
 	{
-		if (ls === null || _u.safe(ls).textNode() === '') {
-			if (ex.tagify() === 'html') {
+		if (ls === null || _u.textNode(ls) === '') {
+			if (_u.tagify(ex) === 'html') {
 				return {
-					'value': ex.tagify()
+					'value': _u.tagify(ex)
 				};
 			}
 			return {
@@ -387,8 +299,8 @@ special_tag_open
 
 special_tag_types
 	= st:([a-z])+
-	& { return ['script', 'style', 'title', 'iframe'].indexOf(st.tagify()) !== -1; }
-	{ return st.tagify(); }
+	& { return ['script', 'style', 'title', 'iframe'].indexOf(_u.tagify(st)) !== -1; }
+	{ return _u.tagify(st); }
 
 special_tag_content
 	= scs:(special_tag_scan)
@@ -396,7 +308,7 @@ special_tag_content
 
 special_tag_scan
 	= cs:(!"</" char)*
-	{ return _u.safe(cs).scriptify();  }
+	{ return _u.scriptify(cs);  }
 
 special_tag_close
 	= "<" s "/" s sc:(special_tag_types) s ">"
@@ -416,11 +328,11 @@ normal_tag "Tag"
 			// if (!ctn.front) { parts.push('</'); }
 			// if (!ctn.back) { parts.push('>'); }
 			// return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
-			return error("The " + otn.name.safeHtml() + " tag is missing part of its closing tag");
+			return error("The " + _u.htmlify(otn.name) + " tag is missing part of its closing tag");
 		} else if (otn.name !== ctn.name) {
-			return error("Expected open tag " + otn.name.safeHtml() + " to match closing tag " + ctn.name.safeHtml() + "");
+			return error("Expected open tag " + _u.htmlify(otn.name) + " to match closing tag " + _u.htmlify(ctn.name) + "");
 		} /*else if (isSelfClosing(otn.name)) {
-			return error("The " + otn.name.safeHtml() + " tag is a void element and should not have a closing tag");
+			return error("The " + _u.htmlify(otn.name) + " tag is a void element and should not have a closing tag");
 		}*/ else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
 			return error(attrs.error);
 		} else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
@@ -483,7 +395,7 @@ close_tag "Closing Tag"
 
 tagname "Tag Name"
 	= tns:([A-Za-z]) tne:([0-9A-Z_a-z-])*
-	{ return [tns].concat(tne).tagify(); }
+	{ return _u.tagify([tns].concat(tne)); }
 
 tag_attribute "Attribute"
   = e ta:(tag_attribute_name) t:(attr_assignment)?
@@ -499,7 +411,7 @@ tag_attribute_name "Attribute Name"
 	/*= s n:(![\/\>\"\'\= ] char)**/
 	/*= s n:(![^\t\n\f \/>"'=] char)**/
 	& { return n.length; }
-	{ return _u.safe(n).tagify(); }
+	{ return _u.tagify(n); }
 
 tag_attribute_value_dblquote "Attribute Value (Double Quoted)"
 	=	tag_attribute_value_dblquote_empty
@@ -507,7 +419,7 @@ tag_attribute_value_dblquote "Attribute Value (Double Quoted)"
 
 tag_attribute_value_dblquote_value
 	= '"' v:([^"])* '"'
-	{ return v.textNode(); }
+	{ return _u.textNode(v); }
 
 tag_attribute_value_dblquote_empty
 	= '"' v:([\s])* '"'
@@ -519,7 +431,7 @@ tag_attribute_value_singlequote "Attribute Value (Single Quoted)"
 
 tag_attribute_value_singlequote_value
 	= "'" v:([^'])* "'"
-	{ return v.textNode(); }
+	{ return _u.textNode(v); }
 
 tag_attribute_value_singlequote_empty
 	= "'" v:([\s])* "'"
@@ -527,7 +439,7 @@ tag_attribute_value_singlequote_empty
 
 tag_attribute_value_noquote "Attribute Value (Unquoted)"
 	= v:([^\=\'\"\<\>` ])+
-	{ return v.textNode(); }
+	{ return _u.textNode(v); }
 
 tag_attribute_value "Attribute Value"
 	= tag_attribute_value_dblquote
@@ -546,7 +458,7 @@ attr_assignment "Attribute Assignment"
 			// TODO: Move this this check up to a place where tag name is available
 			// TODO: & could be allowed in event attributes
 			matches = i.match(allowed);
-			return error("Disallowed character (" + matches[1].safeHtml() + ") found in attribute value");
+			return error("Disallowed character (" + _u.htmlify(matches[1]) + ") found in attribute value");
 		}
 		return i;
 	}
@@ -558,7 +470,7 @@ text_node "Text Node"
 {
 	return {
 		'type': 'text',
-		'contents': tn.textNode()
+		'contents': _u.textNode(tn)
 	};
 }
 
@@ -586,7 +498,7 @@ comment_content
 comment_block
 	= s cb:comment_scan s
 	{
-		var tn = cb !== null ? cb.textNode() : '';
+		var tn = cb !== null ? _u.textNode(cb) : '';
 		if(tn.indexOf('--') !== -1) {
 			return error("Cannot have two or more consecutive hyphens inside of a block comment");
 		}
@@ -603,7 +515,7 @@ comment_block
 
 comment_scan
 	= cs:(!comment_close char)*
-	{ return _u.safe(cs).textNode();  }
+	{ return _u.textNode(cs);  }
 
 /* HTML conditional block comments*/
 
@@ -629,7 +541,7 @@ comment_conditional
 
 conditional_start
 	= "[" s csc:([^\]]+)? s "]>"
-{ return csc.tagify(); }
+{ return _u.tagify(csc); }
 
 conditional_end
 	= "<!" s "[" s "endif" s "]"
@@ -640,7 +552,7 @@ comment_conditional_body
 
 conditional_scan
 	= cs:(!conditional_terminator char)*
-	{ return _u.safe(cs).textNode(); }
+	{ return _u.textNode(cs); }
 
 conditional_terminator
 	= conditional_end

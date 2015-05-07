@@ -171,7 +171,7 @@ var codex = {
         // Check attributes based on the type of <input> element
         if (!util.has(allowedTypes, attributes['type'])) {
           return {
-            'error': 'An input tag does not allow the value ' + _u.htmlify(attributes['type']) +
+            'error': 'An input tag does not allow the value ' + util.htmlify(attributes['type']) +
                      ' for the type attribute'
           };
         }
@@ -183,8 +183,8 @@ var codex = {
           }
           if (!util.has(allowedAttrs, attr)) {
             return {
-              'error': 'An input tag does not allow the ' + _u.htmlify(attr) +
-                       ' attribute when it has ' + _u.htmlify(attributes['type']) +
+              'error': 'An input tag does not allow the ' + util.htmlify(attr) +
+                       ' attribute when it has ' + util.htmlify(attributes['type']) +
                        ' for the type attribute'
             };
           }
@@ -196,7 +196,7 @@ var codex = {
       'mixed': ['attributes/$/global'],
       'normal': ['charset', 'src', 'type'],
       'rules': function scriptRules(attributes, contents, util) {
-        if (attributes['src'] != null && contents != null) {
+        if (util.has(attributes, 'src') && util.isOkay(contents)) {
           // If the 'src' attribute is present, the <script> element must be empty.
           return {
             'error': 'A script tag with a src attribute cannot have contents between the start and end tags'
@@ -213,7 +213,7 @@ var codex = {
     'title': {
       'mixed': ['attributes/$/global'],
       'rules': function styleRules(attributes, contents, util) {
-        if (contents == null) {
+        if (!util.isOkay(contents)) {
           return {
             'error': 'The title tag is required to have content between the start and end tags'
           };
@@ -225,11 +225,11 @@ var codex = {
       'mixed': ['attributes/$/global'],
       'normal': ['charset', 'content', 'http-equiv', 'name', 'scheme'],
       'rules': function metaRules(attributes, contents, util) {
-        if ((attributes['name'] != null || attributes['http-equiv'] != null) && attributes['content'] == null) {
+        if ((util.has(attributes, 'name') || util.has(attributes, 'http-equiv')) && !util.has(attributes, 'content')) {
           return {
             'error': 'The meta tag content attribute must be defined if the name or http-equiv attributes are defined'
           };
-        } else if ((attributes['name'] == null && attributes['http-equiv'] == null) && attributes['content'] != null) {
+        } else if ((!util.has(attributes, 'name') && !util.has(attributes, 'http-equiv')) && util.has(attributes, 'content')) {
           return {
             'error': 'The meta tag content attribute cannot be defined unless the name or http-equiv attributes are defined'
           };

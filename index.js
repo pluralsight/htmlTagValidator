@@ -23,6 +23,7 @@ function htmlTagValidator(source, callback) {
 };
 
 htmlTagValidator._name = "html-tag-validator";
+htmlTagValidator.VERSION = "1.0.3";
 htmlTagValidator._options = {};
 
 htmlTagValidator.setOptions = function(options) {

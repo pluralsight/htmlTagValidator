@@ -6,13 +6,6 @@ function safe(obj) {
 	return ((isArray(obj) || isString(obj)) ? obj : []);
 }
 
-function htmlify(str) {
-	return str
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;');
-}
-
 function str(obj) {
 	return Object.prototype.toString.call(obj);
 }
@@ -40,6 +33,10 @@ function isArray(obj) {
 	return str(obj) === "[object Array]";
 }
 
+function isOkay(obj) {
+	return obj != null;
+}
+
 function has(thing, item) {
 	var k, v, len;
 	if (isArray(thing)) {
@@ -48,7 +45,7 @@ function has(thing, item) {
 			return thing.indexOf(item) !== -1;
 		} else {
 			// thing is an array, find item in array
-			return thing.findWhere(item) !== undefined;
+			return findWhere(thing, item) !== undefined;
 		}
 	} else if (isPlain(thing)) {
 		// thing is an object
@@ -234,11 +231,11 @@ function customTest(name, test, args) {
 				args[0] = Object.keys(args[0]);
 			}
 			if (isArray(args[0])) {
-				return args[0].find(function (a) {
-					return safe(a).tagify() === test.tagify();
+				return find(args[0], function (a) {
+					return tagify(a) === tagify(test);
 				}) != null;
 			}
-			return args[0] === test.tagify();
+			return args[0] === tagify(test);
 		};
 	} else {
 		return {
@@ -249,18 +246,117 @@ function customTest(name, test, args) {
 	return tester();
 }
 
+function find(arr, predicate) {
+	if (arr == null) {
+		throw new TypeError('find() called on null or undefined');
+	}
+	if (!isFunc(predicate)) {
+		throw new TypeError('find() predicate must be a function');
+	}
+	var list = Object(arr);
+	var length = list.length >>> 0;
+	var thisArg = arguments[2];
+	var value;
+
+	for (var i = 0; i < length; i++) {
+		value = list[i];
+		if (predicate.call(thisArg, value, i, list)) {
+			return value;
+		}
+	}
+	return undefined;
+};
+
+function countWhere(arr, props) {
+	var count, i, len, val;
+	count = 0;
+	for (i = 0, len = arr.length; i < len; i++) {
+		val = arr[i];
+		if (has(val, props)) {
+			count += 1;
+		}
+	}
+	return count;
+};
+
+function nodeToString(node) {
+	var elem = safe(node);
+	if (isArray(elem)) {
+		if (elem.length && isArray(elem[0])) {
+			elem = stack(elem);
+		}
+		elem = elem.join('');
+	}
+	return elem;
+}
+
+function textNode(elem) {
+	/*
+	 * A text node has
+	 * - no leading or trailing whitespace
+	 * - no consecutive whitespace characters
+	 */
+	return nodeToString(elem).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+}
+
+function scriptify(elem) {
+	/*
+	 * A script node has
+	 * - no leading or trailing newlines from open and close tags being on
+	 * 	 different lines from the start and end of the script contents
+	 */
+	var res = nodeToString(elem).replace(/^\n+|\n+$/g, '');
+	// Make sure it isn't empty, but do not process as textNode (preserve formatting)
+	return textNode(res) !== '' ? res : null;
+}
+
+function htmlify(elem) {
+	/*
+	 * A htmlified string has
+	 * - html-safe '&' symbol as '&amp;'
+	 * - html-safe '< symbol as '&lt;'
+	 * - html-safe '>' symbol as '&gt;'
+	 */
+	return nodeToString(elem)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;');
+}
+
+function tagify(elem) {
+	/*
+	 * A tagified string has
+	 * - no leading or trailing whitespace
+	 * - no consecutive whitespace characters
+	 * - case-insensitive (lowercase normalized)
+	 */
+	return textNode(elem).toLowerCase();
+}
+
+
 module.exports = {
-	'safe': 								safe,
+	// Array methods
+	'stack': 								stack,
+	'collapse': 						collapse,
+	'find': 								find,
+	'countWhere': 					countWhere,
+	// String methods
+	'nodeToString':					nodeToString,
 	'htmlify':							htmlify,
+	'textNode':							textNode,
+	'scriptify':						scriptify,
+	'tagify':								tagify,
+	// Type detection
 	'str': 									str,
 	'isPlain': 							isPlain,
 	'isPattern': 						isPattern,
 	'isFunc': 							isFunc,
 	'isString': 						isString,
 	'isArray': 							isArray,
+	'isOkay':								isOkay,
+	// Misc methods
+	'safe': 								safe,
 	'has': 									has,
-	'stack': 								stack,
-	'collapse': 						collapse,
 	'mergeOptions': 				mergeOptions,
 	'desugar': 							desugar,
 	'resolve': 							resolve,
