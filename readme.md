@@ -222,3 +222,37 @@ if (err) {
 }
 });
 ```
+
+## Developing
+
+Once the dependencies are installed, start development with the following command:
+
+`grunt dev`
+
+which will automatically compile the parser and run the tests in `test/index-spec.js`.
+
+Tests refer to an HTML test file in `test/html/` and the test name is a
+reference to the filename of the test file. For example `super test 2`
+as a test name points to the file `test/html/superTest2.html`.
+
+There are two options for the test helpers exposed by `tree`:
+ - `tree.ok(this, done)` to assert that the test file successfully generates an AST
+ - `tree.error()` to assert that a test throws an error
+   - `tree.error("This is the error message", this, done)` assert an error `message`
+   - `tree.error({'line': 2}, this, done)` assert an object of properties that each exist in the error
+
+``` javascript
+// test/html/basicSelfClosing.html
+it('basic self closing', function(done) {
+  tree.ok(this, done);
+});
+
+// test/html/basicListItems.html
+it('basic list items', function(done) {
+  tree.error({
+    'message': '<li> is not a valid self closing tag',
+    'line': 5
+
+  }, this, done);
+});
+```
