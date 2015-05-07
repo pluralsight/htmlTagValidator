@@ -26,6 +26,11 @@ describe('html-tag-validator', function() {
     }, this, done);
   });
 
+  it('basic div p', function(done) {
+    tree.error("<p> is not a valid self closing tag", this, done);
+    // tree.error("Expected open tag <p> to match closing tag </div>", this, done);
+  });
+
   it('anchor tags', function(done) {
     tree.ok(this, done);
   });
@@ -48,8 +53,29 @@ describe('html-tag-validator', function() {
     tree.ok(this, done);
   });
 
+  it('basic list items', function(done) {
+    tree.error({
+      'message': '<li> is not a valid self closing tag',
+      'line': 5
+
+    }, this, done);
+  });
+
+  it('basic pre', function(done) {
+    // TODO: Need to re-evaluate this test once pre tag is fixed in 0.3.x
+    tree.ok(this, done);
+  });
+
   it('malformed attribute', function (done) {
     tree.error("Found an attribute assignment \"=\" not followed by a value", this, done);
+  });
+
+  it('malformed attribute 2', function (done) {
+    tree.error("The <div> tag does not have a 12!#3 attribute", this, done);
+  });
+
+  it('malformed attribute 3', function (done) {
+    tree.error("The <div> element has an attribute (\"a\") with an invalid name", this, done);
   });
 
   it('html comment', function(done) {
@@ -62,6 +88,10 @@ describe('html-tag-validator', function() {
 
   it('html comment conditional', function(done) {
     tree.ok(this, done);
+  });
+
+  it('html comment unclosed', function(done) {
+    tree.error("Unterminated HTML comment detected", this, done);
   });
 
   it('malformed conditional comment', function(done) {

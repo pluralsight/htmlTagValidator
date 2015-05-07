@@ -81,6 +81,7 @@ assertErrorTree = function (obj, that, done) {
     options = done;
     func = arguments[3];
   }
+  if (_.isUndefined(obj)) { obj = {}; }
   getTree.apply(that, [that, options, function (err, ast) {
     broadcast(arguments);
     expect(ast).to.be.undefined;
