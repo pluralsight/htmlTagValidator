@@ -36,7 +36,6 @@ The parser implements the basic components of the HTML 5 spec, such as:
   ```
 
  - Void `<script async></script>` and normal `<p class="foo"></p>` attributes
- -
 
 Note: this project is work-in-progress and is **not full spec-compliant**.
 
@@ -70,9 +69,9 @@ function (err, ast) {
 ``` javascript
 var htmlTagValidator = require('html-tag-validator'),
 	sampleHtml = "<html>" +
-							"<head><title>hello world</title></head>" +
-							"<body><p style='color: pink;'>my cool page</p></body>" +
-							"</html>";
+				"<head><title>hello world</title></head>" +
+				"<body><p style='color: pink;'>my cool page</p></body>" +
+				"</html>";
 
 // Turn a HTML string into an AST
 htmlTagValidator(sampleHtml, function (err, ast) {
@@ -132,9 +131,9 @@ document:
 ``` javascript
 var htmlTagValidator = require('html-tag-validator'),
 	sampleHtml = "<html>" +
-							"<head><title>hello world</title></head>" +
-							"<body><p (click)='myCoolFunc()'>my cool page</p></body>" +
-							"</html>";
+				"<head><title>hello world</title></head>" +
+				"<body><p (click)='myCoolFunc()'>my cool page</p></body>" +
+				"</html>";
 
 /*
 * Allow Angular 2 style attributes on all elements. The key '_' means match
@@ -182,9 +181,9 @@ if (err) {
 ``` javascript
 var htmlTagValidator = require('html-tag-validator'),
 	sampleHtml = "<html>" +
-							"<head><title>hello world</title></head>" +
-							"<body><p (click)='myCoolFunc()'>my cool page</p></body>" +
-							"</html>";
+				"<head><title>hello world</title></head>" +
+				"<body><p (click)='myCoolFunc()'>my cool page</p></body>" +
+				"</html>";
 
 /*
 * Allow old-style HTML table attributes on specific elements.
