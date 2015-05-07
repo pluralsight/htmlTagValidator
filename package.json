@@ -1,6 +1,6 @@
 {
   "name": "html-tag-validator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "author": "Code School",
   "contributors": [
@@ -17,13 +17,12 @@
   "description": "PEG.js implementation of HTML tag validator",
   "repository": "git@github.com:codeschool/htmlTagValidator.git",
   "scripts": {
-    "test": "grunt mochaTest:test"
+    "test": "grunt test"
   },
   "devDependencies": {
     "chai": "^1.9.1",
     "grunt": "^0.4.5",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-mocha-test": "^0.12.7",
     "grunt-shell": "^1.1.2",
     "lodash": "^3.7.0",
     "mocha": "^1.21.4",

@@ -227,9 +227,11 @@ if (err) {
 
 Once the dependencies are installed, start development with the following command:
 
-`grunt dev`
+`grunt test`
 
 which will automatically compile the parser and run the tests in `test/index-spec.js`.
+
+Optionally, run `grunt debug` to get extended output and start a file watcher.
 
 Tests refer to an HTML test file in `test/html/` and the test name is a
 reference to the filename of the test file. For example `super test 2`

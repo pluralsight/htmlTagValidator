@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased][unreleased]
 
+## [v1.0.4] - 2015-05-07
+### Added
+- Grunt commands `test` for running tests and `debug` for getting detailed test output and starting the file watcher
+
+### Changed
+- Got rid of the dependency on `grunt-mocha-test` to run the tests
+
 ## [v1.0.3] - 2015-05-07
 ### Fixed
 - Internal utility methods such as `textNode()` and `find()` no longer modify build-in JavaScript objects such as `Array` and `String`
@@ -16,7 +23,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Breaking changes from 0.0.x. Check README for changes to core API.
 
-[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.3...HEAD
+[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.4...HEAD
+[v1.0.4]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.3...v1.0.4
 [v1.0.3]: https://github.com/codeschool/htmlTagValidator/compare/1.0.2...v1.0.3
 [1.0.2]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.0...1.0.2
 [v1.0.0]: https://github.com/codeschool/htmlTagValidator/commit/ebb5423144a9faa8a51c93be98a90079ebe40cac

@@ -5,15 +5,27 @@ var expect            = require('chai').expect,
     prettyjson        = require('prettyjson'),
     getTree, assertOkTree, assertErrorTree;
 
-var broadcast = function (args) {
-  _.forEach(args, function (arg) {
-    if (arg != null) {
-      console.log('\n');
-      console.log(_.isObject(arg) ? prettyjson.render(arg, {}) : arg);
-      console.log('\n');
-    }
-  });
-};
+var _canB,
+    canBroadcast = function () {
+      if (_canB == null) {
+        _canB = console != null && console.log != null &&
+                process != null && process.env != null &&
+                process.env.DEBUG != null;
+      }
+      return _canB;
+    },
+    broadcast = function (args) {
+      // Only broadcast when DEBUG=true is set in the environment
+      if (canBroadcast()) {
+        _.forEach(args, function (arg) {
+          if (arg != null) {
+            console.log('\n');
+            console.log(_.isObject(arg) ? prettyjson.render(arg, {}) : arg);
+            console.log('\n');
+          }
+        });
+      }
+    };
 
 /**
 Load the source file for the current test and then try and generate the AST from it.
