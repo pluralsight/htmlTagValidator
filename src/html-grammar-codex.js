@@ -1,32 +1,29 @@
-module.exports = {
-  // Attribute types
+/**
+ * Tag and attribute names
+ * @note Source: {@link http://www.w3schools.com/TAGS/ HTML Element Reference}
+ * @note Source: {@link https://simon.html5.org/html-elements HTML Elements and Attributes}
+ */
+var codex = {
   'attributes': {
     '$': {
       'global': [
-        // Ignore attributes that are one of the following forms:
-        // data-*, aria-*
-        /(^(data|aria)\-)/i,
-        'accesskey', 'class', 'contenteditable', 'contextmenu', 'dir',
-        'draggable', 'dropzone', 'hidden', 'id', 'lang', 'spellcheck',
-        'style', 'tabindex', 'title', 'translate'
+        'accesskey', 'class', 'contenteditable', 'contextmenu', 'data-*', 'dir',
+        'draggable', 'dropzone', 'hidden', 'id', 'inert', 'itemid', 'itemprop',
+        'itemref', 'itemscope', 'itemtype', 'lang', 'role', 'spellcheck', 'style',
+        'tabindex', 'title', 'translate'
       ],
       'event': [
-        'onafterprint', 'onbeforeprint', 'onbeforeunload', 'onerror',
-        'onhashchange', 'onload', 'onmessage', 'onoffline', 'ononline',
-        'onpagehide', 'onpageshow', 'onpopstate', 'onresize', 'onstorage',
-        'onunload', 'onblur', 'onchange', 'oncontextmenu', 'onfocus',
-        'oninput', 'oninvalid', 'onreset', 'onsearch', 'onselect',
-        'onsubmit', 'onkeydown', 'onkeypress', 'onkeyup', 'onclick',
-        'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave',
-        'ondragover', 'ondragstart', 'ondrop', 'onmousedown',
-        'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup',
-        'onmousewheel', 'onscroll', 'onwheel', 'oncopy', 'oncut',
-        'onpaste', 'onabort', 'oncanplay', 'oncanplaythrough',
-        'oncuechange', 'ondurationchange', 'onemptied', 'onended',
-        'onerror', 'onloadeddata', 'onloadedmetadata', 'onloadstart',
-        'onpause', 'onplay', 'onplaying', 'onprogress', 'onratechange',
-        'onseeked', 'onseeking', 'onstalled', 'onsuspend', 'ontimeupdate',
-        'onvolumechange', 'onwaiting', 'onerror', 'onshow', 'ontoggle'
+        'onabort', 'onblur', 'oncanplay', 'oncanplaythrough', 'onchange', 'onclick',
+        'oncontextmenu', 'ondblclick', 'ondrag', 'ondragend', 'ondragenter',
+        'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'ondurationchange',
+        'onemptied', 'onended', 'onerror', 'onfocus', 'onformchange', 'onforminput',
+        'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onload',
+        'onloadeddata', 'onloadedmetadata', 'onloadstart', 'onmousedown',
+        'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel',
+        'onpause', 'onplay', 'onplaying', 'onprogress', 'onratechange', 'onreset',
+        'onreadystatechange', 'onseeked', 'onseeking', 'onselect', 'onshow',
+        'onstalled', 'onsubmit', 'onsuspend', 'ontimeupdate', 'onvolumechange',
+        'onwaiting'
       ]
     },
     // TODO: Verify this is correct behavior
@@ -37,10 +34,168 @@ module.exports = {
       ]
     },
     // Tags with specific validation rules for attributes
+    'input': {
+      'mixed': [
+        'attributes/$/global', 'attributes/$/event'
+      ],
+      'normal': [
+        'accept', 'alt', 'autocomplete', 'autofocus', 'checked', 'dirname',
+        'disabled', 'form', 'formaction', 'formenctype', 'formmethod',
+        'formnovalidate', 'formtarget', 'height', 'inputmode', 'list', 'max',
+        'maxlength', 'min', 'multiple', 'name', 'pattern', 'placeholder',
+        'readonly', 'required', 'size', 'src', 'step', 'type', 'value', 'width'
+      ],
+      'type-specific': {
+        'file': {
+          'normal': [
+            'accept', 'multiple', 'required'
+          ]
+        },
+        'image': {
+          'normal': [
+            'alt', 'formaction', 'formenctype', 'formmethod', 'formnovalidate',
+            'formtarget', 'height', 'src', 'width'
+          ]
+        },
+        'text': {
+          'normal': [
+            'autocomplete', 'dirname', 'inputmode', 'list', 'maxlength',
+            'minlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'
+          ]
+        },
+        'search': {
+          'normal': [
+            'autocomplete', 'dirname', 'inputmode', 'list', 'maxlength', 'minlength',
+            'pattern', 'placeholder', 'readonly', 'required', 'size'
+          ]
+        },
+        'url': {
+          'normal': [
+            'autocomplete', 'list', 'maxlength', 'minlength', 'pattern',
+            'placeholder', 'readonly', 'required', 'size'
+          ]
+        },
+        'tel': {
+          'normal': [
+            'autocomplete', 'list', 'maxlength', 'minlength', 'pattern',
+            'placeholder', 'readonly', 'required', 'size'
+          ]
+        },
+        'email': {
+          'normal': [
+            'autocomplete', 'list', 'maxlength', 'minlength', 'multiple',
+            'pattern', 'placeholder', 'readonly', 'required', 'size'
+          ]
+        },
+        'password': {
+          'normal': [
+            'autocomplete', 'inputmode', 'maxlength', 'minlength', 'pattern',
+            'placeholder', 'readonly', 'required', 'size'
+          ]
+        },
+        'datetime': {
+          'normal': [
+            'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+          ]
+        },
+        'date': {
+          'normal': [
+            'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+          ]
+        },
+        'month': {
+          'normal': [
+            'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+          ]
+        },
+        'week': {
+          'normal': [
+            'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+          ]
+        },
+        'time': {
+          'normal': [
+            'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+          ]
+        },
+        'datetime-local': {
+          'normal': [
+            'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+          ]
+        },
+        'number': {
+          'normal': [
+            'autocomplete', 'list', 'max', 'min', 'placeholder', 'readonly',
+            'required', 'step'
+          ]
+        },
+        'range': {
+          'normal': [
+            'autocomplete', 'list', 'max', 'min', 'multiple', 'step'
+          ]
+        },
+        'color': {
+          'normal': [
+            'autocomplete', 'list'
+          ]
+        },
+        'checkbox': {
+          'normal': [
+            'checked', 'required'
+          ]
+        },
+        'radio': {
+          'normal': [
+            'checked', 'required'
+          ]
+        },
+        'submit': {
+          'normal': [
+            'formaction', 'formenctype', 'formmethod', 'formnovalidate',
+            'formtarget'
+          ]
+        }
+      },
+      'value-types': [
+        'hidden', 'text', 'search', 'tel', 'url', 'email', 'password', 'datetime',
+        'date', 'month', 'week', 'time', 'datetime-local', 'number', 'range',
+        'color', 'checkbox', 'radio', 'file', 'submit', 'image', 'reset', 'button'
+      ],
+      // TODO: Create tests for each of these rules
+      'rules': function inputRules(attributes, contents, util) {
+        if (!util.has(attributes, 'type')) { return true; }
+        var tagCodex = codex['attributes']['input'],
+            allowedTypes = tagCodex['value-types'],
+            specificTypes = tagCodex['type-specific'],
+            specificTypesAttrs, allowedAttrs, attr;
+        // Check attributes based on the type of <input> element
+        if (!util.has(allowedTypes, attributes['type'])) {
+          return {
+            'error': 'An <input> tag does not allow the value ' + attributes['type'] +
+                     ' for the type attribute'
+          };
+        }
+        specificTypesAttrs = specificTypes[attributes['type']];
+        allowedAttrs = specificTypesAttrs['normal'].concat(specificTypesAttrs['mixed']);
+        for (attr in attributes) {
+          if (attr === 'type') {
+            continue;
+          }
+          if (!util.has(allowedAttrs, attr)) {
+            return {
+              'error': 'An <input> tag does not allow the ' + attr +
+                       ' attribute when it has ' + attributes['type'] +
+                       ' for the type attribute'
+            };
+          }
+        }
+        return true;
+      }
+    },
     'script': {
       'mixed': ['attributes/$/global'],
       'normal': ['charset', 'src', 'type'],
-      'rules': function scriptRules(attributes, contents) {
+      'rules': function scriptRules(attributes, contents, util) {
         if (attributes['src'] != null && contents != null) {
           // If the 'src' attribute is present, the <script> element must be empty.
           return {
@@ -57,7 +212,7 @@ module.exports = {
     },
     'title': {
       'mixed': ['attributes/$/global'],
-      'rules': function styleRules(attributes, contents) {
+      'rules': function styleRules(attributes, contents, util) {
         if (contents == null) {
           return {
             'error': 'The <title> tag is required to have content between the start and end tags'
@@ -69,7 +224,7 @@ module.exports = {
     'meta': {
       'mixed': ['attributes/$/global'],
       'normal': ['charset', 'content', 'http-equiv', 'name', 'scheme'],
-      'rules': function metaRules(attributes, contents) {
+      'rules': function metaRules(attributes, contents, util) {
         if ((attributes['name'] != null || attributes['http-equiv'] != null) && attributes['content'] == null) {
           return {
             'error': 'The <meta> tag content attribute must be defined if the name or http-equiv attributes are defined'
@@ -804,46 +959,6 @@ module.exports = {
         'for'
       ]
     },
-    // TODO: Updated based on type in 0.3.x
-    'input': {
-      'mixed': [
-        'attributes/$/global',
-        'attributes/$/event'
-      ],
-      'normal': [
-        'accept',
-        'alt',
-        'autocomplete',
-        'autofocus',
-        'checked',
-        'dirname',
-        'disabled',
-        'form',
-        'formaction',
-        'formenctype',
-        'formmethod',
-        'formnovalidate',
-        'formtarget',
-        'height',
-        'inputmode',
-        'list',
-        'max',
-        'maxlength',
-        'min',
-        'multiple',
-        'name',
-        'pattern',
-        'placeholder',
-        'readonly',
-        'required',
-        'size',
-        'src',
-        'step',
-        'type',
-        'value',
-        'width'
-      ]
-    },
     'button': {
       'mixed': [
         'attributes/$/global',
@@ -1039,3 +1154,5 @@ module.exports = {
     ]
   }
 };
+
+module.exports = codex;

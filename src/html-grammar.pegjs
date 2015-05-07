@@ -176,7 +176,7 @@
 
 		// Run any custom validation rules that exist
 		if (_u.has(props, 'rules') && props['rules'] != null) {
-			rule = _u.customTest.apply(this, ['attributes/rules', props['rules'], [attributes, contents]]);
+			rule = _u.customTest.apply(this, ['attributes/rules', props['rules'], [attributes, contents, _u]]);
 			if (_u.has(rule, 'error')) {
 				return rule;
 			}
@@ -471,6 +471,7 @@ tag_attribute "Attribute"
 
 tag_attribute_name "Attribute Name"
 	= s n:(![\/\>\"\'\= ] char)*
+		/*= s n:(![^\t\n\f \/>"'=] char)**/
 	& { return n.length; }
 	{ return _u.safe(n).tagify(); }
 

@@ -2805,7 +2805,7 @@ module.exports = (function() {
 
     		// Run any custom validation rules that exist
     		if (_u.has(props, 'rules') && props['rules'] != null) {
-    			rule = _u.customTest.apply(this, ['attributes/rules', props['rules'], [attributes, contents]]);
+    			rule = _u.customTest.apply(this, ['attributes/rules', props['rules'], [attributes, contents, _u]]);
     			if (_u.has(rule, 'error')) {
     				return rule;
     			}
