@@ -35,18 +35,18 @@ module.exports = (function() {
         peg$c0 = peg$FAILED,
         peg$c1 = null,
         peg$c2 = function(dt, st) {
-        		var doct = null;
-        		if (dt !== null) {
-        			if (dt.error != null) {
-        				return error(dt.error);
-        			}
-        			doct = dt.value;
-        		}
-        		return {
-        			'doctype': doct,
-        			'document': st
-        		};
-        	},
+            var doct = null;
+            if (dt !== null) {
+              if (dt.error != null) {
+                return error(dt.error);
+              }
+              doct = dt.value;
+            }
+            return {
+              'doctype': doct,
+              'document': st
+            };
+          },
         peg$c3 = { type: "other", description: "HTML DOCTYPE" },
         peg$c4 = [],
         peg$c5 = void 0,
@@ -57,20 +57,20 @@ module.exports = (function() {
         peg$c10 = { type: "literal", value: ">", description: "\">\"" },
         peg$c11 = function(ls, dt, ex) { return _u.tagify(dt) === 'doctype'; },
         peg$c12 = function(ls, dt, ex) {
-        		if (ls === null || _u.textNode(ls) === '') {
-        			if (_u.tagify(ex) === 'html') {
-        				return {
-        					'value': _u.tagify(ex)
-        				};
-        			}
-        			return {
-        				'error': "The DOCTYPE definition for an HTML 5 document should be \"html\""
-        			};
-        		}
-        		return {
-        			'error': "The DOCTYPE definition must be placed at the beginning of the first line of the document"
-        		};
-        	},
+            if (ls === null || _u.textNode(ls) === '') {
+              if (_u.tagify(ex) === 'html') {
+                return {
+                  'value': _u.tagify(ex)
+                };
+              }
+              return {
+                'error': "The DOCTYPE definition for an HTML 5 document should be \"html\""
+              };
+            }
+            return {
+              'error': "The DOCTYPE definition must be placed at the beginning of the first line of the document"
+            };
+          },
         peg$c13 = "<!",
         peg$c14 = { type: "literal", value: "<!", description: "\"<!\"" },
         peg$c15 = "<",
@@ -88,39 +88,39 @@ module.exports = (function() {
         peg$c27 = function(iot, ic, ict) { return _u.has(['iframe'], iot.name); },
         peg$c28 = function(iot, ic, ict) { return ict === null || iot.name === ict.name; },
         peg$c29 = function(iot, ic, ict) {
-        		var err;
-        		if ((err = validateSpecialTag(iot, ic, ict)) !== true) {
-        			return error(err.error);
-        		} else if ((err = isValidChildren(iot.name, iot.attributes, ic)) !== true) {
-        			return error(err.error);
-        		}
-        		return {
-        			'type': iot.name,
-        			'attributes': iot.attributes,
-        			'contents': ic
-        		};
-        	},
+            var err;
+            if ((err = validateSpecialTag(iot, ic, ict)) !== true) {
+              return error(err.error);
+            } else if ((err = isValidChildren(iot.name, iot.attributes, ic)) !== true) {
+              return error(err.error);
+            }
+            return {
+              'type': iot.name,
+              'attributes': iot.attributes,
+              'contents': ic
+            };
+          },
         peg$c30 = { type: "other", description: "Non-parsed Element" },
         peg$c31 = function(sot, sc, sct) { return _u.has(['script', 'style', 'title'], sot.name); },
         peg$c32 = function(sot, sc, sct) {
-        		var err;
-        		if ((err = validateSpecialTag(sot, sc, sct)) !== true) {
-        			return error(err.error);
-        		} else if ((err = isValidChildren(sot.name, sot.attributes, sc)) !== true) {
-        			return error(err.error);
-        		}
-        		return {
-        			'type': sot.name,
-        			'attributes': sot.attributes,
-        			'contents': sc
-        		};
-        	},
+            var err;
+            if ((err = validateSpecialTag(sot, sc, sct)) !== true) {
+              return error(err.error);
+            } else if ((err = isValidChildren(sot.name, sot.attributes, sc)) !== true) {
+              return error(err.error);
+            }
+            return {
+              'type': sot.name,
+              'attributes': sot.attributes,
+              'contents': sc
+            };
+          },
         peg$c33 = function(st, attrs) {
-        		return {
-        			'name': st,
-        			'attributes': _u.collapse(attrs)
-        		};
-        	},
+            return {
+              'name': st,
+              'attributes': _u.collapse(attrs)
+            };
+          },
         peg$c34 = /^[a-z]/,
         peg$c35 = { type: "class", value: "[a-z]", description: "[a-z]" },
         peg$c36 = function(st) { return ['script', 'style', 'title', 'iframe'].indexOf(_u.tagify(st)) !== -1; },
@@ -132,75 +132,84 @@ module.exports = (function() {
         peg$c42 = "/",
         peg$c43 = { type: "literal", value: "/", description: "\"/\"" },
         peg$c44 = function(sc) {
-        		return {
-        			'name': sc
-        		};
-        	},
+            return {
+              'name': sc
+            };
+          },
         peg$c45 = { type: "other", description: "Tag" },
         peg$c46 = function(otn, sp, c, ctn) { return !isSelfClosing(otn.name) /* || otn.name === ctn.name */; },
         peg$c47 = function(otn, sp, c, ctn) {
-        		var err, attrs, parts = [];
-        		if(!(ctn.front && ctn.back)) {
-        			// TODO: Find another solution without displaying unencoded brackets
-        			// if (!ctn.front) { parts.push('</'); }
-        			// if (!ctn.back) { parts.push('>'); }
-        			// return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
-        			return error("The " + _u.htmlify(otn.name) + " tag is missing part of its closing tag");
-        		} else if (otn.name !== ctn.name) {
-        			return error("Expected open tag " + _u.htmlify(otn.name) + " to match closing tag " + _u.htmlify(ctn.name) + "");
-        		} /*else if (isSelfClosing(otn.name)) {
-        			return error("The " + _u.htmlify(otn.name) + " tag is a void element and should not have a closing tag");
-        		}*/ else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
-        			return error(attrs.error);
-        		} else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
-        			return error(err.error);
-        		}
-        		return {
-        			'type': 'element',
-        			'void': false,
-        			'name': otn.name,
-        			'attributes': otn.attributes,
-        			'children': c
-        		};
-        	},
+            var err, attrs, parts = [];
+            if (!otn.back) {
+                return error("The " + otn.name + " element is missing part of its opening tag");
+            } else if(!(ctn.front && ctn.back)) {
+              // TODO: Find another solution without displaying unencoded brackets
+              // if (!ctn.front) { parts.push('</'); }
+              // if (!ctn.back) { parts.push('>'); }
+              // return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
+              return error("The " + _u.htmlify(otn.name) + " element is missing part of its closing tag");
+            } else if (otn.name !== ctn.name) {
+              return error("Expected open tag " + _u.htmlify(otn.name) + " to match closing tag " + _u.htmlify(ctn.name) + "");
+            } /*else if (isSelfClosing(otn.name)) {
+              return error("The " + _u.htmlify(otn.name) + " tag is a void element and should not have a closing tag");
+            }*/ else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
+              return error(attrs.error);
+            } else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
+              return error(err.error);
+            }
+            return {
+              'type': 'element',
+              'void': false,
+              'name': otn.name,
+              'attributes': otn.attributes,
+              'children': c
+            };
+          },
         peg$c48 = { type: "other", description: "Self-closing Tag" },
         peg$c49 = function(ot) {
-        		var attrs;
-        		if(!isSelfClosing(ot.name)) {
-        			return error("" + ot.name + "" + " is not a valid self closing tag");
-        		}
+            var attrs;
+            if (!ot.back) {
+              return error("The " + _u.htmlify(ot.name) + " element is missing part of its opening tag");
+            } else if(!isSelfClosing(ot.name)) {
+              return error("" + _u.htmlify(ot.name) + "" + " is not a valid self closing tag");
+            }
 
-        		if (false && ot.closing !== null) {
-        			/*
-        			TODO: Note - This is where you would toggle on/off the error thrown when using the XHTML
-        						method of a self-closing tag.
-        			*/
-        			return error("The XHTML self-closing tag format for " + ot.name + " is not allowed in HTML 5");
-        		} else if (_u.has(attrs = checkAttributes(ot.name, ot.attributes), 'error')) {
-        			return error(attrs.error);
-        		}
+            if (false && ot.closing !== null) {
+              /*
+              TODO: Note - This is where you would toggle on/off the error thrown when using the XHTML
+                    method of a self-closing tag.
+              */
+              return error("The XHTML self-closing tag format for " + _u.htmlify(ot.name) + " is not allowed in HTML 5");
+            } else if (_u.has(attrs = checkAttributes(ot.name, ot.attributes), 'error')) {
+              return error(attrs.error);
+            }
 
-        		return {
-        			'type': 'element',
-        			'void': true,
-        			'name': ot.name,
-        			'attributes': ot.attributes,
-        			'children': []
-        		};
-        		// return "<" + ot + ">";
-        	},
+            return {
+              'type': 'element',
+              'void': true,
+              'name': ot.name,
+              'attributes': ot.attributes,
+              'children': []
+            };
+            // return "<" + ot + ">";
+          },
         peg$c50 = { type: "other", description: "Opening Tag" },
-        peg$c51 = function(t, attrs, cl) {
-        		return { 'name': t, 'attributes': _u.collapse(attrs), 'closing': cl};
-        	},
+        peg$c51 = function(t, attrs, cl, e) {
+            return {
+              'name': t,
+              'attributes': _u.collapse(attrs),
+              'closing': cl,
+              'back': e !== null
+            };
+          },
         peg$c52 = { type: "other", description: "Closing Tag" },
         peg$c53 = function(o, t, c) {
-        		return {
-        			'name': t,
-        			'front': o !== null,
-        			'back': c !== null
-        		};
-        	},
+            return {
+              'name': t,
+              'front': o !== null,
+              'back': c !== null
+            };
+          },
         peg$c54 = { type: "other", description: "Tag Name" },
         peg$c55 = /^[A-Za-z]/,
         peg$c56 = { type: "class", value: "[A-Za-z]", description: "[A-Za-z]" },
@@ -209,11 +218,11 @@ module.exports = (function() {
         peg$c59 = function(tns, tne) { return _u.tagify([tns].concat(tne)); },
         peg$c60 = { type: "other", description: "Attribute" },
         peg$c61 = function(ta, t) {
-        		return {
-        			'name': ta,
-        			'value': t
-        		};
-        	},
+            return {
+              'name': ta,
+              'value': t
+            };
+          },
         peg$c62 = { type: "other", description: "Attribute Name" },
         peg$c63 = /^[=\/\\ ]/,
         peg$c64 = { type: "class", value: "[=\\/\\\\ ]", description: "[=\\/\\\\ ]" },
@@ -241,33 +250,33 @@ module.exports = (function() {
         peg$c86 = "=",
         peg$c87 = { type: "literal", value: "=", description: "\"=\"" },
         peg$c88 = function(i) {
-        		// NOTE: equal sign in <meta> tag attribute values, quotes in <style> tags
-        		// var matches, allowed = /(&(?![^\s]+;)|[\'\"=<>`]+)/;
-        		var matches, allowed = /(&(?![^\s]+;)|[<>`]+)/;
-        		if(i === null) {
-        			return error("Found an attribute assignment \"=\" not followed by a value");
-        		} else if (allowed.test(i)) {
-        			// TODO: Move this this check up to a place where tag name is available
-        			// TODO: & could be allowed in event attributes
-        			matches = i.match(allowed);
-        			return error("Disallowed character (" + _u.htmlify(matches[1]) + ") found in attribute value");
-        		}
-        		return i;
-        	},
+            // NOTE: equal sign in <meta> tag attribute values, quotes in <style> tags
+            // var matches, allowed = /(&(?![^\s]+;)|[\'\"=<>`]+)/;
+            var matches, allowed = /(&(?![^\s]+;)|[<>`]+)/;
+            if(i === null) {
+              return error("Found an attribute assignment \"=\" not followed by a value");
+            } else if (allowed.test(i)) {
+              // TODO: Move this this check up to a place where tag name is available
+              // TODO: & could be allowed in event attributes
+              matches = i.match(allowed);
+              return error("Disallowed character (" + _u.htmlify(matches[1]) + ") found in attribute value");
+            }
+            return i;
+          },
         peg$c89 = { type: "other", description: "Text Node" },
         peg$c90 = function(tn) {
-        	return {
-        		'type': 'text',
-        		'contents': _u.textNode(tn)
-        	};
+          return {
+            'type': 'text',
+            'contents': _u.textNode(tn)
+          };
         },
         peg$c91 = { type: "other", description: "Block Comment" },
         peg$c92 = function(com, cc) {
-        		if (cc === null) {
-        			return error('Unterminated HTML comment detected');
-        		}
-        		return com;
-        	},
+            if (cc === null) {
+              return error('Unterminated HTML comment detected');
+            }
+            return com;
+          },
         peg$c93 = { type: "other", description: "Comment Start" },
         peg$c94 = "<!--",
         peg$c95 = { type: "literal", value: "<!--", description: "\"<!--\"" },
@@ -275,38 +284,38 @@ module.exports = (function() {
         peg$c97 = "-->",
         peg$c98 = { type: "literal", value: "-->", description: "\"-->\"" },
         peg$c99 = function(cb) {
-        		var tn = cb !== null ? _u.textNode(cb) : '';
-        		if(tn.indexOf('--') !== -1) {
-        			return error("Cannot have two or more consecutive hyphens inside of a block comment");
-        		}
-        		return {
-        			'type': 'comment',
-        			'conditional': false,
-        			'condition': null,
-        			'children': {
-        				'type': 'text',
-        				'contents': tn
-        			}
-        		};
-        	},
+            var tn = cb !== null ? _u.textNode(cb) : '';
+            if(tn.indexOf('--') !== -1) {
+              return error("Cannot have two or more consecutive hyphens inside of a block comment");
+            }
+            return {
+              'type': 'comment',
+              'conditional': false,
+              'condition': null,
+              'children': {
+                'type': 'text',
+                'contents': tn
+              }
+            };
+          },
         peg$c100 = function(cs) { return _u.textNode(cs);  },
         peg$c101 = function(cons, com, cone) { return cons === null && cone === null; },
         peg$c102 = function(cons, com, cone) {
-        		var condition = '';
-        		if (cone === null) {
-        			return error("Conditional comment start tag found without conditional comment end tag");
-        		} else if (cons === null) {
-        			return error("Conditional comment end tag found without conditional comment start tag");
-        		} else {
-        			condition = cons;
-        		}
-        		return {
-        			'type': 'comment',
-        			'conditional': true,
-        			'condition': condition,
-        			'children': com
-        		};
-        	},
+            var condition = '';
+            if (cone === null) {
+              return error("Conditional comment start tag found without conditional comment end tag");
+            } else if (cons === null) {
+              return error("Conditional comment end tag found without conditional comment start tag");
+            } else {
+              condition = cons;
+            }
+            return {
+              'type': 'comment',
+              'conditional': true,
+              'condition': condition,
+              'children': com
+            };
+          },
         peg$c103 = "[",
         peg$c104 = { type: "literal", value: "[", description: "\"[\"" },
         peg$c105 = /^[^\]]/,
@@ -1333,7 +1342,7 @@ module.exports = (function() {
     }
 
     function peg$parseopen_tag() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
       peg$silentFails++;
       s0 = peg$currPos;
@@ -1378,10 +1387,19 @@ module.exports = (function() {
                       s8 = peg$FAILED;
                       if (peg$silentFails === 0) { peg$fail(peg$c10); }
                     }
+                    if (s8 === peg$FAILED) {
+                      s8 = peg$c1;
+                    }
                     if (s8 !== peg$FAILED) {
-                      peg$reportedPos = s0;
-                      s1 = peg$c51(s3, s4, s6);
-                      s0 = s1;
+                      s9 = peg$parses();
+                      if (s9 !== peg$FAILED) {
+                        peg$reportedPos = s0;
+                        s1 = peg$c51(s3, s4, s6, s8);
+                        s0 = s1;
+                      } else {
+                        peg$currPos = s0;
+                        s0 = peg$c0;
+                      }
                     } else {
                       peg$currPos = s0;
                       s0 = peg$c0;
@@ -2223,7 +2241,7 @@ module.exports = (function() {
         s3 = peg$c0;
       }
       if (s3 !== peg$FAILED) {
-        s4 = peg$parsechar();
+        s4 = peg$parseany();
         if (s4 !== peg$FAILED) {
           s3 = [s3, s4];
           s2 = s3;
@@ -2249,7 +2267,7 @@ module.exports = (function() {
           s3 = peg$c0;
         }
         if (s3 !== peg$FAILED) {
-          s4 = peg$parsechar();
+          s4 = peg$parseany();
           if (s4 !== peg$FAILED) {
             s3 = [s3, s4];
             s2 = s3;
@@ -2271,6 +2289,71 @@ module.exports = (function() {
       return s0;
     }
 
+    function peg$parsecomment_conditional_scan() {
+      var s0, s1, s2, s3, s4;
+
+      s0 = peg$currPos;
+      s1 = [];
+      s2 = peg$currPos;
+      s3 = peg$currPos;
+      peg$silentFails++;
+      s4 = peg$parseconditional_end();
+      peg$silentFails--;
+      if (s4 === peg$FAILED) {
+        s3 = peg$c5;
+      } else {
+        peg$currPos = s3;
+        s3 = peg$c0;
+      }
+      if (s3 !== peg$FAILED) {
+        s4 = peg$parseany();
+        if (s4 !== peg$FAILED) {
+          s3 = [s3, s4];
+          s2 = s3;
+        } else {
+          peg$currPos = s2;
+          s2 = peg$c0;
+        }
+      } else {
+        peg$currPos = s2;
+        s2 = peg$c0;
+      }
+      while (s2 !== peg$FAILED) {
+        s1.push(s2);
+        s2 = peg$currPos;
+        s3 = peg$currPos;
+        peg$silentFails++;
+        s4 = peg$parseconditional_end();
+        peg$silentFails--;
+        if (s4 === peg$FAILED) {
+          s3 = peg$c5;
+        } else {
+          peg$currPos = s3;
+          s3 = peg$c0;
+        }
+        if (s3 !== peg$FAILED) {
+          s4 = peg$parseany();
+          if (s4 !== peg$FAILED) {
+            s3 = [s3, s4];
+            s2 = s3;
+          } else {
+            peg$currPos = s2;
+            s2 = peg$c0;
+          }
+        } else {
+          peg$currPos = s2;
+          s2 = peg$c0;
+        }
+      }
+      if (s1 !== peg$FAILED) {
+        peg$reportedPos = s0;
+        s1 = peg$c41(s1);
+      }
+      s0 = s1;
+
+      return s0;
+    }
+
     function peg$parsecomment_conditional() {
       var s0, s1, s2, s3, s4, s5, s6, s7, s8;
 
@@ -2284,7 +2367,7 @@ module.exports = (function() {
         if (s2 !== peg$FAILED) {
           s3 = peg$parses();
           if (s3 !== peg$FAILED) {
-            s4 = peg$parsecomment_nodes();
+            s4 = peg$parsecomment_conditional_scan();
             if (s4 !== peg$FAILED) {
               s5 = peg$parses();
               if (s5 !== peg$FAILED) {
@@ -2580,6 +2663,20 @@ module.exports = (function() {
       return s0;
     }
 
+    function peg$parseany() {
+      var s0;
+
+      if (input.length > peg$currPos) {
+        s0 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s0 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c6); }
+      }
+
+      return s0;
+    }
+
     function peg$parsechar() {
       var s0, s1;
 
@@ -2663,185 +2760,185 @@ module.exports = (function() {
     }
 
 
-    			// Parser utilities
-    	var _u = require('./html-parser-util'),
-    			// Codex of tag and attribute names
-    			codex = _u.initializeOptions(require('./html-grammar-codex'), options);
+          // Parser utilities
+      var _u = require('./html-parser-util'),
+          // Codex of tag and attribute names
+          codex = _u.initializeOptions(require('./html-grammar-codex'), options);
 
-    	// Verification Functions
+      // Verification Functions
 
-    	function isSelfClosing(tag) {
-    		var path = 'tags/void',
-    				tags = _u.option(path);
-    		return tags != null ? _u.customTest.apply(this, [path, tags, [tag]]) : false;
-    	}
+      function isSelfClosing(tag) {
+        var path = 'tags/void',
+            tags = _u.option(path);
+        return tags != null ? _u.customTest.apply(this, [path, tags, [tag]]) : false;
+      }
 
-    	function isAttributeAllowed(tag, attribute, value) {
-    		var i, len, ref, shared, props,
-    				that = this,
-    				attrTest = function (tst) {
-    					return _u.customTest.apply(that, ['attributes/' + tst, props[tst], [attribute, value]]);
-    				};
+      function isAttributeAllowed(tag, attribute, value) {
+        var i, len, ref, shared, props,
+            that = this,
+            attrTest = function (tst) {
+              return _u.customTest.apply(that, ['attributes/' + tst, props[tst], [attribute, value]]);
+            };
 
-    		// Find the rules for this tag in the options
-    		props = _u.option('attributes', [tag, '_']);
+        // Find the rules for this tag in the options
+        props = _u.option('attributes', [tag, '_']);
 
-    		// Do not continue unless attribute options exist for this tag
-    		if (props == null) { return true; }
+        // Do not continue unless attribute options exist for this tag
+        if (props == null) { return true; }
 
-    		/*
-    			The tag is allowed if it:
-    			a) exists in normal and has any value,
-    			b) exists in void and has no value,
-    			c) or exists in mixed and has any or no value
-    		*/
-    		if (_u.has(props, 'normal') && attrTest('normal')) {
-    			if (value == null) {
-    				return {
-    					'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute requires a value"
-    				};
-    			}
-    			return true;
-    		} else if (_u.has(props, 'void') && attrTest('void')) {
-    			if (value != null) {
-    				return {
-    					'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute should not have a value"
-    				};
-    			}
-    			return true;
-    		} else if (_u.has(props, 'mixed') && attrTest('mixed')) {
-    			return true;
-    		}
+        /*
+          The tag is allowed if it:
+          a) exists in normal and has any value,
+          b) exists in void and has no value,
+          c) or exists in mixed and has any or no value
+        */
+        if (_u.has(props, 'normal') && attrTest('normal')) {
+          if (value == null) {
+            return {
+              'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute requires a value"
+            };
+          }
+          return true;
+        } else if (_u.has(props, 'void') && attrTest('void')) {
+          if (value != null) {
+            return {
+              'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute should not have a value"
+            };
+          }
+          return true;
+        } else if (_u.has(props, 'mixed') && attrTest('mixed')) {
+          return true;
+        }
 
         return {
-    			'error': "The " + _u.htmlify(tag) + " tag does not have a " + _u.htmlify(attribute) + " attribute"
-    		};
-    	}
+          'error': "The " + _u.htmlify(tag) + " tag does not have a " + _u.htmlify(attribute) + " attribute"
+        };
+      }
 
-    	function checkAttributes(tag, attributes, contents) {
-    		var i, len, ref, req, name, value, rule, props, ok = {
-    			'value': attributes
-    		}, names = Object.keys(attributes);
+      function checkAttributes(tag, attributes, contents) {
+        var i, len, ref, req, name, value, rule, props, ok = {
+          'value': attributes
+        }, names = Object.keys(attributes);
 
-    		// If there is any weird stuff in the names, do not continue
-    		for (i = 0, len = names.length; i < len; i++) {
-    			if (/[\/\>\"\'\= ]/.test(names[i])) {
-    				return {
-    					'error': 'The ' + _u.htmlify(tag) + ' element has an attribute (' + _u.htmlify(names[i]) + ') with an invalid name'
-    				};
-    			}
-    		}
+        // If there is any weird stuff in the names, do not continue
+        for (i = 0, len = names.length; i < len; i++) {
+          if (/[\/\>\"\'\= ]/.test(names[i])) {
+            return {
+              'error': 'The ' + _u.htmlify(tag) + ' element has an attribute (' + _u.htmlify(names[i]) + ') with an invalid name'
+            };
+          }
+        }
 
-    		// If the tag is not in the codex then allow anything
-    		props = _u.option('attributes', [tag, '_']);
+        // If the tag is not in the codex then allow anything
+        props = _u.option('attributes', [tag, '_']);
 
-    		if (props == null) { return ok; }
+        if (props == null) { return ok; }
 
-    		// Check if all the required attributes are present
-    		if (_u.has(props, 'required')) {
-    			ref = props['required'];
-    			for (i = 0, len = ref.length; i < len; i++) {
-    			  req = ref[i];
-    			  if ((rule = _u.customTest.apply(this, ['attributes/required', req, [attributes, contents]])) !== true) {
-    					if (rule === false) {
-    				    return {
-    							'error': "The " + _u.htmlify(tag) + " tag must include a " + _u.htmlify(req) + " attribute"
-    						};
-    					} else {
-    						return rule;
-    					}
-    			  }
-    			}
-    		}
+        // Check if all the required attributes are present
+        if (_u.has(props, 'required')) {
+          ref = props['required'];
+          for (i = 0, len = ref.length; i < len; i++) {
+            req = ref[i];
+            if ((rule = _u.customTest.apply(this, ['attributes/required', req, [attributes, contents]])) !== true) {
+              if (rule === false) {
+                return {
+                  'error': "The " + _u.htmlify(tag) + " tag must include a " + _u.htmlify(req) + " attribute"
+                };
+              } else {
+                return rule;
+              }
+            }
+          }
+        }
 
-    		// Make sure each attribute is allowed validated
-    		for (name in attributes) {
-    		  value = attributes[name];
-    			if ((err = isAttributeAllowed(tag, name, value)) !== true) {
-    		    return err;
-    			}
-    		}
+        // Make sure each attribute is allowed validated
+        for (name in attributes) {
+          value = attributes[name];
+          if ((err = isAttributeAllowed(tag, name, value)) !== true) {
+            return err;
+          }
+        }
 
-    		// Run any custom validation rules that exist
-    		if (_u.has(props, 'rules') && props['rules'] != null) {
-    			rule = _u.customTest.apply(this, ['attributes/rules', props['rules'], [attributes, contents, _u]]);
-    			if (_u.has(rule, 'error')) {
-    				return rule;
-    			}
-    		}
+        // Run any custom validation rules that exist
+        if (_u.has(props, 'rules') && props['rules'] != null) {
+          rule = _u.customTest.apply(this, ['attributes/rules', props['rules'], [attributes, contents, _u]]);
+          if (_u.has(rule, 'error')) {
+            return rule;
+          }
+        }
 
-    		return ok;
-    	}
+        return ok;
+      }
 
-    	function validateSpecialTag(sot, sc, sct) {
-    		var attrs = checkAttributes(sot.name, sot.attributes, sc);
-    		if (sct === null) {
-    			return {
-    				'error': "Found open " + _u.htmlify(sot.name) + " tag without closing " + _u.htmlify(sot.name) + " tag"
-    			};
-    		} else if (sot.name !== sct.name) {
-    			return {
-    				'error': "Expected open tag " + _u.htmlify(sot.name) + " to match closing tag " + _u.htmlify(sct.name) + ""
-    			};
-    		} else if (attrs.error != null) {
-    			return attrs;
-    		}
-    		return true;
-    	}
+      function validateSpecialTag(sot, sc, sct) {
+        var attrs = checkAttributes(sot.name, sot.attributes, sc);
+        if (sct === null) {
+          return {
+            'error': "Found open " + _u.htmlify(sot.name) + " tag without closing " + _u.htmlify(sot.name) + " tag"
+          };
+        } else if (sot.name !== sct.name) {
+          return {
+            'error': "Expected open tag " + _u.htmlify(sot.name) + " to match closing tag " + _u.htmlify(sct.name) + ""
+          };
+        } else if (attrs.error != null) {
+          return attrs;
+        }
+        return true;
+      }
 
 
-    	// TODO: Is it possible to move this to the codex?
-     	function isValidChildren(tag, attributes, children) {
-    		/*
-    			Special rules apply for the position of certain elements in the document.
-    			We can look at the children for specific elements to determine if
-    			anything is in a place it is not allowed.
-    		*/
-    		// TODO: Each of these needs a corresponding test
-    		var countTitle, countLink, countMeta;
-    		switch (tag) {
-    		  case 'head':
-    				countTitle = _u.countWhere(children, {'type': 'title'});
-    				if (countTitle < 1) {
-    					return {
-    						'error': "The document will not validate as HTML if you omit the title tag in the document head section"
-    					};
-    				} else if (countTitle > 1) {
-    					return {
-    						'error': "You can not have more than one title element in an HTML document"
-    					};
-    				}
-    		    break;
-    		  default:
-    				if (_u.isArray(children) && children.length > 0) {
-    					countLink = _u.countWhere(children, {'type': 'element', 'name': 'link'});
-    					if (countLink > 0) {
-    						return {
-    							'error': "The link element goes only in the head section of an HTML document"
-    						};
-    					}
-    					countMeta = _u.countWhere(children, {'type': 'element', 'name': 'meta'});
-    					if (countMeta > 0) {
-    						return {
-    							'error': "The meta element goes only in the head section of an HTML document"
-    						};
-    					}
-    					// Process one level deep so that trace is as accurate as possible
-    					if (_u.find(children, function (child) {
-    						if (child['type'] === 'style' && !_u.has(child.attributes, 'scoped')) {
-    							return true;
-    						}
-    						return false;
-    					}) !== undefined) {
-    						return {
-    							'error': "If the scoped attribute is not used, each style tag must be located in the head section"
-    						};
-    					}
-    				}
-    				break;
-    		}
-    		return true;
-    	}
+      // TODO: Is it possible to move this to the codex?
+       function isValidChildren(tag, attributes, children) {
+        /*
+          Special rules apply for the position of certain elements in the document.
+          We can look at the children for specific elements to determine if
+          anything is in a place it is not allowed.
+        */
+        // TODO: Each of these needs a corresponding test
+        var countTitle, countLink, countMeta;
+        switch (tag) {
+          case 'head':
+            countTitle = _u.countWhere(children, {'type': 'title'});
+            if (countTitle < 1) {
+              return {
+                'error': "The document will not validate as HTML if you omit the title tag in the document head section"
+              };
+            } else if (countTitle > 1) {
+              return {
+                'error': "You can not have more than one title element in an HTML document"
+              };
+            }
+            break;
+          default:
+            if (_u.isArray(children) && children.length > 0) {
+              countLink = _u.countWhere(children, {'type': 'element', 'name': 'link'});
+              if (countLink > 0) {
+                return {
+                  'error': "The link element goes only in the head section of an HTML document"
+                };
+              }
+              countMeta = _u.countWhere(children, {'type': 'element', 'name': 'meta'});
+              if (countMeta > 0) {
+                return {
+                  'error': "The meta element goes only in the head section of an HTML document"
+                };
+              }
+              // Process one level deep so that trace is as accurate as possible
+              if (_u.find(children, function (child) {
+                if (child['type'] === 'style' && !_u.has(child.attributes, 'scoped')) {
+                  return true;
+                }
+                return false;
+              }) !== undefined) {
+                return {
+                  'error': "If the scoped attribute is not used, each style tag must be located in the head section"
+                };
+              }
+            }
+            break;
+        }
+        return true;
+      }
 
 
     peg$result = peg$startRuleFunction();
