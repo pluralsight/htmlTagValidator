@@ -171,14 +171,14 @@ var htmlTagValidator = require('html-tag-validator'),
 * <nw-nav-item name="nav1">Home</nw-nav-item>
 */
 htmlTagValidator(sampleHtml, {
-'attributes': {
-	'_': {
-		'mixed': [/^((ng\-)|(^\[[\S]+\]$)|(^\([\S]+\)$))/]
-	},
-	'nw-nav-item': {
-		'normal': 'name'
-	}
-}
+  'attributes': {
+    '_': {
+    	'mixed': /^((ng\-)|(^\[[\S]+\]$)|(^\([\S]+\)$))/
+    },
+    'nw-nav-item': {
+    	'normal': 'name'
+    }
+  }
 }, function (err, ast) {
   if (err) {
   	throw err;
@@ -206,14 +206,19 @@ var htmlTagValidator = require('html-tag-validator'),
 * <td bgcolor="#000000">Two</td>
 */
 htmlTagValidator(sampleHtml, {
-'attributes': {
-	'table': {
-		'normal': ['align', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'frame', 'rules', 'summary', 'width']
-	},
-	'td': {
-		'normal': ['height', 'width', 'bgcolor']
-	}
-}
+  'attributes': {
+    'table': {
+    	'normal': [
+        'align', 'bgcolor', 'border', 'cellpadding', 'cellspacing',
+        'frame', 'rules', 'summary', 'width'
+      ]
+    },
+    'td': {
+    	'normal': [
+        'height', 'width', 'bgcolor'
+      ]
+    }
+  }
 }, function (err, ast) {
   if (err) {
   	throw err;
@@ -254,7 +259,6 @@ it('basic list items', function(done) {
   tree.error({
     'message': '<li> is not a valid self closing tag',
     'line': 5
-
   }, this, done);
 });
 ```
