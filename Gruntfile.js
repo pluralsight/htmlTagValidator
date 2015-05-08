@@ -1,23 +1,27 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     shell: {
+      options: {
+        failOnError: true
+      },
       pegjs: {
-        options: {
-          failOnError: true
-        },
         command: './node_modules/.bin/pegjs src/html-grammar.pegjs src/html-parser.js'
       },
-      mochaTest: {
+      test: {
         command: './node_modules/.bin/mocha test/index-spec.js --reporter="nyan"'
       },
-      mochaDebug: {
+      debug: {
         command: 'DEBUG=true ./node_modules/.bin/mocha test/index-spec.js --reporter="list"'
       }
     },
     watch: {
-      scripts: {
+      test: {
         files: ['Gruntfile.js', 'test/*.js', 'src/html-grammar.pegjs', 'test/html/*.html', 'index.js'],
-        tasks: ['default', 'mochaTest:test']
+        tasks: ['default', 'shell:test']
+      },
+      debug: {
+        files: ['Gruntfile.js', 'test/*.js', 'src/html-grammar.pegjs', 'test/html/*.html', 'index.js'],
+        tasks: ['default', 'shell:debug']
       }
     }
   });
@@ -29,6 +33,6 @@ module.exports = function(grunt) {
   // The default tasks to run when you type: grunt
   // grunt.registerTask('default', ['shell:pegjs', 'shell:browserify']);
   grunt.registerTask('default', ['shell:pegjs']);
-  grunt.registerTask('test', ['default', 'shell:mochaTest']);
-  grunt.registerTask('debug', ['default', 'shell:mochaDebug', 'watch']);
+  grunt.registerTask('test', ['default', 'shell:test']);
+  grunt.registerTask('debug', ['default', 'shell:debug', 'watch:debug']);
 };
