@@ -324,7 +324,7 @@ normal_tag "Tag"
   {
     var err, attrs, parts = [];
     if (!otn.back) {
-        return error("The " + otn.name + " element is missing part of its opening tag");
+        return error("The " + _u.htmlify(otn.name) + " element is missing part of its opening tag");
     } else if(!(ctn.front && ctn.back)) {
       // TODO: Find another solution without displaying unencoded brackets
       // if (!ctn.front) { parts.push('</'); }
@@ -428,11 +428,11 @@ tag_attribute_value_dblquote "Attribute Value (Double Quoted)"
 
 tag_attribute_value_dblquote_value
   = '"' v:([^"])* '"'
-  { return _u.textNode(v); }
+  { return { 'value': _u.textNode(v), 'unquoted': false }; }
 
 tag_attribute_value_dblquote_empty
   = '"' v:([\s])* '"'
-  { return ''; }
+  { return { 'value': '', 'unquoted': false }; }
 
 tag_attribute_value_singlequote "Attribute Value (Single Quoted)"
   =	tag_attribute_value_singlequote_empty
@@ -440,15 +440,15 @@ tag_attribute_value_singlequote "Attribute Value (Single Quoted)"
 
 tag_attribute_value_singlequote_value
   = "'" v:([^'])* "'"
-  { return _u.textNode(v); }
+  { return { 'value': _u.textNode(v), 'unquoted': false }; }
 
 tag_attribute_value_singlequote_empty
   = "'" v:([\s])* "'"
-  { return ''; }
+  { return { 'value': '', 'unquoted': false }; }
 
 tag_attribute_value_noquote "Attribute Value (Unquoted)"
-  = v:([^\=\'\"\<\>` ])+
-  { return _u.textNode(v); }
+  = v:([^ >])+
+  { return { 'value': _u.textNode(v), 'unquoted': true }; }
 
 tag_attribute_value "Attribute Value"
   = tag_attribute_value_dblquote
@@ -459,17 +459,25 @@ attr_assignment "Attribute Assignment"
   = s "=" s i:(tag_attribute_value)?
   {
     // NOTE: equal sign in <meta> tag attribute values, quotes in <style> tags
-    // var matches, allowed = /(&(?![^\s]+;)|[\'\"=<>`]+)/;
-    var matches, allowed = /(&(?![^\s]+;)|[<>`]+)/;
-    if(i === null) {
+    var matches, disallowed;
+    if(i == null) {
       return error("Found an attribute assignment \"=\" not followed by a value");
-    } else if (allowed.test(i)) {
+    } else {
       // TODO: Move this this check up to a place where tag name is available
       // TODO: & could be allowed in event attributes
-      matches = i.match(allowed);
-      return error("Disallowed character (" + _u.htmlify(matches[1]) + ") found in attribute value");
+      if (i.unquoted) {
+        // Note: https://html.spec.whatwg.org/multipage/syntax.html#attribute-value-(unquoted)-state
+        disallowed = /[ \f\n\r\t\v\/<>&"'`=]+/;
+      } else {
+        // Note: https://html.spec.whatwg.org/multipage/syntax.html#attribute-value-(double-quoted)-state
+        disallowed = /(&(?![^\s]+;)+)/;
+      }
+      if (disallowed.test(i.value)) {
+        matches = i.value.match(disallowed);
+        return error("Disallowed character (" + _u.htmlify(matches[0]) + ") found in attribute value");
+      }
     }
-    return i;
+    return i.value;
   }
 
 /* HTML text element*/
@@ -573,7 +581,7 @@ conditional_terminator
 
 /* Generic rules*/
 
-any
+any "Anything"
   = .
 
 char "Character"
