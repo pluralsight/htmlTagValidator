@@ -1,10 +1,10 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     shell: {
-      options: {
-        failOnError: true
-      },
       pegjs: {
+        options: {
+          failOnError: true
+        },
         command: './node_modules/.bin/pegjs src/html-grammar.pegjs src/html-parser.js'
       },
       test: {
