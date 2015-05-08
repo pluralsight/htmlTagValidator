@@ -12,7 +12,7 @@ describe('html-tag-validator', function() {
 
   it('basic div 3', function(done) {
     tree.error({
-      'message': "The div tag is missing part of its closing tag",
+      'message': "The div element is missing part of its closing tag",
       'line': 1,
       'column': 1
     }, this, done);
@@ -20,7 +20,7 @@ describe('html-tag-validator', function() {
 
   it('basic div 4', function(done) {
     tree.error({
-      'message': "The div tag is missing part of its closing tag",
+      'message': "The div element is missing part of its closing tag",
       'line': 1,
       'column': 6
     }, this, done);
@@ -150,6 +150,10 @@ describe('html-tag-validator', function() {
     tree.ok(this, done);
   });
 
+  it('malformed nested tag', function(done) {
+    tree.error("The p element is missing part of its opening tag", this, done);
+  });
+
   it('doctype', function(done) {
     tree.ok(this, done);
   });
@@ -183,6 +187,19 @@ describe('html-tag-validator', function() {
         },
         'nw-nav-item': {
           'normal': 'name'
+        }
+      }
+    }, done);
+  });
+
+  it('full featured test 3', function(done) {
+    tree.ok(this, {
+      'attributes': {
+        'table': {
+          'normal': ['align', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'frame', 'rules', 'summary', 'width']
+        },
+        'td': {
+          'normal': ['height', 'width', 'bgcolor']
         }
       }
     }, done);
