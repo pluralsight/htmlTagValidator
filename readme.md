@@ -208,13 +208,13 @@ var htmlTagValidator = require('html-tag-validator'),
 htmlTagValidator(sampleHtml, {
   'attributes': {
     'table': {
-    	'normal': [
+    'normal': [
         'align', 'bgcolor', 'border', 'cellpadding', 'cellspacing',
         'frame', 'rules', 'summary', 'width'
       ]
     },
     'td': {
-    	'normal': [
+    'normal': [
         'height', 'width', 'bgcolor'
       ]
     }
@@ -257,7 +257,7 @@ it('basic self closing', function(done) {
 // test/html/basicListItems.html
 it('basic list items', function(done) {
   tree.error({
-    'message': '<li> is not a valid self closing tag',
+    'message': 'li is not a valid self closing tag',
     'line': 5
   }, this, done);
 });
