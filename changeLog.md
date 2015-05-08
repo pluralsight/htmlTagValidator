@@ -2,6 +2,32 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased][unreleased]
+### Fixed
+- Quoted attribute values did not follow [HTML 5 spec](https://html.spec.whatwg.org/)
+- Unquoted attribute values did not follow [HTML 5 spec](https://html.spec.whatwg.org/)
+- HTML parser utilities missing function `findWhere()` used by `has()` function
+- Malformed starting tags gave wrong error message
+
+  ``` html
+  <div>
+    <p class
+    </p>
+  </div>
+  ```
+
+- Having HTML or XML elements inside of a conditional comment caused parse errors
+
+  ``` html
+  <!--[if ie]>
+    <style>
+      .breaking {
+        content: "whoops!";
+      }
+    </style>
+  <![endif]-->
+  ```
+
+- Grunt `test` and `debug` should only failOnError when running pegjs compiler
 
 ## [v1.0.4] - 2015-05-07
 ### Added
