@@ -173,7 +173,7 @@ describe('html-tag-validator', function() {
           'normal': ['align', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'frame', 'rules', 'summary', 'width']
         },
         'td': {
-          'normal': ['height', 'width', 'bgcolor']
+          'normal': ['align', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'height', 'width']
         }
       }
     }, done);
@@ -199,7 +199,7 @@ describe('html-tag-validator', function() {
           'normal': ['align', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'frame', 'rules', 'summary', 'width']
         },
         'td': {
-          'normal': ['height', 'width', 'bgcolor']
+          'normal': ['align', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'height', 'width']
         }
       }
     }, done);

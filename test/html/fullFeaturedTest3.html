@@ -16,24 +16,30 @@
       }
 
       @media screen and (max-width: 320px) {
+      .email-title {
+        font-size: 20px !important;
+        line-height: 30px !important;
+        padding-top: 15px !important; }
 
-        .email-title {
-          font-size: 20px !important;
-          line-height: 30px !important;
-          padding-top: 15px !important; }
-
-        .email-intro {
-          font-size: 14px !important;
-          line-height: 21px !important; }
-
+      .email-intro {
+        font-size: 14px !important;
+        line-height: 21px !important; }
       }
 
       @media screen and (min-width: 321px) and (max-width: 375px) {
-
         .email-title {
           font-size: 22px !important;
           line-height: 36px !important; }
+        }
 
+        .client-link a {
+          color: #3a383a !important;
+        }
+
+        td {
+          -ms-text-size-adjust:none;
+          -webkit -text-size-adjust:none;
+        }
       }
     </style>
     <!--[if gte mso 12]>
@@ -47,7 +53,12 @@
     <table border="0" cellpadding="0" cellspacing="0" style="background-color: #e4c59a; background-image: url('https://s3.amazonaws.com/unmasking-html-emails/bg.jpg');" width="100%">
       <tr>
         <td style="padding: 0 10px;">
-          <table align="center" border="0" cellpadding="0" cellspacing="0" class="width-full" width="600">
+          <!--[if (mso)|(IE)]>
+            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+              <tr>
+                <td>
+          <![endif]-->
+          <table align="center" border="0" cellpadding="0" cellspacing="0" class="width-full" style="max-width: 600px;" width="100%">
             <tr>
               <td>
                 <img alt="La Amor Peligrosa vs. La Fuega Fatal" src="https://s3.amazonaws.com/unmasking-html-emails/info.png" style="display: block; max-width: 100%;" width="600" />
@@ -64,87 +75,140 @@
               </td>
             </tr>
           </table>
-          <table align="center" border="0" cellpadding="0" cellspacing="0" class="width-full" width="600">
+          <!--[if (mso)|(IE)]>
+                </td>
+              </tr>
+            </table>
+          <![endif]-->
+
+          <table align="center" border="0" cellpadding="0" cellspacing="0" class="width-full" style="max-width: 600px;" width="100%">
             <tr>
-              <td class="stack-cell" style="padding-top: 15px;">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" style="text-align: center; text-transform: uppercase;" width="300">
-                  <tr>
-                    <td>
-                      <img alt="La Amor Peligrosa" src="https://s3.amazonaws.com/unmasking-html-emails/la-amor-peligrosa.png" style="display: block; max-width: 100%;" width="300" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="color: #b83466; font-family: Georgia, serif; font-size: 20px; font-weight: bold; line-height: 20px; padding-top: 5px;">
-                      Contender
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <table align="center" border="0" cellpadding="0" cellspacing="0" width="140">
-                        <tr>
-                          <td height="5" style="line-height: 5px;">&nbsp;</td>
-                        </tr>
-                        <tr>
-                          <td bgcolor="#902950" height="2" style="line-height: 2px;">&nbsp;</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="color: #902950; font-family: Georgia, serif; font-size: 20px; font-weight: bold; line-height: 20px; padding-top: 5px;">
-                      21-0-0
-                    </td>
-                  </tr>
-                </table>
-              </td>
-              <td class="stack-cell" style="padding-top: 15px;">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" style="text-align: center; text-transform: uppercase;" width="300">
-                  <tr>
-                    <td>
-                      <img alt="La Fuega Fatal" src="https://s3.amazonaws.com/unmasking-html-emails/la-fuega-fatal.png" style="display: block; max-width: 100%;" width="300" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="color: #c11e29; font-family: Georgia, serif; font-size: 20px; font-weight: bold; line-height: 20px; padding-top: 5px;">
-                      Champion
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <table align="center" border="0" cellpadding="0" cellspacing="0" width="120">
-                        <tr>
-                          <td height="5" style="line-height: 5px;">&nbsp;</td>
-                        </tr>
-                        <tr>
-                          <td bgcolor="#951720" height="2" style="line-height: 2px;">&nbsp;</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="color: #951720; font-family: Georgia, serif; font-size: 20px; font-weight: bold; line-height: 20px; padding-top: 5px;">
-                      23-0-0
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
+              <td style="font-size: 0; text-align: center;">
+                <div style="display: inline-block;">
+
+                  <table align="left" border="0" cellpadding="0" cellspacing="0" class="width-full" width="300">
+                    <tr>
+                      <td>
+
+                        <table border="0" cellpadding="0" cellspacing="0" style="text-align: center; text-transform: uppercase;" width="300">
+                          <tr>
+                            <td>
+                              <img alt="La Amor Peligrosa" src="https://s3.amazonaws.com/unmasking-html-emails/la-amor-peligrosa.png" style="display: block; max-width: 100%;" width="300" />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="color: #b83466; font-family: Georgia, serif; font-size: 20px; font-weight: bold; line-height: 20px; padding-top: 5px;">
+                              Contender
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table align="center" border="0" cellpadding="0" cellspacing="0" width="140">
+                                <tr>
+                                  <td height="5" style="line-height: 5px;"></td>
+                                </tr>
+                                <tr>
+                                  <td bgcolor="#902950" height="2" style="line-height: 2px;"></td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="color: #902950; font-family: Georgia, serif; font-size: 20px; font-weight: bold; line-height: 20px; padding-top: 5px;">
+                              21-0-0
+                            </td>
+                          </tr>
+                        </table>
+
+                      </td>
+                    </tr>
+                  </table>
+
+                </div>
+                <div style="display: inline-block;">
+
+                  <table align="left" border="0" cellpadding="0" cellspacing="0" class="width-full" width="300">
+                    <tr>
+                      <td>
+
+                        <table border="0" cellpadding="0" cellspacing="0" style="text-align: center; text-transform: uppercase;" width="300">
+                          <tr>
+                            <td>
+                              <img alt="La Fuega Fatal" src="https://s3.amazonaws.com/unmasking-html-emails/la-fuega-fatal.png" style="display: block; max-width: 100%;" width="300" />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="color: #c11e29; font-family: Georgia, serif; font-size: 20px; font-weight: bold; line-height: 20px; padding-top: 5px;">
+                              Champion
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table align="center" border="0" cellpadding="0" cellspacing="0" width="120">
+                                <tr>
+                                  <td height="5" style="line-height: 5px;">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                  <td bgcolor="#951720" height="2" style="line-height: 2px;">&nbsp;</td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="color: #951720; font-family: Georgia, serif; font-size: 20px; font-weight: bold; line-height: 20px; padding-top: 5px;">
+                              23-0-0
+                            </td>
+                          </tr>
+                        </table>
+
+                      </td>
+                    </tr>
+                  </table>
+
+                </div>
+              </td></tr>
           </table>
-          <table align="center" border="0" cellpadding="0" cellspacing="0" class="width-full" width="600">
+
+          <table align="center" border="0" cellpadding="0" cellspacing="0" class="width-full" style="max-width: 600px;" width="100%">
             <tr>
-              <td>
+              <td style="padding-top: 30px; text-align: center;">
                 <div>
                   <!--[if mso]>
                     <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="http://buttons.cm" style="height:50px;v-text-anchor:middle;width:240px;" arcsize="8%" strokecolor="#000000" fillcolor="#3a383a">
                       <w:anchorlock/>
-                      <center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Buy Tickets</center>
+                      <center style="color:#ffffff;font-family:Georgia,serif;font-size:20px;font-weight:bold;">Buy Tickets</center>
                     </v:roundrect>
                   <![endif]-->
-                  <a href="http://buttons.cm" style="background-color:#3a383a;border:1px solid #000000;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:50px;text-align:center;text-decoration:none;width:240px;-webkit-text-size-adjust:none;mso-hide:all;">Buy Tickets</a>
+                  <a href="http://buttons.cm" style="background-color:#3a383a;border:1px solid #000000;border-radius:4px;color:#ffffff;display:inline-block;font-family:Georgia,serif;font-size:20px;font-weight:bold;line-height:50px;text-align:center;text-decoration:none;width:240px;mso-hide:all;">Buy Tickets</a>
                 </div>
               </td>
             </tr>
           </table>
+
+          <table align="center" border="0" cellpadding="0" cellspacing="0" class="width-full" style="max-width: 600px;" width="100%">
+            <tr>
+                <td align="center" style="color: #3a383a; font-family: Georgia, serif; font-size: 18px; font-weight: bold; line-height: 18px; padding-top: 20px;">
+                  Or, call <span class="client-link">+90 12 3456 7890</span>
+                </td>
+              </tr>
+            <tr>
+              <td align="center" style="color: #545154; font-family: Georgia, serif; font-size: 12px; padding-top: 40px;">
+                No mas? <a href="http://example.org" style="color: #545154;">Unsubscribe</a>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="color: #545154; font-family: Georgia, serif; font-size: 12px; padding: 15px 0;">
+                Av. de las Street No. 123
+                <br />
+                Azcapotzalco Santa Barbara
+                <br />
+                01234 Ciudad de México
+                <br />
+                D.F. Mexico
+              </td>
+            </tr>
+          </table>
+
         </td>
       </tr>
     </table>
