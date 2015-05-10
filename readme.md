@@ -4,6 +4,10 @@ This library takes some HTML source code, provided as a string, and generates an
 AST. An error will be generated describing what is malformed in the source document
 if the AST cannot be generated.
 
+Note: this project is work-in-progress and is **not fully spec-compliant**.
+
+See `todo.md` for plans for current and future releases.
+
 The parser implements the basic components of the HTML 5 spec, such as:
  - `doctype` definition
  - HTML 5 elements
@@ -29,28 +33,24 @@ The parser implements the basic components of the HTML 5 spec, such as:
     ```
 
  - Allowed `<input>` element `type` values and the attributes supported by each `type`
- - Hierarchal rules, such as: a properly-formed HTML 5 document should have a `<title>` element with contents
- - Void elements
+ - Hierarchal rules, such as: a properly-formed HTML 5 document should have a `title` element with contents within the `head` tag
+ - Void *elements*
 
   ``` html
   <img src="cat.gif">
   ```
 
- - Void elements
+ - Void *attributes*
 
   ``` html
   <script async></script>
   ```
 
- - Normal elements
+ - Normal *attributes*
 
    ``` html
    <p class="foo"></p>
    ```
-
-Note: this project is work-in-progress and is **not fully spec-compliant**.
-
-See `todo.md` for plans for current and future releases
 
 ## Install
 
