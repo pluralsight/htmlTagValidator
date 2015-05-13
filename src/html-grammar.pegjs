@@ -2,14 +2,18 @@
 {
       // Parser utilities
   var _u = require('./html-parser-util'),
+      esc = _u.escape,
       // Codex of tag and attribute names
-      codex = _u.initializeOptions(require('./html-grammar-codex'), options);
+      codex = require('./html-grammar-codex')(options);
+
+  // Set error encoding
+  _u.setFormat(codex);
 
   // Verification Functions
 
   function isSelfClosing(tag) {
     var path = 'tags/void',
-        tags = _u.option(path);
+        tags = _u.option(path, null, codex);
     return tags != null ? _u.customTest.apply(this, [path, tags, [tag]]) : false;
   }
 
@@ -21,7 +25,7 @@
         };
 
     // Find the rules for this tag in the options
-    props = _u.option('attributes', [tag, '_']);
+    props = _u.option('attributes', [tag, '_'], codex);
 
     // Do not continue unless attribute options exist for this tag
     if (props == null) { return true; }
@@ -30,28 +34,35 @@
       The tag is allowed if it:
       a) exists in normal and has any value,
       b) exists in void and has no value,
-      c) or exists in mixed and has any or no value
+      c) exists in mixed and has any or no value
+      d) exists in conditional if conditions are met
     */
     if (_u.has(props, 'normal') && attrTest('normal')) {
       if (value == null) {
         return {
-          'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute requires a value"
+          'error': "The " + esc(tag) + " tag " + esc.attr(attribute) +
+                   " attribute requires a value"
         };
       }
       return true;
     } else if (_u.has(props, 'void') && attrTest('void')) {
       if (value != null) {
         return {
-          'error': "The " + _u.htmlify(tag) + " tag " + _u.htmlify(attribute) + " attribute should not have a value"
+          'error': "The " + esc(tag) + " tag " + esc.attr(attribute) +
+                   " attribute should not have a value"
         };
       }
       return true;
     } else if (_u.has(props, 'mixed') && attrTest('mixed')) {
       return true;
+    } else if (_u.has(props, 'conditional') && attrTest('conditional')) {
+      // Does not need to be evaluated further here
+      return true;
     }
 
     return {
-      'error': "The " + _u.htmlify(tag) + " tag does not have a " + _u.htmlify(attribute) + " attribute"
+      'error': "The " + esc(tag) + " tag does not have a " +
+               esc.attr(attribute) + " attribute"
     };
   }
 
@@ -64,13 +75,14 @@
     for (i = 0, len = names.length; i < len; i++) {
       if (/[\/\>\"\'\= ]/.test(names[i])) {
         return {
-          'error': 'The ' + _u.htmlify(tag) + ' element has an attribute (' + _u.htmlify(names[i]) + ') with an invalid name'
+          'error': 'The ' + esc(tag) + ' element has an attribute ' +
+                   esc.attr(names[i]) + ' with an invalid name'
         };
       }
     }
 
     // If the tag is not in the codex then allow anything
-    props = _u.option('attributes', [tag, '_']);
+    props = _u.option('attributes', [tag, '_'], codex);
 
     if (props == null) { return ok; }
 
@@ -79,10 +91,12 @@
       ref = props['required'];
       for (i = 0, len = ref.length; i < len; i++) {
         req = ref[i];
-        if ((rule = _u.customTest.apply(this, ['attributes/required', req, [attributes, contents]])) !== true) {
+        rule = _u.customTest.apply(this, ['attributes/required', req, [attributes, contents]]);
+        if (rule !== true) {
           if (rule === false) {
             return {
-              'error': "The " + _u.htmlify(tag) + " tag must include a " + _u.htmlify(req) + " attribute"
+              'error': "The " + esc(tag) + " tag must include a " + esc.attr(req) +
+                       " attribute"
             };
           } else {
             return rule;
@@ -101,9 +115,19 @@
 
     // Run any custom validation rules that exist
     if (_u.has(props, 'rules') && props['rules'] != null) {
-      rule = _u.customTest.apply(this, ['attributes/rules', props['rules'], [attributes, contents, _u]]);
+      rule = _u.customTest.apply(this, ['attributes/rules', props['rules'], [attributes, contents, _u, codex]]);
       if (_u.has(rule, 'error')) {
         return rule;
+      }
+    }
+
+    // Check conditional attributes
+    if (_u.has(props, 'conditional')) {
+      ref = props['conditions'];
+      for (i = 0, len = ref.length; i < len; i++) {
+        if (_u.isFunc(ref[i]) && (rule = ref[i].apply(this, [attributes, _u, codex])) !== true) {
+          return rule;
+        }
       }
     }
 
@@ -114,11 +138,13 @@
     var attrs = checkAttributes(sot.name, sot.attributes, sc);
     if (sct === null) {
       return {
-        'error': "Found open " + _u.htmlify(sot.name) + " tag without closing " + _u.htmlify(sot.name) + " tag"
+        'error': "Found an open " + esc(sot.name) + " tag without a closing " +
+                 esc(sot.name) + " tag"
       };
     } else if (sot.name !== sct.name) {
       return {
-        'error': "Expected open tag " + _u.htmlify(sot.name) + " to match closing tag " + _u.htmlify(sct.name) + ""
+        'error': "Expected open tag " + esc(sot.name) + " to match closing tag " +
+                 esc(sct.name) + ""
       };
     } else if (attrs.error != null) {
       return attrs;
@@ -141,11 +167,13 @@
         countTitle = _u.countWhere(children, {'type': 'title'});
         if (countTitle < 1) {
           return {
-            'error': "The document will not validate as HTML if you omit the title tag in the document head section"
+            'error': "The document will not validate as HTML if you omit the " +
+                     esc('title') + " tag in the document " + esc('head') + " section"
           };
         } else if (countTitle > 1) {
           return {
-            'error': "You can not have more than one title element in an HTML document"
+            'error': "You can not have more than one " +
+                     esc('title') + " element in an HTML document"
           };
         }
         break;
@@ -154,13 +182,15 @@
           countLink = _u.countWhere(children, {'type': 'element', 'name': 'link'});
           if (countLink > 0) {
             return {
-              'error': "The link element goes only in the head section of an HTML document"
+              'error': "The " + esc('link') + " element goes only in the " +
+                       esc('head') + " section of an HTML document"
             };
           }
           countMeta = _u.countWhere(children, {'type': 'element', 'name': 'meta'});
           if (countMeta > 0) {
             return {
-              'error': "The meta element goes only in the head section of an HTML document"
+              'error': "The " + esc('meta') + " element goes only in the " +
+                       esc('head') + " section of an HTML document"
             };
           }
           // Process one level deep so that trace is as accurate as possible
@@ -171,7 +201,9 @@
             return false;
           }) !== undefined) {
             return {
-              'error': "If the scoped attribute is not used, each style tag must be located in the head section"
+              'error': "If the " + esc.attr('scoped') + " attribute is not used, each " +
+                       esc('style') + " tag must be located in the " +
+                       esc('head') + " section"
             };
           }
         }
@@ -211,11 +243,13 @@ doctype "HTML DOCTYPE"
         };
       }
       return {
-        'error': "The DOCTYPE definition for an HTML 5 document should be \"html\""
+        'error': "The " + esc('DOCTYPE') +
+                 " definition for an HTML 5 document should be " + esc.val('html')
       };
     }
     return {
-      'error': "The DOCTYPE definition must be placed at the beginning of the first line of the document"
+      'error': "The " + esc('DOCTYPE') +
+               " definition must be placed at the beginning of the first line of the document"
     };
   }
 
@@ -324,17 +358,17 @@ normal_tag "Tag"
   {
     var err, attrs, parts = [];
     if (!otn.back) {
-        return error("The " + _u.htmlify(otn.name) + " element is missing part of its opening tag");
+        return error("The " + esc(otn.name) + " element is missing part of its opening tag");
     } else if(!(ctn.front && ctn.back)) {
       // TODO: Find another solution without displaying unencoded brackets
       // if (!ctn.front) { parts.push('</'); }
       // if (!ctn.back) { parts.push('>'); }
       // return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
-      return error("The " + _u.htmlify(otn.name) + " element is missing part of its closing tag");
+      return error("The " + esc(otn.name) + " element is missing part of its closing tag");
     } else if (otn.name !== ctn.name) {
-      return error("Expected open tag " + _u.htmlify(otn.name) + " to match closing tag " + _u.htmlify(ctn.name) + "");
+      return error("Expected open tag " + esc(otn.name) + " to match closing tag " + esc(ctn.name) + "");
     } /*else if (isSelfClosing(otn.name)) {
-      return error("The " + _u.htmlify(otn.name) + " tag is a void element and should not have a closing tag");
+      return error("The " + esc(otn.name) + " tag is a void element and should not have a closing tag");
     }*/ else if (_u.has(attrs = checkAttributes(otn.name, otn.attributes, c), 'error')) {
       return error(attrs.error);
     } else if ((err = isValidChildren(otn.name, otn.attributes, c)) !== true) {
@@ -354,9 +388,9 @@ self_closing_tag "Self-closing Tag"
   {
     var attrs;
     if (!ot.back) {
-      return error("The " + _u.htmlify(ot.name) + " element is missing part of its opening tag");
+      return error("The " + esc(ot.name) + " element is missing part of its opening tag");
     } else if(!isSelfClosing(ot.name)) {
-      return error("" + _u.htmlify(ot.name) + "" + " is not a valid self closing tag");
+      return error("" + esc(ot.name) + "" + " is not a valid self closing tag");
     }
 
     if (false && ot.closing !== null) {
@@ -364,7 +398,7 @@ self_closing_tag "Self-closing Tag"
       TODO: Note - This is where you would toggle on/off the error thrown when using the XHTML
             method of a self-closing tag.
       */
-      return error("The XHTML self-closing tag format for " + _u.htmlify(ot.name) + " is not allowed in HTML 5");
+      return error("The XHTML self-closing tag format for " + esc(ot.name) + " is not allowed in HTML 5");
     } else if (_u.has(attrs = checkAttributes(ot.name, ot.attributes), 'error')) {
       return error(attrs.error);
     }
@@ -461,7 +495,7 @@ attr_assignment "Attribute Assignment"
     // NOTE: equal sign in <meta> tag attribute values, quotes in <style> tags
     var matches, disallowed;
     if(i == null) {
-      return error("Found an attribute assignment \"=\" not followed by a value");
+      return error("Found an attribute assignment " + esc.val('=') + " not followed by a value");
     } else {
       // TODO: Move this this check up to a place where tag name is available
       // TODO: & could be allowed in event attributes
@@ -474,7 +508,7 @@ attr_assignment "Attribute Assignment"
       }
       if (disallowed.test(i.value)) {
         matches = i.value.match(disallowed);
-        return error("Disallowed character (" + _u.htmlify(matches[0]) + ") found in attribute value");
+        return error("Disallowed character " + esc.val(matches[0]) + " found in attribute value");
       }
     }
     return i.value;
@@ -497,7 +531,7 @@ comment "Block Comment"
   = comment_open com:(comment_content) cc:(comment_close)?
   {
     if (cc === null) {
-      return error('Unterminated HTML comment detected');
+      return error('Found an open HTML comment tag without a closing tag');
     }
     return com;
   }
@@ -517,7 +551,7 @@ comment_block
   {
     var tn = cb !== null ? _u.textNode(cb) : '';
     if(tn.indexOf('--') !== -1) {
-      return error("Cannot have two or more consecutive hyphens inside of a block comment");
+      return error("Cannot have two or more consecutive hyphens " + esc.val('--') + " inside of a block comment");
     }
     return {
       'type': 'comment',

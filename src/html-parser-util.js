@@ -1,36 +1,47 @@
 // Utility Functions
 var slice = [].slice;
 
+var _lookups = {
+  'format': {
+    // Render as plain text
+    'plain':      _plainify,
+    // Render as escaped HTML
+    'html':       _htmlify,
+    // Render as markdown
+    'markdown':   _markdownify
+  }
+};
+
 function safe(obj) {
   // If it is not a string or array, is it not safe
   return ((isArray(obj) || isString(obj)) ? obj : []);
 }
 
-function str(obj) {
+function typed(obj) {
   return Object.prototype.toString.call(obj);
 }
 
 function isPlain(obj) {
-  return str(obj) === "[object Object]";
+  return typed(obj) === "[object Object]";
 }
 
 function isPattern(obj) {
-  return str(obj) === "[object RegExp]";
+  return typed(obj) === "[object RegExp]";
 }
 
 function isFunc(obj) {
-  return str(obj) === "[object Function]";
+  return typed(obj) === "[object Function]";
 }
 
 function isString(obj) {
-  return str(obj) === "[object String]";
+  return typed(obj) === "[object String]";
 }
 
 function isArray(obj) {
   if (Array.isArray) {
     return Array.isArray(obj);
   }
-  return str(obj) === "[object Array]";
+  return typed(obj) === "[object Array]";
 }
 
 function isOkay(obj) {
@@ -96,7 +107,7 @@ function collapse(arr) {
   }
 }
 
-function mergeOptions(base, user) {
+function mergeOptions(base, user, merge) {
   var k, v, k2, v2;
   for (k in user) {
     v = user[k];
@@ -104,36 +115,42 @@ function mergeOptions(base, user) {
       // special magic to apply _ to all things at current level
       for (k2 in base) {
         v2 = base[k2];
-        base[k2] = mergeOptions(v2, v);
+        base[k2] = mergeOptions(v2, v, merge);
       }
     } else if (isPlain(v)) {
       if (!has(base, k)) {
         base[k] = {};
       }
-      base[k] = mergeOptions(base[k], v);
+      base[k] = mergeOptions(base[k], v, merge);
     } else {
-      if (!has(base, k)) {
-        base[k] = [];
-      }
-      if (!isArray(base[k])) {
-        base[k] = [base[k]];
-      }
-      if (isArray(v)) {
-        base[k] = slice.call(base[k]).concat(slice.call(v));
+      if (merge) {
+        // Merge options
+        if (!has(base, k)) {
+          base[k] = [];
+        }
+        if (!isArray(base[k])) {
+          base[k] = [base[k]];
+        }
+        if (isArray(v)) {
+          base[k] = slice.call(base[k]).concat(slice.call(v));
+        } else {
+          base[k].push(v);
+        }
       } else {
-        base[k].push(v);
+        // Replace options
+        base[k] = v;
       }
     }
   }
   return base;
 }
 
-function desugar(base, root) {
-  var k, v;
+function desugar(base, root, branch) {
+  var k, v, pattern, regexSugar = /[\*\+]/g, regexEscape = /[\-\[\]\(\)]/g;
   for (k in base) {
     v = base[k];
     if (isPlain(v)) {
-      base[k] = desugar(v, root);
+      base[k] = desugar(v, root, branch);
     } else {
       if (!isArray(v)) {
         v = [v];
@@ -142,12 +159,15 @@ function desugar(base, root) {
         var path;
         if (isString(elem)) {
           // Try to resolve as a location
-          path = resolve(elem, root);
-          if (path !== false) {
-            return path;
-          } else if (elem.indexOf('*') !== -1) {
+          if (/(^[_$]$)|([\S]\/[\S])/.test(elem)) {
+            path = resolve(elem.toLowerCase().replace(branch + '/', ''), root);
+            if (path !== false) {
+              return path;
+            }
+          } else if (regexSugar.test(elem)) {
             // Convert to regular expression
-            return new RegExp(elem.replace(/[\-\[\]\(\)]/g, "\\$&"), 'i');
+            pattern = '^' + elem.replace(regexSugar, '.$&').replace(regexEscape, '\\$&') + '$';
+            return new RegExp(pattern, 'i');
           }
         }
         return elem;
@@ -175,16 +195,8 @@ function resolve(path, root) {
   return base;
 }
 
-function initializeOptions(codx, opts) {
-  if (!isPlain(opts)) { opts = {}; }
-  var res = mergeOptions(codx, opts),
-      desugared = desugar(res, res);
-  return option._options = desugared;
-}
-
 function option(path, sequence, base) {
-  var start = base != null ? base : option._options,
-      resolved = resolve(path, start),
+  var resolved = resolve(path, base),
       i, len, chunk, found = false;
   if (sequence != null) {
     if (!isArray(sequence)) { sequence = [sequence]; }
@@ -227,19 +239,20 @@ function customTest(name, test, args) {
     };
   } else if (isString(test)) {
     tester = function () {
+      var testTag = tagify(test);
       if (isPlain(args[0])) {
         args[0] = Object.keys(args[0]);
       }
       if (isArray(args[0])) {
         return find(args[0], function (a) {
-          return tagify(a) === tagify(test);
+          return tagify(a) === testTag;
         }) != null;
       }
-      return args[0] === tagify(test);
+      return args[0] === testTag;
     };
   } else {
     return {
-      'error': "Invalid " + htmlify(name) + " overrides specified in options object"
+      'error': "Invalid " + escapeId(name) + " overrides specified in options object"
     };
   }
 
@@ -253,10 +266,10 @@ function find(arr, predicate) {
   if (!isFunc(predicate)) {
     throw new TypeError('find() predicate must be a function');
   }
-  var list = Object(arr);
-  var length = list.length >>> 0;
-  var thisArg = arguments[2];
-  var value;
+  var list = Object(arr),
+      length = list.length >>> 0,
+      thisArg = arguments[2],
+      value;
 
   for (var i = 0; i < length; i++) {
     value = list[i];
@@ -265,7 +278,7 @@ function find(arr, predicate) {
     }
   }
   return undefined;
-};
+}
 
 function countWhere(arr, props) {
   var count, i, len, val;
@@ -277,7 +290,7 @@ function countWhere(arr, props) {
     }
   }
   return count;
-};
+}
 
 function findWhere(arr, props) {
   var i, len, val;
@@ -288,7 +301,7 @@ function findWhere(arr, props) {
     }
   }
   return null;
-};
+}
 
 function nodeToString(node) {
   var elem = safe(node);
@@ -321,19 +334,6 @@ function scriptify(elem) {
   return textNode(res) !== '' ? res : null;
 }
 
-function htmlify(elem) {
-  /*
-   * A htmlified string has
-   * - html-safe '&' symbol as '&amp;'
-   * - html-safe '< symbol as '&lt;'
-   * - html-safe '>' symbol as '&gt;'
-   */
-  return nodeToString(elem)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
 function tagify(elem) {
   /*
    * A tagified string has
@@ -344,6 +344,105 @@ function tagify(elem) {
   return textNode(elem).toLowerCase();
 }
 
+// Escaping error messages
+
+function escapeAttr(str) {
+  return _format(str, 'a');
+}
+
+function escapeVal(str) {
+  return _format(str, 'v');
+}
+
+function escapeId(str) {
+  return _format(str, 'n');
+}
+
+function setFormat(codx) {
+  var frmt = option('settings', 'format', codx);
+  if (isPlain(frmt)) {
+    // TODO: allow for custom func for each formatting function
+  } else if (!has(_lookups['format'], frmt)) {
+    // String name not found for format options, use 'plain'
+    frmt = 'plain';
+  }
+  _format._func = _lookups['format'][frmt];
+}
+
+function _format(str, type) {
+  /*
+   * Format an identifier for an error message based on the current
+   * setting for output
+   */
+  return _format._func(str, type);
+}
+// TODO: Need to move this out of util library
+_format._func = null;
+
+function escape(str) {
+  return _format(str, 'n');
+}
+
+escape.value      = escape.val  = escapeVal;
+escape.name       = escape.id   = escapeId;
+escape.attribute  = escape.attr = escapeAttr;
+
+function _plainify(elem, type) {
+  /*
+   * A plainified string has
+   * - quoted attribute values
+   * - plain, lowercased attribute names
+   * - plain, lowercased element names
+   */
+  return _plainify._rules[type](nodeToString(elem));
+}
+
+_plainify._rules = {
+ 'n': function ($1) { return $1.toLowerCase(); },
+ 'a': function ($1) { return $1.toLowerCase(); },
+ 'v': function ($1) { return '"' + $1 + '"'; }
+};
+
+function _htmlify(elem, type) {
+  /*
+   * A htmlified string has
+   * - html-safe:
+   *  - '&' symbol as '&amp;'
+   *  - '< symbol as '&lt;'
+   *  - '>' symbol as '&gt;'
+   *  - '"' symbol as '&quot;'
+   * - quoted attribute values
+   * - plain, uppercased element names
+   * - plain, lowercased attribute names
+   */
+  return _htmlify._rules[type](elem, type)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+_htmlify._rules = {
+ 'n': function ($1) { return $1.toUpperCase(); },
+ 'a': function ($1) { return $1.toLowerCase(); },
+ 'v': function ($1) { return '"' + $1 + '"'; }
+};
+
+function _markdownify(elem, type) {
+  /*
+   * A markdownified string has
+   * - code fragment attribute values
+   * - bolded, uppercased element names
+   * - italicised, lowercased attribute names
+   */
+  return _markdownify._rules[type](textNode(elem));
+}
+
+_markdownify._rules = {
+  'n': function ($1) { return "**" + $1 + "**".toUpperCase(); },
+  'a': function ($1) { return "*" + $1 + "*".toLowerCase(); },
+  'v': function ($1) { return "`" + $1 + "`".toUpperCase(); }
+};
 
 module.exports = {
   // Array methods
@@ -354,12 +453,14 @@ module.exports = {
   'countWhere': 					countWhere,
   // String methods
   'nodeToString':					nodeToString,
-  'htmlify':							htmlify,
   'textNode':							textNode,
   'scriptify':						scriptify,
   'tagify':								tagify,
+  // Error rendering string methods
+  'setFormat':            setFormat,
+  'escape':               escape,
   // Type detection
-  'str': 									str,
+  'typed': 								typed,
   'isPlain': 							isPlain,
   'isPattern': 						isPattern,
   'isFunc': 							isFunc,
@@ -372,7 +473,6 @@ module.exports = {
   'mergeOptions': 				mergeOptions,
   'desugar': 							desugar,
   'resolve': 							resolve,
-  'initializeOptions': 		initializeOptions,
   'option':	 							option,
   'customTest': 					customTest
 };
