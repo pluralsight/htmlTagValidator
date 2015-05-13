@@ -3,11 +3,13 @@ var expect            = require('chai').expect
 
 describe('html-tag-validator', function() {
   it('basic div', function(done) {
-    tree.ok(this, done);
+    var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"p","attributes":{"class":"string class names","data-quote":"tagvalue"},"children":[{"type":"text","contents":"simple content"}]}]}';
+    tree.equals(resultTree, this, done);
   });
 
   it('basic div 2', function(done) {
-    tree.ok(this, done);
+    var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"div","attributes":{"class":"main wrapper main-head"},"children":[{"type":"element","void":false,"name":"p","attributes":{"class":"single-quote"},"children":[{"type":"text","contents":"This is our footer"}]},{"type":"element","void":false,"name":"h1","attributes":{"class":"test"},"children":[]}]}]}';
+    tree.equals(resultTree, this, done);
   });
 
   it('basic div 3', function(done) {
@@ -31,15 +33,18 @@ describe('html-tag-validator', function() {
   });
 
   it('anchor tags', function(done) {
-    tree.ok(this, done);
+    var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"a","attributes":{"id":"top"},"children":[]},{"type":"element","void":false,"name":"div","attributes":{},"children":[{"type":"element","void":false,"name":"ul","attributes":{},"children":[{"type":"element","void":false,"name":"li","attributes":{},"children":[{"type":"element","void":false,"name":"a","attributes":{"href":"http://www.google.com"},"children":[{"type":"text","contents":"Google"}]}]},{"type":"element","void":false,"name":"li","attributes":{},"children":[{"type":"element","void":false,"name":"a","attributes":{"href":"mailto:blastingoff@codeschool.com"},"children":[{"type":"text","contents":"Bug Us"}]}]},{"type":"element","void":false,"name":"li","attributes":{},"children":[{"type":"element","void":false,"name":"a","attributes":{"href":"#top"},"children":[{"type":"text","contents":"Go to top"}]}]}]}]}]}';
+    tree.equals(resultTree, this, done);
   });
 
   it('basic document', function(done) {
-    tree.ok(this, done);
+    var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"html","attributes":{},"children":[{"type":"element","void":false,"name":"head","attributes":{},"children":[{"type":"title","attributes":{},"contents":"hello world"}]},{"type":"element","void":false,"name":"body","attributes":{},"children":[{"type":"element","void":false,"name":"p","attributes":{"style":"color: pink;"},"children":[{"type":"text","contents":"my cool page"}]}]}]}]}';
+    tree.equals(resultTree, this, done);
   });
 
   it('basic angular', function(done) {
-    tree.ok(this, {
+    var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"html","attributes":{"data-at2tr":"yaydata"},"children":[{"type":"element","void":false,"name":"head","attributes":{},"children":[{"type":"title","attributes":{},"contents":"my title"}]},{"type":"element","void":false,"name":"body","attributes":{"data-something":"yaydata"},"children":[{"type":"element","void":false,"name":"div","attributes":{"class":"main"},"children":[{"type":"element","void":false,"name":"h1","attributes":{"id":"main-head","title":"this is the hello world example"},"children":[{"type":"text","contents":"Hello you"}]},{"type":"element","void":false,"name":"button","attributes":{"(click)":"handleClick($event)"},"children":[]},{"type":"element","void":false,"name":"p","attributes":{"[innerhtml]":"model.body","data-complex":"tagvalue"},"children":[{"type":"text","contents":"Hello world"},{"type":"element","void":false,"name":"strong","attributes":{},"children":[{"type":"text","contents":"I\'m bold!"}]},{"type":"text","contents":"Yes you are"}]}]},{"type":"element","void":true,"name":"input","attributes":{"type":"checkbox","checked":"checked"},"children":[]}]}]}]}';
+    tree.equals(resultTree, this, {
       'attributes': {
         '_': {
          'mixed': /^((ng\-)|(^\[[\S]+\]$)|(^\([\S]+\)$))/
@@ -48,8 +53,12 @@ describe('html-tag-validator', function() {
     }, done);
   });
 
-  it('basic self closing', function(done) {
-    tree.ok(this, done);
+  it('invalid input attribute', function(done) {
+    tree.error("An input tag does not allow the value \"beez\" for the type attribute", this, done);
+  });
+
+  it('invalid input attribute 2', function(done) {
+    tree.error("An input tag cannot have the list attribute when its type is set to \"radio\"", this, done);
   });
 
   it('invalid self closing', function(done) {
@@ -83,11 +92,11 @@ describe('html-tag-validator', function() {
   });
 
   it('malformed attribute 3', function (done) {
-    tree.error("The div element has an attribute (\"a\") with an invalid name", this, done);
+    tree.error("The div element has an attribute \"a\" with an invalid name", this, done);
   });
 
   it('malformed class value', function(done) {
-    tree.error("Disallowed character (&lt;) found in attribute value", this, done);
+    tree.error("Disallowed character "<" found in attribute value", this, done);
   });
 
   it('mismatched tags', function(done) {
@@ -99,7 +108,7 @@ describe('html-tag-validator', function() {
   });
 
   it('malformed comment', function(done) {
-    tree.error("Cannot have two or more consecutive hyphens inside of a block comment", this, done);
+    tree.error("Cannot have two or more consecutive hyphens \"--\" inside of a block comment", this, done);
   });
 
   it('html comment conditional', function(done) {
@@ -107,7 +116,7 @@ describe('html-tag-validator', function() {
   });
 
   it('html comment unclosed', function(done) {
-    tree.error("Unterminated HTML comment detected", this, done);
+    tree.error("Found an open HTML comment tag without a closing tag", this, done);
   });
 
   it('malformed conditional comment', function(done) {
@@ -127,11 +136,11 @@ describe('html-tag-validator', function() {
   });
 
   it('malformed script', function(done) {
-    tree.error("Found open script tag without closing script tag", this, done);
+    tree.error("Found an open script tag without a closing script tag", this, done);
   });
 
   it('malformed script 2', function(done) {
-    tree.error("A script tag with a src attribute cannot have contents between the start and end tags", this, done);
+    tree.error("A script tag with a src attribute cannot have content between the start and end tags", this, done);
   });
 
   it('invalid script attribute', function(done) {
@@ -159,11 +168,11 @@ describe('html-tag-validator', function() {
   });
 
   it('invalid doctype', function(done) {
-    tree.error("The DOCTYPE definition for an HTML 5 document should be \"html\"", this, done);
+    tree.error("The doctype definition for an HTML 5 document should be \"html\"", this, done);
   });
 
   it('invalid doctype 2', function(done) {
-    tree.error("The DOCTYPE definition must be placed at the beginning of the first line of the document", this, done);
+    tree.error("The doctype definition must be placed at the beginning of the first line of the document", this, done);
   });
 
   it('full featured test', function(done) {
@@ -203,5 +212,36 @@ describe('html-tag-validator', function() {
         }
       }
     }, done);
+  });
+  // TODO: spec for wildcard attribute in options object
+
+  describe('plain formatting', function () {
+    it('error formatting', function(done) {
+      tree.error("Disallowed character \"&\" found in attribute value", this, {
+        'settings': {
+          'format': 'plain'
+        }
+      }, done);
+    });
+  });
+
+  describe('html formatting', function () {
+    it('error formatting', function(done) {
+      tree.error("Disallowed character &quot;&amp;&quot; found in attribute value", this, {
+        'settings': {
+          'format': 'html'
+        }
+      }, done);
+    });
+  });
+
+  describe('markdown formatting', function () {
+    it('error formatting', function(done) {
+      tree.error("Disallowed character `&` found in attribute value", this, {
+        'settings': {
+          'format': 'markdown'
+        }
+      }, done);
+    });
   });
 });
