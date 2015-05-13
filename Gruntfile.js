@@ -8,19 +8,23 @@ module.exports = function(grunt) {
         command: './node_modules/.bin/pegjs src/html-grammar.pegjs src/html-parser.js'
       },
       test: {
+        options: {
+          failOnError: true
+        },
         command: './node_modules/.bin/mocha test/index-spec.js --reporter="nyan"'
       },
       debug: {
+        options: {
+          failOnError: false,
+          debounceDelay: 2000,
+          forever: true
+        },
         command: 'DEBUG=true ./node_modules/.bin/mocha test/index-spec.js --reporter="list"'
       }
     },
     watch: {
-      test: {
-        files: ['Gruntfile.js', 'test/*.js', 'src/html-grammar.pegjs', 'test/html/*.html', 'index.js'],
-        tasks: ['default', 'shell:test']
-      },
       debug: {
-        files: ['Gruntfile.js', 'test/*.js', 'src/html-grammar.pegjs', 'test/html/*.html', 'index.js'],
+        files: ['Gruntfile.js', 'test/*.js', 'src/*.js', 'src/*.pegjs', 'test/html/*.html', 'index.js'],
         tasks: ['default', 'shell:debug']
       }
     }
