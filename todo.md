@@ -18,10 +18,15 @@
   - [x] Create documentation for 0.2.x release
   - [x] Correct attribute validation for `input` tags based on `type`
 - [ ] **[1.1.x]** Planned
-  - [ ] More accurate HTML 5 spec compliance for `type: 'element'` tags
-  - [ ] Add `settings` block to options object to toggle global settings
-  - [ ] Have strict and non-strict attribute and tag modes
+  - [x] Add `settings` block to options object to toggle global settings
+    - [ ] Have strict and non-strict attribute and tag modes
+      - [ ] Have rule for handling unknown tags
+    - [ ] Have replacement vs merge setting for custom attributes
+    - [x] Have adapter settings for error format
+    - [ ] Update readme to contain descriptions of new settings
+  - [x] Create `conditional` and `conditions` in `attributes` (`options` object) to handle allowed attributes changing based on the value of another attribute in the tag (e.g.: `input` element)
 - [ ] **[1.2.x]** Planned
+  - [ ] More accurate HTML 5 spec compliance for `type: 'element'` tags
   - [ ] Allow plugins to extend validations performed by parser
   - [ ] Better handling of other _special_ HTML elem such as `canvas`
   - [ ] Ability to preserve whitespace in `pre` tags
