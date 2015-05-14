@@ -1,15 +1,20 @@
-var htmlParser = require('./src/html-parser');
+var htmlParser = require('./src/html-parser'),
+    toStr = function (f) {
+      return Object.prototype.toString.call(f);
+    };
 
 function htmlTagValidator(source, callback) {
-  var options = htmlTagValidator._options, func = callback,
-      isSync = (Object.prototype.toString.call(func) !== '[object Function]');
+  var options = htmlTagValidator._options, func = callback;
   if (arguments.length > 2) {
     options = callback;
     func = arguments[2];
   }
 
-  if (Object.prototype.toString.call(func) !== '[object Function]') {
+  if (toStr(func) !== '[object Function]') {
     // Sync
+    if (toStr(func) === '[object Object]') {
+      options = func;
+    }
     return htmlParser(source, options);
   }
 
@@ -28,7 +33,7 @@ function htmlTagValidator(source, callback) {
 };
 
 htmlTagValidator._name = "html-tag-validator";
-htmlTagValidator.VERSION = "1.0.6";
+htmlTagValidator.VERSION = "1.0.7";
 htmlTagValidator._options = {};
 
 htmlTagValidator.setOptions = function(options) {
