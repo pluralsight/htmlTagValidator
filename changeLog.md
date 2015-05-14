@@ -3,9 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased][unreleased]
 
+## [v1.0.8] - 2015-05-14
+### Fixed
+- Encoding error in codex file that contained odd tab character
+
 ## [v1.0.7] - 2015-05-14
 ### Changed
-- Fixed `markdown`, `html` and `plain` output for validation error output
+- Updated `markdown`, `html` and `plain` output for validation error output
 
 ## [v1.0.6] - 2015-05-14
 ### Fixed
@@ -84,6 +88,7 @@ validator("<p></p>", { 'settings': { 'format': 'html' } }, function (err, ast) {
 - Breaking changes from 0.0.x. Check README for changes to core API.
 
 [unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.7...HEAD
+[v1.0.8]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.7...v1.0.8
 [v1.0.7]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.6...v1.0.7
 [v1.0.6]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.5...v1.0.6
 [v1.0.5]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.4...v1.0.5
