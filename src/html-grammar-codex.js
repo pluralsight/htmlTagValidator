@@ -266,11 +266,13 @@ function codex(opts) {
             return {
               'error': 'The ' + esc('meta') + ' tag ' + esc.attr('content') +
                        ' attribute must be defined if the ' + esc.attr('name') +
-                       ' or http-equiv attributes are defined'
+                       ' or ' + esc.attr('http-equiv') + ' attributes are defined'
             };
           } else if ((!util.has(attributes, 'name') && !util.has(attributes, 'http-equiv')) && util.has(attributes, 'content')) {
             return {
-              'error': 'The meta tag content attribute cannot be defined unless the name or http-equiv attributes are defined'
+              'error': 'The ' + esc('meta') + ' tag ' + esc.attr('content') +
+                       ' attribute cannot be defined unless the ' + esc.attr('name') +
+                       ' or ' + esc.attr('http-equiv') + ' attributes are defined'
             };
           }
           return true;
