@@ -97,114 +97,114 @@ function codex(opts) {
           'color', 'checkbox', 'radio', 'file', 'submit', 'image', 'reset', 'button'
         ],
         'types': {
-          'file': {
-            'normal': [
-              'accept', 'multiple', 'required'
-            ]
-          },
-          'image': {
-            'normal': [
-              'alt', 'formaction', 'formenctype', 'formmethod', 'formnovalidate',
-              'formtarget', 'height', 'src', 'width'
-            ]
-          },
-          'text': {
-            'normal': [
-              'autocomplete', 'dirname', 'inputmode', 'list', 'maxlength',
-              'minlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'
-            ]
-          },
-          'search': {
-            'normal': [
-              'autocomplete', 'dirname', 'inputmode', 'list', 'maxlength', 'minlength',
-              'pattern', 'placeholder', 'readonly', 'required', 'size'
-            ]
-          },
-          'url': {
-            'normal': [
-              'autocomplete', 'list', 'maxlength', 'minlength', 'pattern',
-              'placeholder', 'readonly', 'required', 'size'
-            ]
-          },
-          'tel': {
-            'normal': [
-              'autocomplete', 'list', 'maxlength', 'minlength', 'pattern',
-              'placeholder', 'readonly', 'required', 'size'
-            ]
-          },
-          'email': {
-            'normal': [
-              'autocomplete', 'list', 'maxlength', 'minlength', 'multiple',
-              'pattern', 'placeholder', 'readonly', 'required', 'size'
-            ]
-          },
-          'password': {
-            'normal': [
-              'autocomplete', 'inputmode', 'maxlength', 'minlength', 'pattern',
-              'placeholder', 'readonly', 'required', 'size'
-            ]
-          },
-          'datetime': {
-            'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
-            ]
-          },
-          'date': {
-            'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
-            ]
-          },
-          'month': {
-            'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
-            ]
-          },
-          'week': {
-            'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
-            ]
-          },
-          'time': {
-            'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
-            ]
-          },
-          'datetime-local': {
-            'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
-            ]
-          },
-          'number': {
-            'normal': [
-              'autocomplete', 'list', 'max', 'min', 'placeholder', 'readonly',
-              'required', 'step'
-            ]
-          },
-          'range': {
-            'normal': [
-              'autocomplete', 'list', 'max', 'min', 'multiple', 'step'
-            ]
-          },
-          'color': {
-            'normal': [
-              'autocomplete', 'list'
-            ]
-          },
-          'checkbox': {
-            'normal': [
-              'checked', 'required'
-            ]
-          },
-          'radio': {
-            'normal': [
-              'checked', 'required'
-            ]
-          },
-          'submit': {
-            'normal': [
-              'formaction', 'formenctype', 'formmethod', 'formnovalidate',
-              'formtarget'
-            ]
+          'file': {
+            'normal': [
+              'accept', 'multiple', 'required'
+            ]
+          },
+          'image': {
+            'normal': [
+              'alt', 'formaction', 'formenctype', 'formmethod', 'formnovalidate',
+              'formtarget', 'height', 'src', 'width'
+            ]
+          },
+          'text': {
+            'normal': [
+              'autocomplete', 'dirname', 'inputmode', 'list', 'maxlength',
+              'minlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'
+            ]
+          },
+          'search': {
+            'normal': [
+              'autocomplete', 'dirname', 'inputmode', 'list', 'maxlength', 'minlength',
+              'pattern', 'placeholder', 'readonly', 'required', 'size'
+            ]
+          },
+          'url': {
+            'normal': [
+              'autocomplete', 'list', 'maxlength', 'minlength', 'pattern',
+              'placeholder', 'readonly', 'required', 'size'
+            ]
+          },
+          'tel': {
+            'normal': [
+              'autocomplete', 'list', 'maxlength', 'minlength', 'pattern',
+              'placeholder', 'readonly', 'required', 'size'
+            ]
+          },
+          'email': {
+            'normal': [
+              'autocomplete', 'list', 'maxlength', 'minlength', 'multiple',
+              'pattern', 'placeholder', 'readonly', 'required', 'size'
+            ]
+          },
+          'password': {
+            'normal': [
+              'autocomplete', 'inputmode', 'maxlength', 'minlength', 'pattern',
+              'placeholder', 'readonly', 'required', 'size'
+            ]
+          },
+          'datetime': {
+            'normal': [
+              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+            ]
+          },
+          'date': {
+            'normal': [
+              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+            ]
+          },
+          'month': {
+            'normal': [
+              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+            ]
+          },
+          'week': {
+            'normal': [
+              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+            ]
+          },
+          'time': {
+            'normal': [
+              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+            ]
+          },
+          'datetime-local': {
+            'normal': [
+              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+            ]
+          },
+          'number': {
+            'normal': [
+              'autocomplete', 'list', 'max', 'min', 'placeholder', 'readonly',
+              'required', 'step'
+            ]
+          },
+          'range': {
+            'normal': [
+              'autocomplete', 'list', 'max', 'min', 'multiple', 'step'
+            ]
+          },
+          'color': {
+            'normal': [
+              'autocomplete', 'list'
+            ]
+          },
+          'checkbox': {
+            'normal': [
+              'checked', 'required'
+            ]
+          },
+          'radio': {
+            'normal': [
+              'checked', 'required'
+            ]
+          },
+          'submit': {
+            'normal': [
+              'formaction', 'formenctype', 'formmethod', 'formnovalidate',
+              'formtarget'
+            ]
           }
         },
         'rules': function inputRules(attributes, contents, util, codx) {
