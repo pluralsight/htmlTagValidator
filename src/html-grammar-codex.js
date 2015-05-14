@@ -1,10 +1,10 @@
+var _u = require('./html-parser-util');
 /**
- * Tag and attribute names
+ * Defaults for global settings, tag names, and attribute names
  * @param {Object} opts User options
  * @note Source: {@link http://www.w3schools.com/TAGS/ HTML Element Reference}
  * @note Source: {@link https://simon.html5.org/html-elements HTML Elements and Attributes}
  */
-var _u = require('./html-parser-util');
 function codex(opts) {
   // TODO: Refactor the options to make this less verbose
   // TODO: Refactor so that rules function doesn't have to repeat checkAttributes tasks

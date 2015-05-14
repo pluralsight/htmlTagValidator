@@ -347,15 +347,15 @@ function tagify(elem) {
 // Escaping error messages
 
 function escapeAttr(str) {
-  return _format(str, 'a');
+  return _format(str, 'attribute');
 }
 
 function escapeVal(str) {
-  return _format(str, 'v');
+  return _format(str, 'value');
 }
 
 function escapeId(str) {
-  return _format(str, 'n');
+  return _format(str, 'name');
 }
 
 function setFormat(codx) {
@@ -380,7 +380,7 @@ function _format(str, type) {
 _format._func = null;
 
 function escape(str) {
-  return _format(str, 'n');
+  return _format(str, 'name');
 }
 
 escape.value      = escape.val  = escapeVal;
@@ -390,7 +390,7 @@ escape.attribute  = escape.attr = escapeAttr;
 function _plainify(elem, type) {
   /*
    * A plainified string has
-   * - quoted attribute values
+   * - plain attribute values
    * - plain, lowercased attribute names
    * - plain, lowercased element names
    */
@@ -398,9 +398,9 @@ function _plainify(elem, type) {
 }
 
 _plainify._rules = {
- 'n': function ($1) { return $1.toLowerCase(); },
- 'a': function ($1) { return $1.toLowerCase(); },
- 'v': function ($1) { return '"' + $1 + '"'; }
+ 'name': function ($1) { return $1.toLowerCase(); },
+ 'attribute': function ($1) { return $1.toLowerCase(); },
+ 'value': function ($1) { return  $1; }
 };
 
 function _htmlify(elem, type) {
@@ -412,10 +412,10 @@ function _htmlify(elem, type) {
    *  - '>' symbol as '&gt;'
    *  - '"' symbol as '&quot;'
    * - quoted attribute values
-   * - plain, uppercased element names
+   * - escaped <tag>, uppercased element names
    * - plain, lowercased attribute names
    */
-  return _htmlify._rules[type](elem, type)
+  return _htmlify._rules[type](nodeToString(elem))
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -423,25 +423,25 @@ function _htmlify(elem, type) {
 }
 
 _htmlify._rules = {
- 'n': function ($1) { return $1.toUpperCase(); },
- 'a': function ($1) { return $1.toLowerCase(); },
- 'v': function ($1) { return '"' + $1 + '"'; }
+ 'name': function ($1) { return '<' + $1.toUpperCase() + '>'; },
+ 'attribute': function ($1) { return $1.toLowerCase(); },
+ 'value': function ($1) { return '"' + $1 + '"'; }
 };
 
 function _markdownify(elem, type) {
   /*
    * A markdownified string has
-   * - code fragment attribute values
-   * - bolded, uppercased element names
-   * - italicised, lowercased attribute names
+   * - quoted attribute values
+   * - code fragment, lowercased element names
+   * - code fragment, lowercased attribute names
    */
-  return _markdownify._rules[type](textNode(elem));
+  return _markdownify._rules[type](nodeToString(elem));
 }
 
 _markdownify._rules = {
-  'n': function ($1) { return "**" + $1 + "**".toUpperCase(); },
-  'a': function ($1) { return "*" + $1 + "*".toLowerCase(); },
-  'v': function ($1) { return "`" + $1 + "`".toUpperCase(); }
+  'name': function ($1) { return '`' + $1.toLowerCase() + '`'; },
+  'attribute': function ($1) { return '`' + $1.toLowerCase() + '`'; },
+  'value': function ($1) { return '"' + $1 + '"'; }
 };
 
 module.exports = {
