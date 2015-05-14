@@ -58,15 +58,12 @@
   <![endif]-->
   ```
 
-- [ ] More accurate HTML 5 spec compliance for `type: 'element'` tags
-  - [ ] Validate elements allow for `event` and `global` attributes
-
-- [ ] Add `settings` block to options object to toggle global settings
+- [x] Add `settings` block to options object to toggle global settings
 
   ``` javascript
   {
     'settings': {
-      'allowSelfClosingSlash': false
+      'format': 'markdown'
     }
   }
   ```
@@ -85,6 +82,9 @@
 ### 1.2.0
 
 - [ ] Allow plugins to extend validations performed by parser
+
+- [ ] More accurate HTML 5 spec compliance for `type: 'element'` tags
+  - [ ] Validate elements allow for `event` and `global` attributes
 
 - [ ] Better handling of other _special_ HTML elements
 
