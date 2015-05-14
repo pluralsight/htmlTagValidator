@@ -53,14 +53,6 @@ describe('html-tag-validator', function() {
     }, done);
   });
 
-  it('invalid input attribute', function(done) {
-    tree.error("An input tag does not allow the value \"beez\" for the type attribute", this, done);
-  });
-
-  it('invalid input attribute 2', function(done) {
-    tree.error("An input tag cannot have the list attribute when its type is set to \"radio\"", this, done);
-  });
-
   it('invalid self closing', function(done) {
     tree.error("li is not a valid self closing tag", this, done);
   });
@@ -84,7 +76,7 @@ describe('html-tag-validator', function() {
   });
 
   it('malformed attribute', function (done) {
-    tree.error("Found an attribute assignment \"=\" not followed by a value", this, done);
+    tree.error("Found an attribute assignment = not followed by a value", this, done);
   });
 
   it('malformed attribute 2', function (done) {
@@ -93,6 +85,14 @@ describe('html-tag-validator', function() {
 
   it('malformed attribute 3', function (done) {
     tree.error("The div element has an attribute \"a\" with an invalid name", this, done);
+  });
+
+  it('invalid input attribute', function(done) {
+    tree.error("An input tag does not allow the value beez for the type attribute", this, done);
+  });
+
+  it('invalid input attribute 2', function(done) {
+    tree.error("An input tag cannot have the list attribute when its type is set to radio", this, done);
   });
 
   it('malformed class value', function(done) {
@@ -108,7 +108,7 @@ describe('html-tag-validator', function() {
   });
 
   it('malformed comment', function(done) {
-    tree.error("Cannot have two or more consecutive hyphens \"--\" inside of a block comment", this, done);
+    tree.error("Cannot have two or more consecutive hyphens -- inside of a block comment", this, done);
   });
 
   it('html comment conditional', function(done) {
@@ -168,7 +168,7 @@ describe('html-tag-validator', function() {
   });
 
   it('invalid doctype', function(done) {
-    tree.error("The doctype definition for an HTML 5 document should be \"html\"", this, done);
+    tree.error("The doctype definition for an HTML 5 document should be html", this, done);
   });
 
   it('invalid doctype 2', function(done) {
@@ -217,7 +217,7 @@ describe('html-tag-validator', function() {
 
   describe('plain formatting', function () {
     it('error formatting', function(done) {
-      tree.error("Disallowed character \"&\" found in attribute value", this, {
+      tree.error("An input tag cannot have the autocomplete attribute when its type is set to radio", this, {
         'settings': {
           'format': 'plain'
         }
@@ -227,7 +227,7 @@ describe('html-tag-validator', function() {
 
   describe('html formatting', function () {
     it('error formatting', function(done) {
-      tree.error("Disallowed character &quot;&amp;&quot; found in attribute value", this, {
+      tree.error("An &lt;INPUT&gt; tag cannot have the autocomplete attribute when its type is set to &quot;radio&quot;", this, {
         'settings': {
           'format': 'html'
         }
@@ -237,7 +237,7 @@ describe('html-tag-validator', function() {
 
   describe('markdown formatting', function () {
     it('error formatting', function(done) {
-      tree.error("Disallowed character `&` found in attribute value", this, {
+      tree.error("An `input` tag cannot have the `autocomplete` attribute when its `type` is set to \"radio\"", this, {
         'settings': {
           'format': 'markdown'
         }
