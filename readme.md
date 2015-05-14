@@ -250,15 +250,29 @@ which will automatically compile the parser and run the tests in `test/index-spe
 
 Optionally, run `grunt debug` to get extended output and start a file watcher.
 
+### Writing tests
+
 Tests refer to an HTML test file in `test/html/` and the test name is a
 reference to the filename of the test file. For example `super test 2`
 as a test name points to the file `test/html/superTest2.html`.
 
-There are two options for the test helpers exposed by `tree`:
- - `tree.ok(this, done)` to assert that the test file successfully generates an AST
- - `tree.error()` to assert that a test throws an error
-   - `tree.error("This is the error message", this, done)` assert an error `message`
-   - `tree.error({'line': 2}, this, done)` assert an object of properties that each exist in the error
+There are three options for the test helpers exposed by `tree`:
+- `tree.ok(this, done)` to assert that the test file successfully generates an AST
+- `tree.equals(ast, this, done)` to assert that the test file generates an AST that exactly matches `ast`
+- `tree.error()` to assert that a test throws an error
+  - `tree.error("This is the error message", this, done)` assert an error `message`
+  - `tree.error({'line': 2}, this, done)` assert an object of properties that each exist in the error
+
+You can pass in an `options` object as the _2nd-to-last argument_ in each method:
+
+  ``` javascript
+  var options = {
+    'settings': {
+      'format': 'html'
+    }
+  };
+  tree.ok(this, options, done);
+  ```
 
 ``` javascript
 // test/html/basicSelfClosing.html
