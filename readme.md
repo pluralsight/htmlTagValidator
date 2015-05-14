@@ -139,6 +139,10 @@ document:
 
 ### Passing in options
 
+Currently, you can provide custom attribute names to merge with the default
+values, custom validation rules, and global settings such as the output format
+for the validation messages.
+
 ``` javascript
 var htmlTagValidator = require('html-tag-validator'),
   sampleHtml = "<html>" +
@@ -172,6 +176,10 @@ var htmlTagValidator = require('html-tag-validator'),
 * <nw-nav-item name="nav1">Home</nw-nav-item>
 */
 htmlTagValidator(sampleHtml, {
+  'settings': {
+    // Set output format for validation error messages
+    'format': 'plain' // 'plain', 'html', or 'markdown'
+  },
   'attributes': {
     '_': {
       'mixed': /^((ng\-)|(^\[[\S]+\]$)|(^\([\S]+\)$))/
@@ -207,6 +215,9 @@ var htmlTagValidator = require('html-tag-validator'),
 * <td bgcolor="#000000">Two</td>
 */
 htmlTagValidator(sampleHtml, {
+  'settings': {
+    'format': 'plain'
+  },
   'attributes': {
     'table': {
       'normal': [
