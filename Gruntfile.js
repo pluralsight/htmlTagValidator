@@ -30,12 +30,9 @@ module.exports = function(grunt) {
     }
   });
 
-  // Load the npm installed tasks
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  // The default tasks to run when you type: grunt
-  // grunt.registerTask('default', ['shell:pegjs', 'shell:browserify']);
   grunt.registerTask('default', ['shell:pegjs']);
   grunt.registerTask('test', ['default', 'shell:test']);
   grunt.registerTask('debug', ['default', 'shell:debug', 'watch:debug']);

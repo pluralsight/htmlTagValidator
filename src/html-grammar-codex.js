@@ -16,7 +16,7 @@ function codex(opts) {
       // TODO: create strict and non-strict attribute modes
       'attributes': 'strict',
       // TODO: create merge and replace tag schemes
-      'options': 'merge'
+      'policy': 'merge'
     },
     'attributes': {
       '$': {
@@ -1195,8 +1195,11 @@ function codex(opts) {
       ]
     }
   };
-
+  var shouldMerge;
   if (!_u.isPlain(opts)) { opts = {}; }
+  shouldMerge = (_u.has(opts, 'settings') && _u.has(opts['settings'], 'policy') ?
+                  opts['settings']['policy'] :
+                  defs['settings']['policy'])  === 'merge';
   // Merge defaults with user options, replace user settings
   [ {
       'type': 'tags',
@@ -1209,8 +1212,11 @@ function codex(opts) {
       'policy': 'replace'
     }
   ].forEach(function (m) {
-    var res = _u.has(opts, m.type) ?
-      _u.mergeOptions(defs[m.type], opts[m.type], m.policy === 'merge') : defs[m.type];
+    // Never merge settings
+    var willMerge = (shouldMerge === true && m.policy !== 'replace'),
+      res = _u.has(opts, m.type) ?
+        _u.mergeOptions(defs[m.type], opts[m.type], willMerge) :
+        defs[m.type];
     defs[m.type] = m.type !== 'settings' ? _u.desugar(res, res, m.type) : res;
   });
   return defs;
