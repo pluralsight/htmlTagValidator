@@ -32,7 +32,7 @@ function htmlTagValidator(source, callback) {
   })(this, source, options, func), 0);
 };
 
-htmlTagValidator._name = "html-tag-validator";
+htmlTagValidator.NAME = "html-tag-validator";
 htmlTagValidator.VERSION = "1.0.8";
 htmlTagValidator._options = {};
 
