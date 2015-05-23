@@ -87,7 +87,7 @@ validator("<p></p>", { 'settings': { 'format': 'html' } }, function (err, ast) {
 ### Added
 - Breaking changes from 0.0.x. Check README for changes to core API.
 
-[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.7...HEAD
+[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.8...HEAD
 [v1.0.8]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.7...v1.0.8
 [v1.0.7]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.6...v1.0.7
 [v1.0.6]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.5...v1.0.6
