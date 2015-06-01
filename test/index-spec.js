@@ -244,4 +244,17 @@ describe('html-tag-validator', function() {
       }, done);
     });
   });
+
+  it('removing defaults', function(done) {
+    tree.ok(this, {
+      'settings': {
+        'policy': 'replace'
+      },
+      'attributes': {
+        '_': {
+          'mixed': '*'
+        }
+      }
+    }, done);
+  });
 });
