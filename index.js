@@ -15,7 +15,7 @@ function htmlTagValidator(source, callback) {
     if (toStr(func) === '[object Object]') {
       options = func;
     }
-    return htmlParser(source, options);
+    return htmlParser.parse(source, options);
   }
 
   // Async

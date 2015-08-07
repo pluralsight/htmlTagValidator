@@ -36,7 +36,7 @@ Load the source file for the current test and then try and generate the AST from
 @param [Function] callback
   The function to call when htmlTagValidator has generated the AST or an error.
 */
-getTree = function (that, callback) {
+getTreeAsync = function (that, options, callback) {
   var args = Array.prototype.slice.call(arguments, 1),
       fileTitle = _.camelCase(that.test.title.trim()),
       filePath = __dirname + '/html/' + fileTitle + '.html';
@@ -49,6 +49,37 @@ getTree = function (that, callback) {
     };
   });
 };
+
+/**
+ Load the source file for the current test and then try and generate the AST from it.
+ @note Uses the name of the test to determine what test input to use such that `bees-test`
+ looks for the file `beesTest.html` in the `./test/html/` directory.
+ @note Alternative arguments format to pass options object is: that, options, callback.
+ @param [Object] that
+ The context of the running test
+ @param [Function] callback
+ The function to call when htmlTagValidator has generated the AST or an error.
+ */
+getTreeSync = function (that, options, callback) {
+  var fileTitle = _.camelCase(that.test.title.trim()),
+      filePath = __dirname + '/html/' + fileTitle + '.html',
+      ast;
+  fs.readFile(filePath, "utf8", function(err, data) {
+    if (err) {
+      callback(err);
+    } else {
+      try {
+        ast = htmlTagValidator.apply(that, [data, options]);
+        callback(null, ast);
+      }
+      catch(error) {
+        callback(error, ast);
+      }
+    };
+  });
+};
+
+getTree = getTreeAsync
 
 /**
 Assert that the current file returns an AST without errors.
@@ -141,5 +172,11 @@ module.exports = {
   'ok': assertOkTree,
   'error': assertErrorTree,
   'equals': assertEqualsTree,
-  'broadcast': broadcast
+  'broadcast': broadcast,
+  'synchronous': function() {
+    getTree = getTreeSync;
+  },
+  'asynchronous': function() {
+    getTree = getTreeAsync;
+  }
 };

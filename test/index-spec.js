@@ -1,7 +1,23 @@
 var expect            = require('chai').expect
     tree              = require('./helpers');
 
-describe('html-tag-validator', function() {
+describe('asynchronous html-tag-validator', function() {
+  before(function() {
+    tree.asynchronous();
+  })
+
+  runTests();
+});
+
+describe('synchronous html-tag-validator', function() {
+  before(function() {
+    tree.synchronous();
+  })
+
+  runTests();
+});
+
+function runTests() {
   it('basic div', function(done) {
     var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"p","attributes":{"class":"string class names","data-quote":"tagvalue"},"children":[{"type":"text","contents":"simple content"}]}]}';
     tree.equals(resultTree, this, done);
@@ -257,4 +273,4 @@ describe('html-tag-validator', function() {
       }
     }, done);
   });
-});
+};
