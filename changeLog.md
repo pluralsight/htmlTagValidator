@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased][unreleased]
 
+## [v1.1.0] - 2015-08-07
+### Fixed
+- Definition for synchronous usage was incorrect in `htmlTagValidator()`
+
+### Added
+- Tests to verify that `htmlTagValidator()` can be called synchronously or asynchronously
+
 ## [v1.0.8] - 2015-05-14
 ### Fixed
 - Encoding error in codex file that contained odd tab character
@@ -87,7 +94,8 @@ validator("<p></p>", { 'settings': { 'format': 'html' } }, function (err, ast) {
 ### Added
 - Breaking changes from 0.0.x. Check README for changes to core API.
 
-[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.8...HEAD
+[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.1.0...HEAD
+[v1.0.8]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.8...v1.1.0
 [v1.0.8]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.7...v1.0.8
 [v1.0.7]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.6...v1.0.7
 [v1.0.6]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.5...v1.0.6
