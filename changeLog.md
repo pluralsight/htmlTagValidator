@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased][unreleased]
 
+## [v1.2.0] - 2016-02-19
+### Added
+- Added `verbose` setting to create a verbose AST instead of the default AST. As of right now, this mode will tell you whether an attribute was quoted or unquoted but will be extended with additional information in the future.
+
 ## [v1.1.0] - 2015-08-07
 ### Fixed
 - Definition for synchronous usage was incorrect in `htmlTagValidator()`
@@ -94,8 +98,9 @@ validator("<p></p>", { 'settings': { 'format': 'html' } }, function (err, ast) {
 ### Added
 - Breaking changes from 0.0.x. Check README for changes to core API.
 
-[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.1.0...HEAD
-[v1.0.8]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.8...v1.1.0
+[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.2.0...HEAD
+[v1.2.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.1.0...v1.2.0
+[v1.1.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.8...v1.1.0
 [v1.0.8]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.7...v1.0.8
 [v1.0.7]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.6...v1.0.7
 [v1.0.6]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.5...v1.0.6
