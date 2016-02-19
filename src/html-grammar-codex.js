@@ -16,7 +16,8 @@ function codex(opts) {
       // TODO: create strict and non-strict attribute modes
       'attributes': 'strict',
       // TODO: create merge and replace tag schemes
-      'policy': 'merge'
+      'policy': 'merge',
+      'verbose': false
     },
     'attributes': {
       '$': {

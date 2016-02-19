@@ -272,7 +272,7 @@ module.exports = (function() {
                 return error("Disallowed character " + esc.val(matches[0]) + " found in attribute value");
               }
             }
-            return i.value;
+            return _u.option('settings/verbose', null, codex) ? i : i.value;
           },
         peg$c90 = { type: "other", description: "Text Node" },
         peg$c91 = function(tn) {

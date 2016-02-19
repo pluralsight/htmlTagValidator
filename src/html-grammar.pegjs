@@ -511,7 +511,7 @@ attr_assignment "Attribute Assignment"
         return error("Disallowed character " + esc.val(matches[0]) + " found in attribute value");
       }
     }
-    return i.value;
+    return _u.option('settings/verbose', null, codex) ? i : i.value;
   }
 
 /* HTML text element*/
