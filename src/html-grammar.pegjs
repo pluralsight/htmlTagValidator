@@ -67,7 +67,7 @@
   }
 
   function checkAttributes(tag, attributes, contents) {
-    var i, len, ref, req, name, value, rule, props, ok = {
+    var i, len, ref, req, name, value, rule, props, err, ok = {
       'value': attributes
     }, names = Object.keys(attributes);
 
