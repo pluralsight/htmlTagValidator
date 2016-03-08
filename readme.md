@@ -178,7 +178,10 @@ var htmlTagValidator = require('html-tag-validator'),
 htmlTagValidator(sampleHtml, {
   'settings': {
     // Set output format for validation error messages
-    'format': 'plain' // 'plain', 'html', or 'markdown'
+    'format': 'plain', // 'plain', 'html', or 'markdown'
+    /* Setting verbose to true will generate an AST with additional
+     * details such as whether tag attributes are unquoted */
+    'verbose': false // true or false
   },
   'attributes': {
     '_': {

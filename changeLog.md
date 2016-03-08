@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased][unreleased]
 
+## [v1.4.0] - 2016-03-08
+### Changed
+- Consolidated rules for text nodes, `doctype` tags, and whitespace to increase the parsing performance.
+
+### Fixed
+- The more self closing tags that are present in a document, the longer the document takes to parse, and this is causing the process to run out of memory while processing large documents with lots of self closing tags.
+
 ## [v1.2.0] - 2016-02-19
 ### Added
 - Added `verbose` setting to create a verbose AST instead of the default AST. As of right now, this mode will tell you whether an attribute was quoted or unquoted but will be extended with additional information in the future.
@@ -98,7 +105,8 @@ validator("<p></p>", { 'settings': { 'format': 'html' } }, function (err, ast) {
 ### Added
 - Breaking changes from 0.0.x. Check README for changes to core API.
 
-[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.4.0...HEAD
+[v1.4.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.2.0...v1.4.0
 [v1.2.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.8...v1.1.0
 [v1.0.8]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.7...v1.0.8
