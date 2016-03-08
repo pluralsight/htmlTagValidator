@@ -233,7 +233,9 @@ start
 /* HTML doctype definition */
 
 doctype "HTML DOCTYPE"
-  = ls:(!doctype_terminators .)* doctype_start dt:([a-zA-Z])+ s ex:(char+)? s ">"
+/*= ls:([\s\S]* !doctype_terminators) doctype_start dt:([a-zA-Z])+ s ex:(charz) s ">"*/
+  /*= ls:(!("<!" / ("<" [\s]* "iframe")) .)* "<!" dt:([a-zA-Z])+ s ex:(char+)? s ">"*/
+  = ls:(!("<!" / ("<" s "iframe")) any)* "<!" dt:([a-zA-Z])+ s ex:([^>])* s ">"
   &	{ return _u.tagify(dt) === 'doctype'; }
   {
     if (ls === null || _u.textNode(ls) === '') {
@@ -252,13 +254,6 @@ doctype "HTML DOCTYPE"
                " definition must be placed at the beginning of the first line of the document"
     };
   }
-
-doctype_start
-  = "<!"
-
-doctype_terminators
-  = doctype_start
-  / "<" s "iframe"
 
 /* HTML node types*/
 
