@@ -235,7 +235,7 @@ start
 doctype "HTML DOCTYPE"
 /*= ls:([\s\S]* !doctype_terminators) doctype_start dt:([a-zA-Z])+ s ex:(charz) s ">"*/
   /*= ls:(!("<!" / ("<" [\s]* "iframe")) .)* "<!" dt:([a-zA-Z])+ s ex:(char+)? s ">"*/
-  = ls:(!("<!" / ("<" s "iframe")) any)* "<!" dt:([a-zA-Z])+ s ex:([^>])* s ">"
+  = ls:(!("<!" / ("<" s "iframe")) .)* "<!" dt:([a-zA-Z])+ s ex:([^>])* s ">"
   &	{ return _u.tagify(dt) === 'doctype'; }
   {
     if (ls === null || _u.textNode(ls) === '') {
@@ -333,7 +333,7 @@ special_tag_types
   { return _u.tagify(st); }
 
 special_tag_content
-  = cs:(!"</" any)*
+  = cs:(!"</" .)*
   { return _u.scriptify(cs);  }
 
 special_tag_close
@@ -579,11 +579,11 @@ comment_block
   }
 
 comment_scan
-  = cs:(!comment_close any)*
+  = cs:(!comment_close .)*
   { return _u.textNode(cs);  }
 
 comment_conditional_scan
-  = cs:(!conditional_end any)*
+  = cs:(!conditional_end .)*
   { return _u.scriptify(cs);  }
 
 /* HTML conditional block comments*/
