@@ -11,10 +11,14 @@
 
   // Verification Functions
 
-  function isSelfClosing(tag) {
-    var path = 'tags/void',
-        tags = _u.option(path, null, codex);
-    return tags != null ? _u.customTest.apply(this, [path, tags, [tag]]) : false;
+  function isSelfClosing(tag, path) {
+    var usePath = path || 'tags/void',
+        tags = _u.option(usePath, null, codex);
+    return tags != null ? _u.customTest.apply(this, [usePath, tags, [tag]]) : false;
+  }
+
+  function canBeSelfClosing(tag) {
+    return isSelfClosing(tag) || isSelfClosing(tag, 'tags/mixed');
   }
 
   function isAttributeAllowed(tag, attribute, value) {
@@ -379,7 +383,7 @@ self_closing_tag_shortcut
   = "<" s t:(tagname) attrs:(tag_attribute)* s cl:("/") s e:(">") s
   {
     var attrs;
-    if(!isSelfClosing(t)) {
+    if(!canBeSelfClosing(t)) {
       return error("" + esc(t) + "" + " is not a valid self closing tag");
     }
 
