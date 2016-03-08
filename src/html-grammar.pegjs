@@ -11,10 +11,14 @@
 
   // Verification Functions
 
-  function isSelfClosing(tag) {
-    var path = 'tags/void',
-        tags = _u.option(path, null, codex);
-    return tags != null ? _u.customTest.apply(this, [path, tags, [tag]]) : false;
+  function isSelfClosing(tag, path) {
+    var usePath = path || 'tags/void',
+        tags = _u.option(usePath, null, codex);
+    return tags != null ? _u.customTest.apply(this, [usePath, tags, [tag]]) : false;
+  }
+
+  function canBeSelfClosing(tag) {
+    return isSelfClosing(tag) || isSelfClosing(tag, 'tags/mixed');
   }
 
   function isAttributeAllowed(tag, attribute, value) {
@@ -233,7 +237,9 @@ start
 /* HTML doctype definition */
 
 doctype "HTML DOCTYPE"
-  = ls:(!doctype_terminators .)* doctype_start dt:([a-zA-Z])+ s ex:(char+)? s ">"
+/*= ls:([\s\S]* !doctype_terminators) doctype_start dt:([a-zA-Z])+ s ex:(charz) s ">"*/
+  /*= ls:(!("<!" / ("<" [\s]* "iframe")) .)* "<!" dt:([a-zA-Z])+ s ex:(char+)? s ">"*/
+  = ls:(!("<!" / ("<" s "iframe")) .)* "<!" dt:([a-zA-Z])+ s ex:([^>])* s ">"
   &	{ return _u.tagify(dt) === 'doctype'; }
   {
     if (ls === null || _u.textNode(ls) === '') {
@@ -252,13 +258,6 @@ doctype "HTML DOCTYPE"
                " definition must be placed at the beginning of the first line of the document"
     };
   }
-
-doctype_start
-  = "<!"
-
-doctype_terminators
-  = doctype_start
-  / "<" s "iframe"
 
 /* HTML node types*/
 
@@ -284,6 +283,7 @@ comment_nodes "Comment Node Types"
 tag "HTML Tag"
    = iframe_tag
   / special_tag
+  / self_closing_tag_shortcut
   / normal_tag
   / self_closing_tag
 
@@ -337,11 +337,7 @@ special_tag_types
   { return _u.tagify(st); }
 
 special_tag_content
-  = scs:(special_tag_scan)
-  { return scs; }
-
-special_tag_scan
-  = cs:(!"</" char)*
+  = cs:(!"</" .)*
   { return _u.scriptify(cs);  }
 
 special_tag_close
@@ -382,6 +378,28 @@ normal_tag "Tag"
       'children': c
     };
   }
+
+self_closing_tag_shortcut
+  = "<" s t:(tagname) attrs:(tag_attribute)* s cl:("/") s e:(">") s
+  {
+    var attrs;
+    if(!canBeSelfClosing(t)) {
+      return error("" + esc(t) + "" + " is not a valid self closing tag");
+    }
+
+    if (_u.has(attrs = checkAttributes(t, _u.collapse(attrs)), 'error')) {
+      return error(attrs.error);
+    }
+
+    return {
+      'type': 'element',
+      'void': true,
+      'name': t,
+      'attributes': attrs,
+      'children': []
+    };
+  }
+
 
 self_closing_tag "Self-closing Tag"
   = ot:(open_tag)
@@ -450,7 +468,7 @@ tag_attribute "Attribute"
   }
 
 tag_attribute_name "Attribute Name"
-  = s n:(![\=\/\\ ] char)*
+  = s n:([^\=\/\\ <>]*)
   /*= s n:(![\/\>\"\'\= ] char)**/
   /*= s n:(![^\t\n\f \/>"'=] char)**/
   & { return n.length; }
@@ -517,11 +535,11 @@ attr_assignment "Attribute Assignment"
 /* HTML text element*/
 
 text_node "Text Node"
-= tn:(char)+
+= tn:(chars)
 {
   return {
     'type': 'text',
-    'contents': _u.textNode(tn)
+    'contents': tn
   };
 }
 
@@ -565,11 +583,11 @@ comment_block
   }
 
 comment_scan
-  = cs:(!comment_close any)*
+  = cs:(!comment_close .)*
   { return _u.textNode(cs);  }
 
 comment_conditional_scan
-  = cs:(!conditional_end any)*
+  = cs:(!conditional_end .)*
   { return _u.scriptify(cs);  }
 
 /* HTML conditional block comments*/
@@ -606,7 +624,7 @@ comment_conditional_body
   = ccb:(conditional_scan)
 
 conditional_scan
-  = cs:(!conditional_terminator char)*
+  = cs:(!conditional_terminator [^<>])*
   { return _u.textNode(cs); }
 
 conditional_terminator
@@ -616,16 +634,15 @@ conditional_terminator
 /* Generic rules*/
 
 any "Anything"
+  /*= a:([\s\S])* { return _u.textNode(a); }*/
+  /*= [\s\S]*/
   = .
 
-char "Character"
-  = [^<>]
+chars "Characters"
+  = c:([^<>])+ { return _u.textNode(c); }
 
 e "Enforced Whitespace"
-  = _+
+  = [ \f\n\r\t\v]+
 
 s "Optional Whitespace"
-  = _*
-
-_ "Whitespace"
-  = [ \f\n\r\t\v]
+  = [ \f\n\r\t\v]*

@@ -11,7 +11,7 @@ module.exports = function(grunt) {
         options: {
           failOnError: true
         },
-        command: './node_modules/.bin/mocha test/index-spec.js --reporter="nyan"'
+        command: './node_modules/.bin/mocha test/index-spec.js --reporter="nyan"  --color'
       },
       debug: {
         options: {
