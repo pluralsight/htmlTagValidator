@@ -284,6 +284,7 @@ comment_nodes "Comment Node Types"
 tag "HTML Tag"
    = iframe_tag
   / special_tag
+  / self_closing_tag_shortcut
   / normal_tag
   / self_closing_tag
 
@@ -382,6 +383,28 @@ normal_tag "Tag"
       'children': c
     };
   }
+
+self_closing_tag_shortcut
+  = "<" s t:(tagname) attrs:(tag_attribute)* s cl:("/") s e:(">") s
+  {
+    var attrs;
+    if(!isSelfClosing(t)) {
+      return error("" + esc(t) + "" + " is not a valid self closing tag");
+    }
+
+    if (_u.has(attrs = checkAttributes(t, _u.collapse(attrs)), 'error')) {
+      return error(attrs.error);
+    }
+
+    return {
+      'type': 'element',
+      'void': true,
+      'name': t,
+      'attributes': attrs,
+      'children': []
+    };
+  }
+
 
 self_closing_tag "Self-closing Tag"
   = ot:(open_tag)
