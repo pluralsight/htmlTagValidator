@@ -333,11 +333,7 @@ special_tag_types
   { return _u.tagify(st); }
 
 special_tag_content
-  = scs:(special_tag_scan)
-  { return scs; }
-
-special_tag_scan
-  = cs:(!"</" char)*
+  = cs:(!"</" any)*
   { return _u.scriptify(cs);  }
 
 special_tag_close
@@ -468,7 +464,7 @@ tag_attribute "Attribute"
   }
 
 tag_attribute_name "Attribute Name"
-  = s n:(![\=\/\\ ] char)*
+  = s n:([^\=\/\\ <>]*)
   /*= s n:(![\/\>\"\'\= ] char)**/
   /*= s n:(![^\t\n\f \/>"'=] char)**/
   & { return n.length; }
@@ -535,11 +531,11 @@ attr_assignment "Attribute Assignment"
 /* HTML text element*/
 
 text_node "Text Node"
-= tn:(char)+
+= tn:(chars)
 {
   return {
     'type': 'text',
-    'contents': _u.textNode(tn)
+    'contents': tn
   };
 }
 
@@ -624,7 +620,7 @@ comment_conditional_body
   = ccb:(conditional_scan)
 
 conditional_scan
-  = cs:(!conditional_terminator char)*
+  = cs:(!conditional_terminator [^<>])*
   { return _u.textNode(cs); }
 
 conditional_terminator
@@ -634,16 +630,15 @@ conditional_terminator
 /* Generic rules*/
 
 any "Anything"
+  /*= a:([\s\S])* { return _u.textNode(a); }*/
+  /*= [\s\S]*/
   = .
 
-char "Character"
-  = [^<>]
+chars "Characters"
+  = c:([^<>])+ { return _u.textNode(c); }
 
 e "Enforced Whitespace"
-  = _+
+  = [ \f\n\r\t\v]+
 
 s "Optional Whitespace"
-  = _*
-
-_ "Whitespace"
-  = [ \f\n\r\t\v]
+  = [ \f\n\r\t\v]*
