@@ -273,4 +273,23 @@ function runTests() {
       }
     }, done);
   });
+
+  describe('angular 2', function () {
+    it('angular 2 attributes', function (done) {
+      var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"h2","attributes":{},"children":[{"type":"text","contents":"Cash left to enter races: {{cashLeft() | currency:\'USD\':true}}"}]},{"type":"element","void":false,"name":"ul","attributes":{},"children":[{"type":"element","void":false,"name":"li","attributes":{"*ngFor":"let race of races"},"children":[{"type":"element","void":false,"name":"h2","attributes":{},"children":[{"type":"text","contents":"{{race.name}} {{race.entryFee | currency:\'USD\':true}}"}]},{"type":"element","void":false,"name":"p","attributes":{},"children":[{"type":"text","contents":"{{race.date | date:\'yMMMdhm\'}}"}]},{"type":"element","void":false,"name":"p","attributes":{},"children":[{"type":"text","contents":"{{race.about}}"}]},{"type":"element","void":false,"name":"button","attributes":{"*ngIf":"!race.isRacing"},"children":[{"type":"text","contents":"Enter Race"}]},{"type":"element","void":false,"name":"h3","attributes":{"*ngIf":"race.isRacing"},"children":[{"type":"text","contents":"Already Racing"}]}]}]},{"type":"element","void":false,"name":"h2","attributes":{},"children":[{"type":"text","contents":"Total cost: {{totalCost() | currency:\'USD\':true}}"}]},{"type":"element","void":false,"name":"Super-Component","attributes":{"[ngModel]":"magic"},"children":[]}]}';
+      tree.equals(resultTree, this, {
+        settings: {
+          preserveCase: true
+        },
+        tags: {
+          normal: [ 'template' ]
+        },
+        attributes: {
+          '_': {
+            mixed: /^((\*ng)|(^\[[\S]+\]$)|(^\([\S]+\)$))|(^\[\([\S]+\)\]$)/
+          }
+        }
+      }, done);
+    });
+  });
 };

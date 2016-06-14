@@ -236,7 +236,10 @@ module.exports = (function() {
         peg$c54 = { type: "class", value: "[A-Za-z]", description: "[A-Za-z]" },
         peg$c55 = /^[0-9A-Z_a-z\-]/,
         peg$c56 = { type: "class", value: "[0-9A-Z_a-z-]", description: "[0-9A-Z_a-z-]" },
-        peg$c57 = function(tns, tne) { return _u.tagify([tns].concat(tne)); },
+        peg$c57 = function(tns, tne) { 
+            var tn = [tns].concat(tne);
+            return _u.option('settings/preserveCase', null, codex) ? _u.textNode(tn) : _u.tagify(tn);
+          },
         peg$c58 = { type: "other", description: "Attribute" },
         peg$c59 = function(ta, t) {
             return {
@@ -248,7 +251,9 @@ module.exports = (function() {
         peg$c61 = /^[^=\/\\ <>]/,
         peg$c62 = { type: "class", value: "[^\\=\\/\\\\ <>]", description: "[^\\=\\/\\\\ <>]" },
         peg$c63 = function(n) { return n.length; },
-        peg$c64 = function(n) { return _u.tagify(n); },
+        peg$c64 = function(n) {
+            return _u.option('settings/preserveCase', null, codex) ? _u.textNode(n) : _u.tagify(n);
+          },
         peg$c65 = { type: "other", description: "Attribute Value (Double Quoted)" },
         peg$c66 = "\"",
         peg$c67 = { type: "literal", value: "\"", description: "\"\\\"\"" },

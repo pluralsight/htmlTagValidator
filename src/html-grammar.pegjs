@@ -456,7 +456,10 @@ close_tag "Closing Tag"
 
 tagname "Tag Name"
   = tns:([A-Za-z]) tne:([0-9A-Z_a-z-])*
-  { return _u.tagify([tns].concat(tne)); }
+  { 
+    var tn = [tns].concat(tne);
+    return _u.option('settings/preserveCase', null, codex) ? _u.textNode(tn) : _u.tagify(tn);
+  }
 
 tag_attribute "Attribute"
   = e ta:(tag_attribute_name) t:(attr_assignment)?
@@ -472,7 +475,9 @@ tag_attribute_name "Attribute Name"
   /*= s n:(![\/\>\"\'\= ] char)**/
   /*= s n:(![^\t\n\f \/>"'=] char)**/
   & { return n.length; }
-  { return _u.tagify(n); }
+  {
+    return _u.option('settings/preserveCase', null, codex) ? _u.textNode(n) : _u.tagify(n);
+  }
 
 tag_attribute_value_dblquote "Attribute Value (Double Quoted)"
   =	tag_attribute_value_dblquote_empty
