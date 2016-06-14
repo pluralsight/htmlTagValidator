@@ -3,6 +3,26 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased][unreleased]
 
+## [v1.5.0] - 2016-06-14
+### Added
+- Added `preserveCase` option to allow validation of Angular 2 templates. Here is a combination of settings and configuration that appears to work well for Angular 2.
+
+  ``` javascript
+  {
+    settings: {
+      preserveCase: true
+    },
+    tags: {
+      normal: [ 'template' ]
+    },
+    attributes: {
+      '_': {
+        mixed: /^((\*ng)|(^\[[\S]+\]$)|(^\([\S]+\)$))|(^\[\([\S]+\)\]$)/
+      }
+    }
+  }
+  ```
+
 ## [v1.4.0] - 2016-03-08
 ### Changed
 - Consolidated rules for text nodes, `doctype` tags, and whitespace to increase the parsing performance.
@@ -105,7 +125,8 @@ validator("<p></p>", { 'settings': { 'format': 'html' } }, function (err, ast) {
 ### Added
 - Breaking changes from 0.0.x. Check README for changes to core API.
 
-[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.4.0...HEAD
+[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.5.0...HEAD
+[v1.5.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.2.0...v1.4.0
 [v1.2.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.0.8...v1.1.0
