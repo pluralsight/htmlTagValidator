@@ -147,7 +147,11 @@ for the validation messages.
 var htmlTagValidator = require('html-tag-validator'),
   sampleHtml = "<html>" +
                "<head><title>hello world</title></head>" +
-               "<body><p (click)='myCoolFunc()'>my cool page</p></body>" +
+               "<body>" +
+                 "<p *ngFor=\"let item of items\" (click)=\"func(item)\">" +
+                  "my cool page" +
+                 "</p>" +
+               "</body>" +
                "</html>";
 
 /*
@@ -161,34 +165,34 @@ var htmlTagValidator = require('html-tag-validator'),
 * This options object says the following:
 * for all existing HTML 5 tag names '_' ...
 * allow the following types of attribute names
-*   1) ng-*
-*   2) (*)  
-*   3) [*]  
+*   1) *ngSomething
+*   2) (something)  
+*   3) [something]  
+*   4) [(something)]
 * for void (e.g.: async) attributes OR
 * normal attributes (e.g.: checked="checked") ...
 * in addition to the standard HTML 5 attributes for the element.
-*
-* The second addition is to allow a normal attribute named 'name' to be
-* added to the tag 'nw-nav-item' in addition to all the HTML 5 global
-* and event attributes. By default, unknown tags will accept the global
-* and event attributes. This addition will allow for a tag with the
-* following definition:
-* <nw-nav-item name="nav1">Home</nw-nav-item>
+* Also, this adds a new normal (not self-closing) tag named
+* template to support Angular 2 <template></template> tags.
 */
 htmlTagValidator(sampleHtml, {
-  'settings': {
+  settings: {
     // Set output format for validation error messages
-    'format': 'plain', // 'plain', 'html', or 'markdown'
+    format: 'plain', // 'plain', 'html', or 'markdown'
     /* Setting verbose to true will generate an AST with additional
      * details such as whether tag attributes are unquoted */
-    'verbose': false // true or false
+    verbose: false, // default: false
+    /* Set preserveCase to true to preserve the original case of tag and
+     * attribute names so that you can support case-sensitive Angular 2
+     * attribute names such as *ngFor and [ngModel] */
+    preserveCase: true // default: false
   },
-  'attributes': {
+  tags: {
+    normal: [ 'template' ]
+  },
+  attributes: {
     '_': {
-      'mixed': /^((ng\-)|(^\[[\S]+\]$)|(^\([\S]+\)$))/
-    },
-    'nw-nav-item': {
-      'normal': 'name'
+      mixed: /^((\*ng)|(^\[[\S]+\]$)|(^\([\S]+\)$))|(^\[\([\S]+\)\]$)/
     }
   }
 }, function (err, ast) {
