@@ -553,9 +553,6 @@ text_node "Text Node"
 php "PHP Code"
   = php_open com:(php_block) cc:(php_close)
   {
-    if (cc === null) {
-      return error('Found an open PHP code tag without a closing tag');
-    }
     return com;
   }
 
@@ -564,25 +561,20 @@ php_open "PHP start"
   
 php_close "PHP close"
   = "?>"
-  / EOF 
+  / eof
   
 php_block
-  = s pb:php_scan s
+  = s pb:(php_scan) s
   {
-    var tn = pb !== null ? _u.textNode(pb) : '';
-    if(tn.indexOf('?>') !== -1) {
-      return error("Cannot have a php closing block " + esc.val('?>') + " inside of a PHP code block");
-    }
     return {
       'type': 'php',
       'attributes': {},
-      'contents': tn
+      'contents': _u.scriptify(pb)
     };
   }
 
 php_scan
-  = ps:(!php_close .)*
-  { return _u.textNode(ps);  }
+  = (!php_close .)*
 
 /* HTML block comments*/
 
@@ -688,5 +680,5 @@ e "Enforced Whitespace"
 s "Optional Whitespace"
   = [ \f\n\r\t\v]*
 
-EOF "End of File"
+eof "End of File"
   = !.

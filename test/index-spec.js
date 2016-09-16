@@ -297,17 +297,22 @@ function runTests() {
   
   describe('php', function () {
     it('php inline tags', function (done) {
-      var resultTree = '{"doctype": null,"document": [{"attributes": {},"children": [{"attributes": {},"children": [{"attributes": {},"contents": "my title","type": "title"}],"name": "head","type": "element","void": false}, {"attributes": {},"children": [{"attributes": {},"children": [{"attributes": {}, "contents": "echo \\"hello world\\"","type": "php"}],"name": "div","type": "element","void": false}],"name": "body","type": "element","void": false}],"name": "html","type": "element","void": false}]}';
+      var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"html","attributes":{},"children":[{"type":"element","void":false,"name":"head","attributes":{},"children":[{"type":"title","attributes":{},"contents":"my title"}]},{"type":"element","void":false,"name":"body","attributes":{},"children":[{"type":"element","void":false,"name":"div","attributes":{},"children":[{"type":"php","attributes":{},"contents":"echo \\"hello world1\\";"},{"type":"php","attributes":{},"contents":"echo \\"hello world2\\" "}]}]}]}]}';
       tree.equals(resultTree, this, done);
     });
     
     it('php block tags', function (done) {
-      var resultTree = '{"doctype": null,"document": [{"attributes": {},"children": [{"attributes": {},"children": [{"attributes": {},"contents": "my title","type": "title"}],"name": "head","type": "element","void": false}, {"attributes": {},"children": [{"attributes": {},"children": [{"attributes": {}, "contents": "echo \\"hello world1\\" echo \\"hello world2\\" echo \\"hello world3\\"","type": "php"}],"name": "div","type": "element","void": false}],"name": "body","type": "element","void": false}],"name": "html","type": "element","void": false}]}';
+      var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"html","attributes":{},"children":[{"type":"element","void":false,"name":"head","attributes":{},"children":[{"type":"title","attributes":{},"contents":"my title"}]},{"type":"element","void":false,"name":"body","attributes":{},"children":[{"type":"element","void":false,"name":"div","attributes":{},"children":[{"type":"php","attributes":{},"contents":"echo \\"hello world1\\"\\n        echo \\"hello world2\\"\\n        echo \\"hello world3\\"\\n      "}]}]}]}]}';
       tree.equals(resultTree, this, done);
     });
-    
+
     it('php valid not closed', function (done) {
       var resultTree = '{"doctype": null,"document": [{"attributes": {},"children": [{"attributes": {},"children": [{"attributes": {},"contents": "my title","type": "title"}],"name": "head","type": "element","void": false}, {"attributes": {},"children": [{"attributes": {},"children": [],"name": "div","type": "element","void": false}],"name": "body","type": "element","void": false}],"name": "html","type": "element","void": false}, {"attributes": {}, "contents": "echo \\"hello world\\"","type": "php"}]}';
+      tree.equals(resultTree, this, done);
+    });
+
+    it('php multiple tags', function (done) {
+      var resultTree = '{"doctype":null,"document":[{"type":"php","attributes":{},"contents":"echo \\"hello world 2a\\"\\n    echo \\"hello world 2b\\""},{"type":"element","void":false,"name":"html","attributes":{},"children":[{"type":"element","void":false,"name":"head","attributes":{},"children":[{"type":"title","attributes":{},"contents":"my title"}]},{"type":"element","void":false,"name":"body","attributes":{},"children":[{"type":"element","void":false,"name":"div","attributes":{},"children":[{"type":"php","attributes":{},"contents":"echo \\"hello world 1a\\"\\n                echo \\"hello world 1b\\"\\n            "},{"type":"php","attributes":{},"contents":"echo \\"hello world 3a\\"\\n                echo \\"hello world 3b\\"\\n            "}]}]},{"type":"php","attributes":{},"contents":"echo \\"hello world 4a\\"\\n        echo \\"hello world 4b\\"\\n    "}]}]}';
       tree.equals(resultTree, this, done);
     });
   }); 
