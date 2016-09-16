@@ -562,8 +562,9 @@ php "PHP Code"
 php_open "PHP start"
   = "<?php"
   
-php_close "PHP start"
+php_close "PHP close"
   = "?>"
+  / EOF
   
 php_block
   = s pb:php_scan s
@@ -690,3 +691,6 @@ e "Enforced Whitespace"
 
 s "Optional Whitespace"
   = [ \f\n\r\t\v]*
+
+EOF "End of File"
+  = !.
