@@ -551,7 +551,7 @@ text_node "Text Node"
 
 /* Inline php code */
 php "PHP Code"
-  = php_open com:(php_block) cc:(php_close)?
+  = php_open com:(php_block) cc:(php_close)
   {
     if (cc === null) {
       return error('Found an open PHP code tag without a closing tag');
@@ -564,7 +564,7 @@ php_open "PHP start"
   
 php_close "PHP close"
   = "?>"
-  / EOF
+  / EOF 
   
 php_block
   = s pb:php_scan s

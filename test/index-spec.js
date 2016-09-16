@@ -307,7 +307,7 @@ function runTests() {
     });
     
     it('php valid not closed', function (done) {
-      var resultTree = '{"doctype": null,"document": [{"attributes": {},"children": [{"attributes": {},"children": [{"attributes": {},"contents": "my title","type": "title"}],"name": "head","type": "element","void": false}, {"attributes": {},"children": [{"attributes": {},"children": [{"children": {"contents": "echo \\"hello world1\\" echo \\"hello world2\\" echo \\"hello world3\\"","type": "text"},"condition": null,"conditional": false,"type": "php"}],"name": "div","type": "element","void": false}],"name": "body","type": "element","void": false}],"name": "html","type": "element","void": false}]}';
+      var resultTree = '{"doctype": null,"document": [{"attributes": {},"children": [{"attributes": {},"children": [{"attributes": {},"contents": "my title","type": "title"}],"name": "head","type": "element","void": false}, {"attributes": {},"children": [{"attributes": {},"children": [],"name": "div","type": "element","void": false}],"name": "body","type": "element","void": false}],"name": "html","type": "element","void": false}, {"children": {"contents": "echo \\"hello world\\"","type": "text"},"condition": null,"conditional": false,"type": "php"}]}';
       tree.equals(resultTree, this, done);
     });
   }); 

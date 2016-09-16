@@ -2274,9 +2274,6 @@ module.exports = (function() {
         s2 = peg$parsephp_block();
         if (s2 !== peg$FAILED) {
           s3 = peg$parsephp_close();
-          if (s3 === peg$FAILED) {
-            s3 = null;
-          }
           if (s3 !== peg$FAILED) {
             peg$savedPos = s0;
             s1 = peg$c91(s2, s3);
