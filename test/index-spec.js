@@ -297,13 +297,8 @@ function runTests() {
   
   describe('php', function () {
     it('php tags', function (done) {
-      var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"p","attributes":{"class":"string class names","data-quote":"tagvalue"},"children":[{"type":"text","contents":"simple content"}]}]}';
-      htmlTagValidator().then(function(){
-        debugger
-        done()
-      })
-      debugger
-      // tree.equals(resultTree, this, done);
+      var resultTree = '{"doctype": null,"document": [{"attributes": {},"children": [{"attributes": {},"children": [{"attributes": {},"contents": "my title","type": "title"}],"name": "head","type": "element","void": false}, {"attributes": {},"children": [{"attributes": {},"children": [{"children": {"contents": "echo \\"hello world\\"","type": "text"},"condition": null,"conditional": false,"type": "php"}],"name": "div","type": "element","void": false}],"name": "body","type": "element","void": false}],"name": "html","type": "element","void": false}]}';
+      tree.equals(resultTree, this, done);
     });
   }); 
 };
