@@ -271,6 +271,7 @@ node "Node"
 
 node_types "Node Types"
   = tag
+  / php
   / comment
   / text_node
 
@@ -281,7 +282,7 @@ comment_nodes "Comment Node Types"
 /* HTML elements*/
 
 tag "HTML Tag"
-   = iframe_tag
+  = iframe_tag
   / special_tag
   / self_closing_tag_shortcut
   / normal_tag
@@ -547,6 +548,44 @@ text_node "Text Node"
     'contents': tn
   };
 }
+
+/* Inline php code */
+php "PHP Code"
+  = php_open com:(php_block) cc:(php_close)?
+  {
+    if (cc === null) {
+      return error('Found an open PHP code tag without a closing tag');
+    }
+    return com;
+  }
+
+php_open "PHP start"
+  = "<?php"
+  
+php_close "PHP start"
+  = "?>"
+  
+php_block
+  = s pb:php_scan s
+  {
+    var tn = pb !== null ? _u.textNode(pb) : '';
+    if(tn.indexOf('?>') !== -1) {
+      return error("Cannot have a php closing block " + esc.val('?>') + " inside of a PHP code block");
+    }
+    return {
+      'type': 'php',
+      'conditional': false,
+      'condition': null,
+      'children': {
+        'type': 'text',
+        'contents': tn
+      }
+    };
+  }
+
+php_scan
+  = ps:(!php_close .)*
+  { return _u.textNode(ps);  }
 
 /* HTML block comments*/
 

@@ -1,5 +1,7 @@
 var expect            = require('chai').expect
     tree              = require('./helpers');
+    
+var htmlTagValidator  = require('../index')
 
 describe('asynchronous html-tag-validator', function() {
   before(function() {
@@ -292,4 +294,16 @@ function runTests() {
       }, done);
     });
   });
+  
+  describe('php', function () {
+    it('php tags', function (done) {
+      var resultTree = '{"doctype":null,"document":[{"type":"element","void":false,"name":"p","attributes":{"class":"string class names","data-quote":"tagvalue"},"children":[{"type":"text","contents":"simple content"}]}]}';
+      htmlTagValidator().then(function(){
+        debugger
+        done()
+      })
+      debugger
+      // tree.equals(resultTree, this, done);
+    });
+  }); 
 };
