@@ -325,12 +325,8 @@ module.exports = (function() {
             }
             return {
               'type': 'php',
-              'conditional': false,
-              'condition': null,
-              'children': {
-                'type': 'text',
-                'contents': tn
-              }
+              'attributes': {},
+              'contents': tn
             };
           },
         peg$c99 = function(ps) { return _u.textNode(ps);  },

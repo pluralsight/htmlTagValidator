@@ -575,12 +575,8 @@ php_block
     }
     return {
       'type': 'php',
-      'conditional': false,
-      'condition': null,
-      'children': {
-        'type': 'text',
-        'contents': tn
-      }
+      'attributes': {},
+      'contents': tn
     };
   }
 
