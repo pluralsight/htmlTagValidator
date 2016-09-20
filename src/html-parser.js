@@ -50,12 +50,6 @@ module.exports = (function() {
             };
           },
         peg$c1 = function(p, st) {
-            if (st == null) {
-              return {
-                'doctype': null,
-                'document': [ p ]
-              };
-            }
             return {
               'doctype': st.doctype,
               'document': p.concat(st.document)

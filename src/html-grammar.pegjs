@@ -238,12 +238,6 @@ start
 php_start
   = s p:(php_start_scan)+ st:(start)
   {
-    if (st == null) {
-      return {
-        'doctype': null,
-        'document': [ p ]
-      };
-    }
     return {
       'doctype': st.doctype,
       'document': p.concat(st.document)
