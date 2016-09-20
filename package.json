@@ -1,6 +1,6 @@
 {
   "name": "html-tag-validator",
-  "version": "1.5.0",
+  "version": "1.5.0-php",
   "main": "index.js",
   "author": "Code School",
   "contributors": [
