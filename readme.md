@@ -257,6 +257,21 @@ which will automatically compile the parser and run the tests in `test/index-spe
 
 Optionally, run `grunt debug` to get extended output and start a file watcher.
 
+## Publishing to npm
+Publishing master as normal works for pure html implementations, but sometimes
+a variation is needed, for example a PHP flavor that supports inline PHP tags.
+
+Any variations should be on their own branch and named appropriately. These should
+be published separately as well, this can be done using npm tags. First change
+the version number in the package.json to include the language prefix, so for PHP
+that would be something like: `1.5.0-php` then when publishing to npm do: 
+`npm publish --tag php`. Doing this will allow you to reference this variation in
+your package.json like: `"html-tag-validator": "1.5.0-php"`
+
+## Note on validator variations
+Anything that pertains to vanilla HTML should be implemented on master and merged
+into variation branches. 
+
 ### Writing tests
 
 Tests refer to an HTML test file in `test/html/` and the test name is a
