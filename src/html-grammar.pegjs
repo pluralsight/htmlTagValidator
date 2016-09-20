@@ -219,7 +219,8 @@
 
 /* Start Grammar */
 start
-  = dt:(doctype)? s st:(content)
+  = php_start
+  / dt:(doctype)? s st:(content)
   {
     var doct = null;
     if (dt !== null) {
@@ -233,6 +234,25 @@ start
       'document': st
     };
   }
+
+php_start
+  = s p:(php_start_scan)+ st:(start)
+  {
+    if (st == null) {
+      return {
+        'doctype': null,
+        'document': [ p ]
+      };
+    }
+    return {
+      'doctype': st.doctype,
+      'document': p.concat(st.document)
+    }
+  }
+
+php_start_scan
+  = n:(php) s
+  { return n; }
 
 /* HTML doctype definition */
 
@@ -457,7 +477,7 @@ close_tag "Closing Tag"
 
 tagname "Tag Name"
   = tns:([A-Za-z]) tne:([0-9A-Z_a-z-])*
-  { 
+  {
     var tn = [tns].concat(tne);
     return _u.option('settings/preserveCase', null, codex) ? _u.textNode(tn) : _u.tagify(tn);
   }
@@ -558,11 +578,11 @@ php "PHP Code"
 
 php_open "PHP start"
   = "<?php"
-  
+
 php_close "PHP close"
   = "?>"
   / eof
-  
+
 php_block
   = s pb:(php_scan) s
   {
