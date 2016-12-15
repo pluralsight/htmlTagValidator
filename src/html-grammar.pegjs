@@ -572,6 +572,8 @@ php "PHP Code"
 
 php_open "PHP start"
   = "<?php"
+  / "<?"
+  / "<?="
 
 php_close "PHP close"
   = "?>"
