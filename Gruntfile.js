@@ -9,7 +9,10 @@ module.exports = function(grunt) {
       },
       test: {
         options: {
-          failOnError: true
+          failOnError: true,
+          execOptions: {
+            maxBuffer: Infinity
+          }
         },
         command: './node_modules/.bin/mocha test/index-spec.js --reporter="nyan"  --color'
       },
