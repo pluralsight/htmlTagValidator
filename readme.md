@@ -251,11 +251,11 @@ htmlTagValidator(sampleHtml, {
 
 Once the dependencies are installed, start development with the following command:
 
-`grunt test`
+`grunt test` - Automatically compile the parser and run the tests in `test/index-spec.js`.
 
-which will automatically compile the parser and run the tests in `test/index-spec.js`.
+`grunt debug` - Run tests with --inspect flag and extended output
 
-Optionally, run `grunt debug` to get extended output and start a file watcher.
+`grunt watch debug` - Get extended output and start a file watcher.
 
 ## Publishing to npm
 Publishing master as normal works for pure html implementations, but sometimes
