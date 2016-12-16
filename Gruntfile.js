@@ -5,7 +5,7 @@ module.exports = function(grunt) {
         options: {
           failOnError: true
         },
-        command: './node_modules/.bin/pegjs src/html-grammar.pegjs src/html-parser.js'
+        command: './node_modules/.bin/pegjs -o src/html-parser.js src/html-grammar.pegjs'
       },
       test: {
         options: {
@@ -22,13 +22,21 @@ module.exports = function(grunt) {
           debounceDelay: 2000,
           forever: true
         },
+        command: 'DEBUG=true ./node_modules/.bin/mocha test/index-spec.js --reporter="list" -- --debug-brk --inspect'
+      },
+      watchDebug: {
+        options: {
+          failOnError: false,
+          debounceDelay: 2000,
+          forever: true
+        },
         command: 'DEBUG=true ./node_modules/.bin/mocha test/index-spec.js --reporter="list"'
       }
     },
     watch: {
       debug: {
         files: ['Gruntfile.js', 'test/*.js', 'src/*.js', 'src/*.pegjs', 'test/html/*.html', 'index.js'],
-        tasks: ['default', 'shell:debug']
+        tasks: ['default', 'shell:watchDebug']
       }
     }
   });
@@ -38,5 +46,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['shell:pegjs']);
   grunt.registerTask('test', ['default', 'shell:test']);
-  grunt.registerTask('debug', ['default', 'shell:debug', 'watch:debug']);
+  grunt.registerTask('debug', ['default', 'shell:debug']);
+  grunt.registerTask('watch debug', ['default', 'watch:debug']);
 };
