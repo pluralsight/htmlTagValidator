@@ -219,7 +219,8 @@
 
 /* Start Grammar */
 start
-  = dt:(doctype)? s st:(content)
+  = php_start
+  / dt:(doctype)? s st:(content)
   {
     var doct = null;
     if (dt !== null) {
@@ -233,6 +234,19 @@ start
       'document': st
     };
   }
+
+php_start
+  = s p:(php_start_scan)+ st:(start)
+  {
+    return {
+      'doctype': st.doctype,
+      'document': p.concat(st.document)
+    }
+  }
+
+php_start_scan
+  = n:(php) s
+  { return n; }
 
 /* HTML doctype definition */
 
@@ -271,6 +285,7 @@ node "Node"
 
 node_types "Node Types"
   = tag
+  / php
   / comment
   / text_node
 
@@ -281,7 +296,7 @@ comment_nodes "Comment Node Types"
 /* HTML elements*/
 
 tag "HTML Tag"
-   = iframe_tag
+  = iframe_tag
   / special_tag
   / self_closing_tag_shortcut
   / normal_tag
@@ -456,7 +471,7 @@ close_tag "Closing Tag"
 
 tagname "Tag Name"
   = tns:([A-Za-z]) tne:([0-9A-Z_a-z-])*
-  { 
+  {
     var tn = [tns].concat(tne);
     return _u.option('settings/preserveCase', null, codex) ? _u.textNode(tn) : _u.tagify(tn);
   }
@@ -547,6 +562,35 @@ text_node "Text Node"
     'contents': tn
   };
 }
+
+/* Inline php code */
+php "PHP Code"
+  = php_open com:(php_block) cc:(php_close)
+  {
+    return com;
+  }
+
+php_open "PHP start"
+  = "<?php"
+  / "<?"
+  / "<?="
+
+php_close "PHP close"
+  = "?>"
+  / eof
+
+php_block
+  = s pb:(php_scan) s
+  {
+    return {
+      'type': 'php',
+      'attributes': {},
+      'contents': _u.scriptify(pb)
+    };
+  }
+
+php_scan
+  = (!php_close .)*
 
 /* HTML block comments*/
 
@@ -651,3 +695,6 @@ e "Enforced Whitespace"
 
 s "Optional Whitespace"
   = [ \f\n\r\t\v]*
+
+eof "End of File"
+  = !.
