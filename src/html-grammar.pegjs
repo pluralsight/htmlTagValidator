@@ -62,6 +62,9 @@
     } else if (_u.has(props, 'conditional') && attrTest('conditional')) {
       // Does not need to be evaluated further here
       return true;
+    } else if(_u.has(props, 'boolean') && attrTest('boolean')) {
+      // boolean attributes just need to exist to be true
+      return true
     }
 
     return {
