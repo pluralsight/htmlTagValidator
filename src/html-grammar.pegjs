@@ -146,6 +146,9 @@
                  esc(sot.name) + " tag"
       };
     } else if (sot.name !== sct.name) {
+      sot
+      sct
+      debugger
       return {
         'error': "Expected open tag " + esc(sot.name) + " to match closing tag " +
                  esc(sct.name) + ""
@@ -214,6 +217,15 @@
         break;
     }
     return true;
+  }
+  
+  function isClosingTagOptional(tag) {
+    var tags = ["body","colgroup","dd","dt","head","html","li","optgroup","option","p","tbody","td","tfoot","th","thead"]
+    if(tags.indexOf(tag) > -1) {
+      return true
+    } else {
+      return false
+    }
   }
 }
 
@@ -284,6 +296,7 @@ tag "HTML Tag"
    = iframe_tag
   / special_tag
   / self_closing_tag_shortcut
+  / tag_optionally_closed
   / normal_tag
   / self_closing_tag
 
@@ -347,10 +360,27 @@ special_tag_close
       'name': sc
     };
   }
+  
+tag_optionally_closed "Tag that can optionally have a closing tag"
+  = otn:(open_tag) sp:(s) c:(content) 
+  &(stn:(open_tag) &{return isClosingTagOptional(otn.name) && otn.name === stn.name})
+  /*&(ctn:(close_tag) &{debugger})*/
+  {
+    debugger
+    
+    return {
+      'type': 'element',
+      'void': false,
+      'name': otn.name,
+      'attributes': otn.attributes,
+      'children': c
+    };
+  }
+
 
 normal_tag "Tag"
   = otn:(open_tag) sp:(s) c:(content) ctn:(close_tag)
-  & { return !isSelfClosing(otn.name) /* || otn.name === ctn.name */; }
+  & { return !isSelfClosing(otn.name) /* && !isClosingTagOptional(otn.name)*/ /* || otn.name === ctn.name */; }
   {
     var err, attrs, parts = [];
     if (!otn.back) {
@@ -362,6 +392,7 @@ normal_tag "Tag"
       // return error("The <" + otn.name + "> tag is missing part (" + parts.join(', ') + ") of its closing tag");
       return error("The " + esc(otn.name) + " element is missing part of its closing tag");
     } else if (otn.name !== ctn.name) {
+      debugger
       return error("Expected open tag " + esc(otn.name) + " to match closing tag " + esc(ctn.name) + "");
     } /*else if (isSelfClosing(otn.name)) {
       return error("The " + esc(otn.name) + " tag is a void element and should not have a closing tag");
