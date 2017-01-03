@@ -21,10 +21,11 @@ function codex(opts) {
     },
     'attributes': {
       '$': {
+        'boolean': ['hidden', 'inert', 'itemscope'],
         'global': [
           'accesskey', 'class', 'contenteditable', 'contextmenu', 'data-*', 'dir',
-          'draggable', 'dropzone', 'hidden', 'id', 'inert', 'itemid', 'itemprop',
-          'itemref', 'itemscope', 'itemtype', 'lang', 'role', 'spellcheck', 'style',
+          'draggable', 'dropzone', 'id', 'itemid', 'itemprop',
+          'itemref', 'itemtype', 'lang', 'role', 'spellcheck', 'style',
           'tabindex', 'title', 'translate'
         ],
         'event': [
@@ -45,19 +46,21 @@ function codex(opts) {
       // All tags not specifically mentioned should accept global and event attributes
       '_': {
         'mixed': [
-          'attributes/$/global'
+          'attributes/$/global',
+          'attributes/$/boolean'
         ]
       },
       // Tags with specific validation rules for attributes
       'input': {
         // TODO: Implement conditional attribute -> attribute in checkAttributes()
         'conditional': [
-          'accept', 'alt', 'autocomplete', 'checked', 'dirname', 'form',
-          'formaction', 'formenctype', 'formmethod', 'formnovalidate',
+          'accept', 'alt', 'autocomplete', 'dirname', 'form',
+          'formaction', 'formenctype', 'formmethod',
           'formtarget', 'height', 'inputmode', 'list', 'max', 'maxlength', 'min',
-          'multiple', 'pattern', 'placeholder', 'readonly', 'required', 'size',
+          'pattern', 'placeholder', 'size',
           'src', 'step', 'width'
         ],
+        'boolean': ['checked', 'formnovalidate', 'multiple', 'readonly', 'required'],
         'conditions': [
           function inputConditions(attributes, util, codx) {
             if (!util.has(attributes, 'type')) { return true; }
@@ -87,10 +90,10 @@ function codex(opts) {
           }
         ],
         'mixed': [
-          'attributes/$/global', 'attributes/$/event'
+          'attributes/$/global', 'attributes/$/boolean','attributes/$/event'
         ],
         'normal': [
-          'autofocus', 'disabled', 'name', 'type', 'value'
+          'name', 'type', 'value'
         ],
         'type-values': [
           'hidden', 'text', 'search', 'tel', 'url', 'email', 'password', 'datetime',
@@ -99,91 +102,106 @@ function codex(opts) {
         ],
         'types': {
           'file': {
+            'boolean': ['multiple', 'required'],
             'normal': [
-              'accept', 'multiple', 'required'
+              'accept'
             ]
           },
           'image': {
+            'boolean': ['formnovalidate'],
             'normal': [
-              'alt', 'formaction', 'formenctype', 'formmethod', 'formnovalidate',
+              'alt', 'formaction', 'formenctype', 'formmethod',
               'formtarget', 'height', 'src', 'width'
             ]
           },
           'text': {
+            'boolean': ['readonly', 'required'],
             'normal': [
               'autocomplete', 'dirname', 'inputmode', 'list', 'maxlength',
-              'minlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'
+              'minlength', 'pattern', 'placeholder', 'size'
             ]
           },
           'search': {
+            'boolean': ['readonly', 'required'],
             'normal': [
               'autocomplete', 'dirname', 'inputmode', 'list', 'maxlength', 'minlength',
-              'pattern', 'placeholder', 'readonly', 'required', 'size'
+              'pattern', 'placeholder', 'size'
             ]
           },
           'url': {
+            'boolean': ['readonly', 'required'],
             'normal': [
               'autocomplete', 'list', 'maxlength', 'minlength', 'pattern',
-              'placeholder', 'readonly', 'required', 'size'
+              'placeholder', 'size'
             ]
           },
           'tel': {
+            'boolean': ['readonly', 'required'],
             'normal': [
               'autocomplete', 'list', 'maxlength', 'minlength', 'pattern',
-              'placeholder', 'readonly', 'required', 'size'
+              'placeholder', 'size'
             ]
           },
           'email': {
+            'boolean': ['multiple', 'readonly', 'required'],
             'normal': [
-              'autocomplete', 'list', 'maxlength', 'minlength', 'multiple',
-              'pattern', 'placeholder', 'readonly', 'required', 'size'
+              'autocomplete', 'list', 'maxlength', 'minlength',
+              'pattern', 'placeholder', 'size'
             ]
           },
           'password': {
+            'boolean': ['readonly', 'required'],
             'normal': [
               'autocomplete', 'inputmode', 'maxlength', 'minlength', 'pattern',
-              'placeholder', 'readonly', 'required', 'size'
+              'placeholder', 'size'
             ]
           },
           'datetime': {
+            'boolean': ['readonly', 'required'],
             'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+              'autocomplete', 'list', 'max', 'min', 'step'
             ]
           },
           'date': {
+            'boolean': ['readonly', 'required'],
             'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+              'autocomplete', 'list', 'max', 'min', 'step'
             ]
           },
           'month': {
+            'boolean': ['readonly', 'required'],
             'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+              'autocomplete', 'list', 'max', 'min', 'step'
             ]
           },
           'week': {
+            'boolean': ['readonly', 'required'],
             'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+              'autocomplete', 'list', 'max', 'min', 'step'
             ]
           },
           'time': {
+            'boolean': ['readonly', 'required'],
             'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+              'autocomplete', 'list', 'max', 'min', 'step'
             ]
           },
           'datetime-local': {
+            'boolean': ['readonly', 'required'],
             'normal': [
-              'autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'
+              'autocomplete', 'list', 'max', 'min', 'step'
             ]
           },
           'number': {
+            'boolean': ['readonly', 'required'],
             'normal': [
-              'autocomplete', 'list', 'max', 'min', 'placeholder', 'readonly',
-              'required', 'step'
+              'autocomplete', 'list', 'max', 'min', 'placeholder', 'step'
             ]
           },
           'range': {
+            'boolean': ['multiple'],
             'normal': [
-              'autocomplete', 'list', 'max', 'min', 'multiple', 'step'
+              'autocomplete', 'list', 'max', 'min', 'step'
             ]
           },
           'color': {
@@ -192,18 +210,15 @@ function codex(opts) {
             ]
           },
           'checkbox': {
-            'normal': [
-              'checked', 'required'
-            ]
+            'boolean': ['checked', 'required'],
           },
           'radio': {
-            'normal': [
-              'checked', 'required'
-            ]
+            'boolean': ['checked', 'required'],
           },
           'submit': {
+            'boolean': ['formnovalidate'],
             'normal': [
-              'formaction', 'formenctype', 'formmethod', 'formnovalidate',
+              'formaction', 'formenctype', 'formmethod',
               'formtarget'
             ]
           }
@@ -239,10 +254,10 @@ function codex(opts) {
           }
           return true;
         },
-        'void': ['async', 'defer']
+        'boolean': ['async', 'defer']
       },
       'style': {
-        'mixed': ['attributes/$/global', 'attributes/$/event'],
+        'mixed': ['attributes/$/global', 'attributes/$/boolean','attributes/$/event'],
         'normal': ['media', 'scoped', 'type']
       },
       'title': {
@@ -280,17 +295,19 @@ function codex(opts) {
         }
       },
       'link': {
-        'mixed': ['attributes/$/global', 'attributes/$/event'],
+        'mixed': ['attributes/$/global', 'attributes/$/boolean','attributes/$/event'],
         'normal': ['rel', 'crossorigin', 'href', 'hreflang', 'media', 'sizes', 'type'],
         'required': ['rel']
       },
       'iframe': {
-        'mixed': ['attributes/$/global', 'attributes/$/event'],
-        'normal': ['height', 'name', 'sandbox', 'seamless', 'src', 'srcdoc', 'width']
+        'mixed': ['attributes/$/global', 'attributes/$/boolean','attributes/$/event'],
+        'normal': ['height', 'name', 'sandbox', 'src', 'srcdoc', 'width'],
+        'boolean': ['allowfullscreen', 'seamless']
       },
       'html': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -300,12 +317,14 @@ function codex(opts) {
       'head': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'base': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -316,14 +335,17 @@ function codex(opts) {
       'noscript': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'body': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['nowrap'],
         'normal': [
           'onafterprint',
           'onbeforeprint',
@@ -348,108 +370,127 @@ function codex(opts) {
       'section': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'nav': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'article': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'aside': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'h1': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'h2': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'h3': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'h4': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'h5': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'h6': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'hgroup': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'header': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'footer': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'address': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'p': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'hr': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
-        ]
+        ],
+        'boolean': ['noshade']
       },
       'pre': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'blockquote': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -459,22 +500,26 @@ function codex(opts) {
       'ol': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['compact', 'reversed'],
         'normal': [
-          'reversed',
           'start'
         ]
       },
       'ul': {
+        'boolean': ['compact'],
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'li': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -482,44 +527,55 @@ function codex(opts) {
         ]
       },
       'dl': {
+        'boolean': ['compact'],
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'dt': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
-        ]
+        ],
+        'boolean': ['nowrap']
       },
       'dd': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
-        ]
+        ],
+        'boolean': ['nowrap']
       },
       'figure': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'figcaption': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'div': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
-        ]
+        ],
+        'boolean': ['nowrap']
       },
       'a': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -535,36 +591,42 @@ function codex(opts) {
       'em': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'strong': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'small': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       's': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'cite': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'q': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -574,18 +636,21 @@ function codex(opts) {
       'dfn': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'abbr': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'data': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -595,6 +660,7 @@ function codex(opts) {
       'time': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -605,114 +671,133 @@ function codex(opts) {
       'code': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'var': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'samp': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'kbd': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'sub': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'sup': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'i': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'b': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'u': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'mark': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'ruby': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'rt': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'rp': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'bdi': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'bdo': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'span': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'br': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'wbr': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'ins': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -723,6 +808,7 @@ function codex(opts) {
       'del': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -733,15 +819,16 @@ function codex(opts) {
       'img': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['ismap'],
         'normal': [
           'alt',
           'src',
           'srcset',
           'crossorigin',
           'usemap',
-          'ismap',
           'width',
           'height'
         ]
@@ -749,6 +836,7 @@ function codex(opts) {
       'embed': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -761,12 +849,13 @@ function codex(opts) {
       'object': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['typemustmatch'],
         'normal': [
           'data',
           'type',
-          'typemustmatch',
           'name',
           'usemap',
           'form',
@@ -777,6 +866,7 @@ function codex(opts) {
       'param': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -787,8 +877,10 @@ function codex(opts) {
       'video': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['muted'],
         'normal': [
           'src',
           'crossorigin',
@@ -797,7 +889,6 @@ function codex(opts) {
           'autoplay',
           'mediagroup',
           'loop',
-          'muted',
           'controls',
           'width',
           'height'
@@ -806,8 +897,10 @@ function codex(opts) {
       'audio': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['muted'],
         'normal': [
           'src',
           'crossorigin',
@@ -815,13 +908,13 @@ function codex(opts) {
           'autoplay',
           'mediagroup',
           'loop',
-          'muted',
           'controls'
         ]
       },
       'source': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -833,10 +926,11 @@ function codex(opts) {
       'track': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['default'],
         'normal': [
-          'default',
           'kind',
           'label',
           'src',
@@ -846,6 +940,7 @@ function codex(opts) {
       'canvas': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -856,6 +951,7 @@ function codex(opts) {
       'map': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -865,8 +961,10 @@ function codex(opts) {
       'area': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['nohref'],
         'normal': [
           'alt',
           'coords',
@@ -883,18 +981,22 @@ function codex(opts) {
       'table': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
-        ]
+        ],
+        'boolean': ['sortable']
       },
       'caption': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'colgroup': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -904,6 +1006,7 @@ function codex(opts) {
       'col': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -913,32 +1016,38 @@ function codex(opts) {
       'tbody': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'thead': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'tfoot': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'tr': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'td': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['nowrap'],
         'normal': [
           'colspan',
           'rowspan',
@@ -948,8 +1057,10 @@ function codex(opts) {
       'th': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['nowrap'],
         'normal': [
           'colspan',
           'rowspan',
@@ -961,8 +1072,10 @@ function codex(opts) {
       'form': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['novalidate'],
         'normal': [
           'accept-charset',
           'action',
@@ -970,17 +1083,17 @@ function codex(opts) {
           'enctype',
           'method',
           'name',
-          'novalidate',
           'target'
         ]
       },
       'fieldset': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['disabled'],
         'normal': [
-          'disabled',
           'form',
           'name'
         ]
@@ -988,12 +1101,14 @@ function codex(opts) {
       'legend': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'label': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -1004,16 +1119,15 @@ function codex(opts) {
       'button': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['autofocus', 'disabled', 'formnovalidate'],
         'normal': [
-          'autofocus',
-          'disabled',
           'form',
           'formaction',
           'formenctype',
           'formmethod',
-          'formnovalidate',
           'formtarget',
           'name',
           'type',
@@ -1023,21 +1137,20 @@ function codex(opts) {
       'select': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['autofocus', 'disabled', 'multiple', 'required'],
         'normal': [
-          'autofocus',
-          'disabled',
           'form',
-          'multiple',
           'name',
-          'required',
           'size'
         ]
       },
       'datalist': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -1047,43 +1160,42 @@ function codex(opts) {
       'optgroup': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['disabled'],
         'normal': [
-          'disabled',
           'label'
         ]
       },
       'option': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['disabled', 'selected'],
         'normal': [
-          'disabled',
           'label',
-          'selected',
           'value'
         ]
       },
       'textarea': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['autofocus', 'disabled', 'readonly', 'required'],
         'normal': [
           'autocomplete',
-          'autofocus',
           'cols',
           'dirname',
-          'disabled',
           'form',
           'inputmode',
           'maxlength',
           'name',
           'placeholder',
-          'readonly',
-          'required',
           'rows',
           'wrap'
         ]
@@ -1091,12 +1203,12 @@ function codex(opts) {
       'keygen': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['autofocus', 'disabled'],
         'normal': [
-          'autofocus',
           'challenge',
-          'disabled',
           'form',
           'keytype',
           'name'
@@ -1105,6 +1217,7 @@ function codex(opts) {
       'output': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -1116,6 +1229,7 @@ function codex(opts) {
       'progress': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -1126,6 +1240,7 @@ function codex(opts) {
       'meter': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
         'normal': [
@@ -1140,29 +1255,31 @@ function codex(opts) {
       'details': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
-        'normal': [
+        'boolean': [
           'open'
         ]
       },
       'summary': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ]
       },
       'command': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['checked', 'disabled'],
         'normal': [
           'type',
           'label',
           'icon',
-          'disabled',
-          'checked',
           'radiogroup',
           'command'
         ]
@@ -1170,8 +1287,10 @@ function codex(opts) {
       'menu': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
+        'boolean': ['compact'],
         'normal': [
           'type',
           'label'
@@ -1180,9 +1299,10 @@ function codex(opts) {
       'dialog': {
         'mixed': [
           'attributes/$/global',
+          'attributes/$/boolean',
           'attributes/$/event'
         ],
-        'normal': [
+        'boolean': [
           'open'
         ]
       }
