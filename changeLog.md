@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - Boolean attributes in all the allowed variations forms are now parsed and included in the AST
   - `<input checked>`
   - `<input checked="true">`
-  - `<input checked=""`
+  - `<input checked="">`
 
 ### Fixed
 - Allow unambiguous ampersands (`&`) in double-quoted attribute values. Ampersands are allowed **EXCEPT** when they come in the form of a named reference (e.g., `&something;`) where `something` is not a valid named reference from [this list](https://www.w3.org/TR/html5/entities.json).
