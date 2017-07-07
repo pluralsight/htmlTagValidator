@@ -1314,7 +1314,8 @@ function codex(opts) {
         'img', 'input','keygen','link','meta','param',
         'source','track', 'wbr'
       ]
-    }
+    },
+    'namedReferences': require('./html-named-references')
   };
   var shouldMerge;
   if (!_u.isPlain(opts)) { opts = {}; }

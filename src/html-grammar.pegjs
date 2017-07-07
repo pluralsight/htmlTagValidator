@@ -459,7 +459,7 @@ close_tag "Closing Tag"
 
 tagname "Tag Name"
   = tns:([A-Za-z]) tne:([0-9A-Z_a-z-])*
-  { 
+  {
     var tn = [tns].concat(tne);
     return _u.option('settings/preserveCase', null, codex) ? _u.textNode(tn) : _u.tagify(tn);
   }
@@ -519,7 +519,6 @@ attr_assignment "Attribute Assignment"
   = s "=" s i:(tag_attribute_value)?
   {
     // NOTE: equal sign in <meta> tag attribute values, quotes in <style> tags
-    var matches, disallowed;
     if(i == null) {
       return error("Found an attribute assignment " + esc.val('=') + " not followed by a value");
     } else {
@@ -527,14 +526,24 @@ attr_assignment "Attribute Assignment"
       // TODO: & could be allowed in event attributes
       if (i.unquoted) {
         // Note: https://html.spec.whatwg.org/multipage/syntax.html#attribute-value-(unquoted)-state
-        disallowed = /[ \f\n\r\t\v\/<>&"'`=]+/;
+        var disallowed = /[ \f\n\r\t\v\/<>&"'`=]+/;
+        if (disallowed.test(i.value)) {
+          var matches = i.value.match(disallowed);
+          return error("Disallowed character " + esc.val(matches[0]) + " found in attribute value");
+        }
       } else {
         // Note: https://html.spec.whatwg.org/multipage/syntax.html#attribute-value-(double-quoted)-state
-        disallowed = /(&(?![^\s]+;)+)/;
-      }
-      if (disallowed.test(i.value)) {
-        matches = i.value.match(disallowed);
-        return error("Disallowed character " + esc.val(matches[0]) + " found in attribute value");
+        if (/&([\S]+);/g.test(i.value)) {
+          var namedReferences = _u.option('namedReferences', null, codex);
+          var matches;
+          var disallowed = /&([\S]+);/g;
+          while ((matches = disallowed.exec(i.value)) !== null) {
+            // Note: The value should only be disallowed if it is not in this list https://www.w3.org/TR/html5/entities.json
+            if (namedReferences.indexOf(matches[1]) === -1) {
+              return error("Ambiguous named reference " + esc(matches[1]) + " not allowed in double-quoted attribute value");
+            }
+          }
+        }
       }
     }
     return _u.option('settings/verbose', null, codex) ? i : i.value;
