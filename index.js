@@ -33,7 +33,7 @@ function htmlTagValidator(source, callback) {
 };
 
 htmlTagValidator.NAME = "html-tag-validator";
-htmlTagValidator.VERSION = "1.6.0";
+htmlTagValidator.VERSION = "1.6.0-php1.0.1";
 htmlTagValidator._options = {};
 
 htmlTagValidator.setOptions = function(options) {
