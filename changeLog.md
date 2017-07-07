@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased][unreleased]
 
+## [v1.6.0] - 2017-07-06
+### Added
+- Boolean attributes in all the allowed variations forms are now parsed and included in the AST
+  - `<input checked>`
+  - `<input checked="true">`
+  - `<input checked=""`
+
+### Fixed
+- Allow unambiguous ampersands (`&`) in double-quoted attribute values. Ampersands are allowed **EXCEPT** when they come in the form of a named reference (e.g., `&something;`) where `something` is not a valid named reference from [this list](https://www.w3.org/TR/html5/entities.json).
+
 ## [v1.5.0] - 2016-06-14
 ### Added
 - Added `preserveCase` option to allow validation of Angular 2 templates. Here is a combination of settings and configuration that appears to work well for Angular 2.
@@ -125,7 +135,8 @@ validator("<p></p>", { 'settings': { 'format': 'html' } }, function (err, ast) {
 ### Added
 - Breaking changes from 0.0.x. Check README for changes to core API.
 
-[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.5.0...HEAD
+[unreleased]: https://github.com/codeschool/htmlTagValidator/compare/v1.6.0...HEAD
+[v1.6.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.5.0...v1.6.0
 [v1.5.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.2.0...v1.4.0
 [v1.2.0]: https://github.com/codeschool/htmlTagValidator/compare/v1.1.0...v1.2.0
