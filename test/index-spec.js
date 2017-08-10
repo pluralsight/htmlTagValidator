@@ -1,13 +1,13 @@
 var expect            = require('chai').expect
     tree              = require('./helpers');
 
-describe('asynchronous html-tag-validator', function() {
-  before(function() {
-    tree.asynchronous();
-  })
-
-  runTests();
-});
+// describe('asynchronous html-tag-validator', function() {
+//   before(function() {
+//     tree.asynchronous();
+//   })
+// 
+//   runTests();
+// });
 
 describe('synchronous html-tag-validator', function() {
   before(function() {
@@ -316,6 +316,18 @@ function runTests() {
       tree.error({
         'message': "Ambiguous named reference barrr not allowed in double-quoted attribute value"
       }, this, done);
+    });
+  });
+  
+  describe('xml files', function () {
+    it('sample xml', function(done) {
+      var resultTree = '{"doctype":{"value":"xml","attributes":{"version":"1.0","encoding":"utf-8"}},"document":[{"type":"element","void":false,"name":"android.support.constraint.ConstraintLayout","attributes":{"xmlns:android":"http://schemas.android.com/apk/res/android","xmlns:app":"http://schemas.android.com/apk/res-auto","xmlns:tools":"http://schemas.android.com/tools","android:layout_width":"match_parent","android:layout_height":"match_parent","android:paddingBottom":"16dp","android:paddingLeft":"16dp","android:paddingRight":"16dp","android:paddingTop":"16dp","tools:context":"com.codeschool.tinybytes.MainActivity"},"children":[{"type":"element","void":true,"name":"TextView","attributes":{"value":{"android:layout_width":"wrap_content","android:layout_height":"wrap_content","android:text":"Tiny Bytes","android:textSize":"24sp"}},"children":[]}]}]}';
+      tree.equals(resultTree, this, { 
+        settings: {
+          xmlMode: true,
+          preserveCase: true
+        }
+      }, done);
     });
   });
 };

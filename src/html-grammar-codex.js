@@ -17,7 +17,9 @@ function codex(opts) {
       'attributes': 'strict',
       // TODO: create merge and replace tag schemes
       'policy': 'merge',
-      'verbose': false
+      'verbose': false,
+      'preserveCase': false,
+      'xmlMode': false
     },
     'attributes': {
       '$': {

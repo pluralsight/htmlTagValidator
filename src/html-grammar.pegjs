@@ -18,10 +18,16 @@
   }
 
   function canBeSelfClosing(tag) {
-    return isSelfClosing(tag) || isSelfClosing(tag, 'tags/mixed');
+    if (_u.option('settings/xmlMode', null, codex)) {
+      return true;
+    }
+    return isSelfClosing(tag) || isSelfClosing(tag, 'tags/mixed');;
   }
 
   function isAttributeAllowed(tag, attribute, value) {
+    if (_u.option('settings/xmlMode', null, codex)) {
+      return true;
+    }
     var i, len, ref, shared, props,
         that = this,
         attrTest = function (tst) {
@@ -222,7 +228,7 @@
 
 /* Start Grammar */
 start
-  = dt:(doctype)? s st:(content)
+  = dt:(doctype / doctype_xml)? s st:(content)
   {
     var doct = null;
     if (dt !== null) {
@@ -254,13 +260,31 @@ doctype "HTML DOCTYPE"
       return {
         'error': "The " + esc('DOCTYPE') +
                  " definition for an HTML 5 document should be " + esc.val('html')
-      };
+    };
     }
     return {
       'error': "The " + esc('DOCTYPE') +
                " definition must be placed at the beginning of the first line of the document"
     };
   }
+
+doctype_xml "XML DOCTYPE"
+  = "<?xml" attrs:(tag_attribute)* s "?>"
+  {
+    if (!_u.option('settings/xmlMode', null, codex)) {
+      return {
+        'error': "The " + esc('DOCTYPE') +
+                 " definition for an HTML 5 document should be " + esc.val('html')
+      };
+    }
+    return {
+      value: {
+        'value': 'xml',
+        'attributes': _u.collapse(attrs)
+      }
+    };
+  }
+
 
 /* HTML node types*/
 
@@ -458,10 +482,14 @@ close_tag "Closing Tag"
 /* HTML element attributes*/
 
 tagname "Tag Name"
-  = tns:([A-Za-z]) tne:([0-9A-Z_a-z-])*
+  = tns:([A-Za-z]) tne:([0-9A-Z_a-z-.])*
   {
     var tn = [tns].concat(tne);
-    return _u.option('settings/preserveCase', null, codex) ? _u.textNode(tn) : _u.tagify(tn);
+    var tnText = _u.textNode(tn);
+    if (!_u.option('settings/xmlMode', null, codex) && tnText.indexOf('.') !== -1) {
+        return error("Invalid character " + esc.val('.') + " in tag name " + esc.id(tnText));
+    }
+    return _u.option('settings/preserveCase', null, codex) ? tnText : _u.tagify(tn);
   }
 
 tag_attribute "Attribute"
