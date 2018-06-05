@@ -26,7 +26,7 @@ function codex(opts) {
           'accesskey', 'class', 'contenteditable', 'contextmenu', 'data-*', 'dir',
           'draggable', 'dropzone', 'id', 'itemid', 'itemprop',
           'itemref', 'itemtype', 'lang', 'role', 'spellcheck', 'style',
-          'tabindex', 'title', 'translate'
+          'tabindex', 'title', 'translate', 'aria-label', 'aria-labelledby'
         ],
         'event': [
           'onabort', 'onblur', 'oncanplay', 'oncanplaythrough', 'onchange', 'onclick',
