@@ -1,5 +1,19 @@
 # html-tag-validator
 
+---
+
+## This Repository is Archived
+
+Originally developed for the Code School interactive learning platform, this project served as the backbone for numerous in-browser coding challenges. Since the integration and sunset of Code School in 2018, it has been unmaintained.
+
+As 2021 comes to a close, I've decided to archive this repository rather than leave it in an unmaintained state. I want to personally thank all of the talented developers from Code School who supported this library and the learning experiences it powered. Thank you as well to everyone who created issues, PRs, and support over the years.
+
+This project has been licensed under the MIT license since 2014, and we hope the community will use it to do great things.
+
+– AJ Foster, Software Engineer at Pluralsight
+
+---
+
 This library takes some HTML source code, provided as a string, and generates an
 AST. An error will be generated describing what is malformed in the source document
 if the AST cannot be generated.
